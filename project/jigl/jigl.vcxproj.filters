@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="include\lexing">
+      <UniqueIdentifier>{a4ac5d32-ddba-4d07-9ca6-4edad2eee6b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\lexing">
+      <UniqueIdentifier>{6c11f7bb-1f1c-4610-9157-f2f1dd722d66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\jigl\lexing\lexemes.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\lexing\lexeme.cpp">
+      <Filter>source\lexing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

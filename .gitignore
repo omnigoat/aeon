@@ -7,7 +7,22 @@
 *.pch
 *.ncb
 *.pdb
+*.idb
+*.lastbuildstate
+project/*.tlog
+project/*.log
 
 ; ignore object files
 *.obj
 *.o
+
+
+; jigl
+project/Debug/
+project/Release/
+project/jigl/Debug/
+project/jigl/Release/
+
+
+
+
