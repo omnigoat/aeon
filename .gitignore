@@ -1,0 +1,13 @@
+
+; ignore visual studio files
+*.opensdf
+*.suo
+*.sdf
+*.user
+*.pch
+*.ncb
+*.pdb
+
+; ignore object files
+*.obj
+*.o
