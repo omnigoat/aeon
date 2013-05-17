@@ -15,6 +15,9 @@
     <Filter Include="source\lexing">
       <UniqueIdentifier>{6c11f7bb-1f1c-4610-9157-f2f1dd722d66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{9d14fb63-180e-41e3-b616-cf3b5abd1d0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp">
@@ -34,5 +37,13 @@
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\lexing\lex.cpp">
+      <Filter>source\lexing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\resource\basic-lexing.jigl">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
 </Project>

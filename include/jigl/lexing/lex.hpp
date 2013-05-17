@@ -13,9 +13,39 @@ namespace jigl {
 namespace lexing {
 //=====================================================================
 	
-	auto lex(lexemes_t&, char const* begin, char const* end) -> void;
+	struct stream_t
+	{
+		stream_t(char const* begin, char const* end);
+
+		auto begin() const -> char const*;
+		auto end() const -> char const*;
+		auto current() const -> char const*;
+		auto cv() const -> char;
+		auto valid() const -> bool;
+		auto position() const -> position_t const&;
+
+		auto increment() -> void;
+		auto reset(char const*) -> void;
+
+	private:
+		char const* begin_;
+		char const* end_;
+		char const* current_;
+
+		position_t position_;
+	};
+
+	auto lex(lexemes_t&, stream_t&) -> void;
 	
-	
+	namespace ID
+	{
+		uint32_t const identifier = 1;
+		uint32_t const integer_literal = 10;
+		uint32_t const real_literal = 11;
+	}
+
+
+
 //=====================================================================
 } // namespace lexing
 } // namespace jigl
