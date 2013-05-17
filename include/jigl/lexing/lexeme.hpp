@@ -9,10 +9,18 @@
 #include <cstdint>
 #include <ostream>
 //=====================================================================
+
+//=====================================================================
 namespace jigl {
 namespace lexing {
 //=====================================================================
 	
+	//=====================================================================
+	// forward declare of ID type
+	//=====================================================================
+	enum class ID;
+
+
 	//=====================================================================
 	// position in file
 	//=====================================================================
@@ -53,7 +61,7 @@ namespace lexing {
 	//=====================================================================
 	struct lexeme_t
 	{
-		typedef size_t id_t;
+		typedef ID id_t;
 		static std::string empty_text;
 		
 		lexeme_t(id_t, char const* begin, char const* end, position_t const&, channel_t const& = channel_t());
@@ -74,7 +82,7 @@ namespace lexing {
 	};
 	
 	inline std::ostream& operator << (std::ostream& stream, lexeme_t const& L) {
-		return stream << L.id() << "[" << L.position().row << ":" << L.position().column << "]: " << L.text().c_str();
+		return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text().c_str();
 	}
 	
 	

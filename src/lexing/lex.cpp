@@ -4,8 +4,8 @@
 using jigl::lexing::lexeme_t;
 using jigl::lexing::lexemes_t;
 using jigl::lexing::stream_t;
-
-namespace LXID = jigl::lexing::ID;
+using jigl::lexing::ID;
+//namespace LXID = jigl::lexing::ID;
 
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1)
@@ -65,7 +65,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 	while (stream.valid() && ('a' <= stream.cv() && stream.cv() <='z' || stream.cv() == '-'))
 		stream.increment();
 
-	result.push_back(lexeme_t(LXID::identifier, b, stream.current(), stream.position()));
+	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.position()));
 }
 
 auto number(lexemes_t& result, stream_t& stream) -> void
@@ -74,7 +74,7 @@ auto number(lexemes_t& result, stream_t& stream) -> void
 	while (stream.valid() && ('0' <= stream.cv() && stream.cv() <='9'))
 		stream.increment();
 
-	result.push_back(lexeme_t(LXID::integer_literal, b, stream.current(), stream.position()));
+	result.push_back(lexeme_t(ID::integer_literal, b, stream.current(), stream.position()));
 }
 
 auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
@@ -93,8 +93,11 @@ auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
 
 			case '0': case '1': case '2': case '3': case '4':
 			case '5': case '6': case '7': case '8': case '9':
-				//number(result, stream);
+				number(result, stream);
 				break;
+
+			default:
+				stream.increment();
 		}
 	}
 }

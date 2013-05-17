@@ -37,12 +37,12 @@ namespace lexing {
 
 	auto lex(lexemes_t&, stream_t&) -> void;
 	
-	namespace ID
+	enum class ID
 	{
-		uint32_t const identifier = 1;
-		uint32_t const integer_literal = 10;
-		uint32_t const real_literal = 11;
-	}
+		identifier,
+		integer_literal,
+		real_literal
+	};
 
 
 
