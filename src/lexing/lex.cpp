@@ -88,9 +88,12 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
-		if (!strncmp(b, keywords[x], keyword_lengths[x])) {
+		if (keyword_lengths[x] == (stream.current() - b) && !strncmp(b, keywords[x], keyword_lengths[x])) {
 			result.push_back(lexeme_t(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.position()));
 			return;
+		}
+		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
+			break;
 		}
 	}
 
