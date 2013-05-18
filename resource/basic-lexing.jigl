@@ -1,1 +1,6 @@
-identifier if else ifi 01234.+.+.==& 234.4312
+
+type @dragon
+	var name as @string
+	var age as @int
+end
+

@@ -98,7 +98,8 @@ auto stream_t::marked_position() const -> position_t const& {
 	case '<': case '>': case '=': case '!': \
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
-	case ')': case '{': case '}': case ':'
+	case ')': case '{': case '}': case ':': \
+	case '@'
 
 namespace
 {
