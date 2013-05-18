@@ -58,6 +58,18 @@ auto stream_t::reset(char const* mark) -> void {
 	current_ = mark;
 }
 
+
+
+//
+// identifier
+//
+#define IDENTIFIER_PREDICATE \
+	case 'a': case 'b': case 'c': case 'd': case 'e': \
+	case 'f': case 'g': case 'h': case 'i': case 'j': \
+	case 'k': case 'l': case 'm': case 'n': case 'o': \
+	case 'p': case 'q': case 'r': case 's': case 't': \
+	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z'
+
 namespace
 {
 	#define X(n,s,l) s,
@@ -72,9 +84,6 @@ namespace
 	};
 	#undef X
 
-
-	//char const** keywords_begin = keyword_things + 4;
-	//char const** keywords_end = keyword_things + 7;
 	uint32_t const keywords_begin = 4;
 	uint32_t const keywords_end = 7;
 }
@@ -99,6 +108,15 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 
 	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.position()));
 }
+
+
+
+//
+// numbers
+//
+#define NUMBER_PREDICATE \
+	case '0': case '1': case '2': case '3': case '4': \
+	case '5': case '6': case '7': case '8': case '9'
 
 auto number_literal(lexemes_t& result, stream_t& stream) -> void
 {
@@ -132,6 +150,13 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 	}
 }
 
+#define PUNCTUATION_PREDICATE \
+	case '-': case '+': case '*': case '/': \
+	case '<': case '>': case '=': case '!': \
+	case '&': case '|': case '%': case '^': \
+	case '.': case '[': case ']': case '(': \
+	case ')': case '{': case '}'
+
 auto punctuation(lexemes_t& result, stream_t& stream) -> void
 {
 	char const* b = stream.current();
@@ -140,11 +165,7 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 	{
 		switch (stream.cv())
 		{
-			case '-': case '+': case '*': case '/':
-			case '<': case '>': case '=': case '!':
-			case '&': case '|': case '%': case '^':
-			case '.': case '[': case ']': case '(':
-			case ')': case '{': case '}':
+			PUNCTUATION_PREDICATE:
 				stream.increment();
 				break;
 
@@ -153,7 +174,6 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 					result.push_back( lexeme_t(ID::punctuation, b, stream.current(), stream.position()) );
 				goto done;
 		}
-
 	}
 
 done:;
@@ -168,23 +188,15 @@ begin:
 
 	switch (stream.cv())
 	{
-		case 'a': case 'b': case 'c': case 'd': case 'e':
-		case 'f': case 'g': case 'h': case 'i': case 'j':
-		case 'k': case 'l': case 'm': case 'n': case 'o':
-		case 'p': case 'q': case 'r': case 's': case 't':
-		case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+		IDENTIFIER_PREDICATE:
 			identifier(result, stream);
 			break;
 
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
+		NUMBER_PREDICATE:
 			number_literal(result, stream);
 			break;
 
-		case '-': case '+': case '*': case '/':
-		case '<': case '>': case '=': case '!':
-		case '&': case '|': case '%': case '^':
-		case '.':
+		PUNCTUATION_PREDICATE:
 			punctuation(result, stream);
 			break;
 
