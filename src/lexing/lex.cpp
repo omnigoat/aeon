@@ -5,10 +5,12 @@ using jigl::lexing::lexeme_t;
 using jigl::lexing::lexemes_t;
 using jigl::lexing::stream_t;
 using jigl::lexing::ID;
+using jigl::lexing::position_t;
+
 //namespace LXID = jigl::lexing::ID;
 
 stream_t::stream_t(char const* begin, char const* end)
-	: begin_(begin), end_(end), current_(begin), position_(1, 1)
+	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)
 {
 }
 
@@ -39,23 +41,26 @@ auto stream_t::position() const -> jigl::lexing::position_t const& {
 auto stream_t::increment() -> void {
 	ATMA_ASSERT(current_ != end_);
 
-	
+	++position_.column;
 	++current_;
 
 	if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
 		++position_.row;
 		position_.column = 1;
 	}
+}
 
-	#if 0
-	// skip past windows newlines
-	if (current_ != end_ && *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')
-		++current_;
-	#endif
+auto stream_t::mark() -> char const* {
+	marked_position_ = position_;
+	return mark_ = current_;
 }
 
 auto stream_t::reset(char const* mark) -> void {
 	current_ = mark;
+}
+
+auto stream_t::marked_position() const -> position_t const& {
+	return marked_position_;
 }
 
 
@@ -93,24 +98,24 @@ auto stream_t::reset(char const* mark) -> void {
 	case '<': case '>': case '=': case '!': \
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
-	case ')': case '{': case '}'
+	case ')': case '{': case '}': case ':'
 
 namespace
 {
 	#define X(n,s,l) s,
-	char const* keywords[7] = {
+	char const* keywords[] = {
 		JIGL_LEXING_IDS()
 	};
 	#undef X
 
 	#define X(n,s,l) l,
-	uint32_t keyword_lengths[7] = {
+	uint32_t keyword_lengths[] = {
 		JIGL_LEXING_IDS()
 	};
 	#undef X
 
-	uint32_t const keywords_begin = 4;
-	uint32_t const keywords_end = 7;
+	uint32_t const keywords_begin = static_cast<uint32_t>(jigl::lexing::ID::lower_bound) + 1;
+	uint32_t const keywords_end = static_cast<uint32_t>(jigl::lexing::ID::upper_bound);
 }
 
 
@@ -119,14 +124,15 @@ namespace
 //
 auto identifier(lexemes_t& result, stream_t& stream) -> void
 {
-	char const* b = stream.current();
+	//char const* b = stream.current();
+	char const* b = stream.mark();
 	while (stream.valid() && ('a' <= stream.cv() && stream.cv() <='z' || stream.cv() == '-'))
 		stream.increment();
 
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (stream.current() - b) && !strncmp(b, keywords[x], keyword_lengths[x])) {
-			result.push_back(lexeme_t(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.position()));
+			result.push_back(lexeme_t(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position()));
 			return;
 		}
 		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
@@ -134,7 +140,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 		}
 	}
 
-	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.position()));
+	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.marked_position()));
 }
 
 
@@ -145,7 +151,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 auto number_literal(lexemes_t& result, stream_t& stream) -> void
 {
 	// do the integer literal
-	char const* b = stream.current();
+	char const* m = stream.mark();
 	while (stream.valid() && ('0' <= stream.cv() && stream.cv() <='9'))
 		stream.increment();
 
@@ -163,14 +169,14 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 
 		// integer or real
 		if (i > 0)
-			result.push_back(lexeme_t(ID::real_literal, b, stream.current(), stream.position()));
+			result.push_back(lexeme_t(ID::real_literal, m, stream.current(), stream.marked_position()));
 		else {
-			result.push_back(lexeme_t(ID::integer_literal, b, dot, stream.position()));
+			result.push_back(lexeme_t(ID::integer_literal, m, dot, stream.marked_position()));
 			stream.reset(dot);
 		}
 	}
 	else {
-		result.push_back(lexeme_t(ID::integer_literal, b, stream.current(), stream.position()));
+		result.push_back(lexeme_t(ID::integer_literal, m, stream.current(), stream.marked_position()));
 	}
 }
 
@@ -180,7 +186,7 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 //
 auto punctuation(lexemes_t& result, stream_t& stream) -> void
 {
-	char const* b = stream.current();
+	char const* b = stream.mark();
 	
 	while (stream.valid())
 	{
@@ -192,7 +198,7 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 
 			default:
 				if (stream.current() != b)
-					result.push_back( lexeme_t(ID::punctuation, b, stream.current(), stream.position()) );
+					result.push_back( lexeme_t(ID::punctuation, b, stream.current(), stream.marked_position()) );
 				goto done;
 		}
 	}

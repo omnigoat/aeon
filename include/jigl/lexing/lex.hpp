@@ -23,16 +23,19 @@ namespace lexing {
 		auto cv() const -> char;
 		auto valid() const -> bool;
 		auto position() const -> position_t const&;
-
+		auto marked_position() const -> position_t const&;
 		auto increment() -> void;
+		auto mark() -> char const*;
 		auto reset(char const*) -> void;
-
+		
 	private:
 		char const* begin_;
 		char const* end_;
 		char const* current_;
+		char const* mark_;
 
 		position_t position_;
+		position_t marked_position_;
 	};
 
 	auto lex(lexemes_t&, stream_t&) -> void;
@@ -42,9 +45,12 @@ namespace lexing {
 		X(integer_literal, "", 0) \
 		X(real_literal, "", 0)  \
 		X(punctuation, "", 0) \
+		X(lower_bound, "", 0) \
 		X(if_keyword, "if", 2) \
 		X(else_keyword, "else", 4) \
-		X(type_keyword, "type", 4)
+		X(type_keyword, "type", 4) \
+		X(function_keyword, "function", 8) \
+		X(upper_bound, "", 0)
 
 	#define X(name, string, strlen) name,
 	enum class ID
