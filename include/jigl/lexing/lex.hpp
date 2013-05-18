@@ -37,14 +37,21 @@ namespace lexing {
 
 	auto lex(lexemes_t&, stream_t&) -> void;
 	
+	#define JIGL_LEXING_IDS() \
+		X(identifier, "", 0) \
+		X(integer_literal, "", 0) \
+		X(real_literal, "", 0)  \
+		X(punctuation, "", 0) \
+		X(if_keyword, "if", 2) \
+		X(else_keyword, "else", 4) \
+		X(type_keyword, "type", 4)
+
+	#define X(name, string, strlen) name,
 	enum class ID
 	{
-		identifier,
-		integer_literal,
-		real_literal,
-		operator_
+		JIGL_LEXING_IDS()
 	};
-
+	#undef X
 
 
 //=====================================================================

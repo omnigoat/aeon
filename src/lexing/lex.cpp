@@ -58,12 +58,41 @@ auto stream_t::reset(char const* mark) -> void {
 	current_ = mark;
 }
 
+namespace
+{
+	#define X(n,s,l) s,
+	char const* keywords[7] = {
+		JIGL_LEXING_IDS()
+	};
+	#undef X
+
+	#define X(n,s,l) l,
+	uint32_t keyword_lengths[7] = {
+		JIGL_LEXING_IDS()
+	};
+	#undef X
+
+
+	//char const** keywords_begin = keyword_things + 4;
+	//char const** keywords_end = keyword_things + 7;
+	uint32_t const keywords_begin = 4;
+	uint32_t const keywords_end = 7;
+}
+
 
 auto identifier(lexemes_t& result, stream_t& stream) -> void
 {
 	char const* b = stream.current();
 	while (stream.valid() && ('a' <= stream.cv() && stream.cv() <='z' || stream.cv() == '-'))
 		stream.increment();
+
+	for (auto x = keywords_begin; x != keywords_end; ++x)
+	{
+		if (!strncmp(b, keywords[x], keyword_lengths[x])) {
+			result.push_back(lexeme_t(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.position()));
+			return;
+		}
+	}
 
 	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.position()));
 }
@@ -100,7 +129,6 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 	}
 }
 
-#if 01
 auto punctuation(lexemes_t& result, stream_t& stream) -> void
 {
 	char const* b = stream.current();
@@ -119,43 +147,49 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 
 			default:
 				if (stream.current() != b)
-					result.push_back( lexeme_t(ID::operator_, b, stream.current(), stream.position()) );
+					result.push_back( lexeme_t(ID::punctuation, b, stream.current(), stream.position()) );
 				goto done;
 		}
+
 	}
 
 done:;
 }
-#endif
+
 
 auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
 {
-	while (stream.valid())
+begin:
+	if (!stream.valid())
+		goto done;
+
+	switch (stream.cv())
 	{
-		switch (stream.cv())
-		{
-			case 'a': case 'b': case 'c': case 'd': case 'e':
-			case 'f': case 'g': case 'h': case 'i': case 'j':
-			case 'k': case 'l': case 'm': case 'n': case 'o':
-			case 'p': case 'q': case 'r': case 's': case 't':
-			case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-				identifier(result, stream);
-				break;
+		case 'a': case 'b': case 'c': case 'd': case 'e':
+		case 'f': case 'g': case 'h': case 'i': case 'j':
+		case 'k': case 'l': case 'm': case 'n': case 'o':
+		case 'p': case 'q': case 'r': case 's': case 't':
+		case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+			identifier(result, stream);
+			break;
 
-			case '0': case '1': case '2': case '3': case '4':
-			case '5': case '6': case '7': case '8': case '9':
-				number_literal(result, stream);
-				break;
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			number_literal(result, stream);
+			break;
 
-			case '-': case '+': case '*': case '/':
-			case '<': case '>': case '=': case '!':
-			case '&': case '|': case '%': case '^':
-			case '.':
-				punctuation(result, stream);
-				break;
+		case '-': case '+': case '*': case '/':
+		case '<': case '>': case '=': case '!':
+		case '&': case '|': case '%': case '^':
+		case '.':
+			punctuation(result, stream);
+			break;
 
-			default:
-				stream.increment();
-		}
+		default:
+			stream.increment();
 	}
+
+	goto begin;
+
+done:;
 }
