@@ -41,7 +41,8 @@ namespace lexing {
 	{
 		identifier,
 		integer_literal,
-		real_literal
+		real_literal,
+		operator_
 	};
 
 

@@ -68,14 +68,55 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.position()));
 }
 
-auto number(lexemes_t& result, stream_t& stream) -> void
+auto number_literal(lexemes_t& result, stream_t& stream) -> void
 {
+	// do the integer literal
 	char const* b = stream.current();
 	while (stream.valid() && ('0' <= stream.cv() && stream.cv() <='9'))
 		stream.increment();
 
-	result.push_back(lexeme_t(ID::integer_literal, b, stream.current(), stream.position()));
+	// maybe turn it into a real literal?
+	if (stream.cv() == '.')
+	{
+		// do more numbers for decimal places
+		char const* dot = stream.current();
+		stream.increment();
+		uint32_t i = 0;
+		while (stream.valid() && ('0' <= stream.cv() && stream.cv() <='9')) {
+			stream.increment();
+			++i;
+		}
+
+		// integer or real
+		if (i > 0)
+			result.push_back(lexeme_t(ID::real_literal, b, stream.current(), stream.position()));
+		else {
+			result.push_back(lexeme_t(ID::integer_literal, b, dot, stream.position()));
+			stream.reset(dot);
+		}
+	}
+	else {
+		result.push_back(lexeme_t(ID::integer_literal, b, stream.current(), stream.position()));
+	}
 }
+
+#if 01
+auto punctuation(lexemes_t& result, stream_t& stream) -> void
+{
+	char const* b = stream.current();
+	
+	
+	switch (stream.cv())
+	{
+		case '-': case '+': case '*': case '/':
+		case '<': case '>': case '=': case '!':
+		case '&': case '|': case '%': case '^':
+		case '.':
+			stream.increment();
+			result.push_back( lexeme_t(ID::operator_, b, stream.current(), stream.position()) );
+	}
+}
+#endif
 
 auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
 {
@@ -93,7 +134,14 @@ auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
 
 			case '0': case '1': case '2': case '3': case '4':
 			case '5': case '6': case '7': case '8': case '9':
-				number(result, stream);
+				number_literal(result, stream);
+				break;
+
+			case '-': case '+': case '*': case '/':
+			case '<': case '>': case '=': case '!':
+			case '&': case '|': case '%': case '^':
+			case '.':
+				punctuation(result, stream);
 				break;
 
 			default:
