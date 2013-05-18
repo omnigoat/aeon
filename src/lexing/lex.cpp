@@ -105,16 +105,26 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 {
 	char const* b = stream.current();
 	
-	
-	switch (stream.cv())
+	while (stream.valid())
 	{
-		case '-': case '+': case '*': case '/':
-		case '<': case '>': case '=': case '!':
-		case '&': case '|': case '%': case '^':
-		case '.':
-			stream.increment();
-			result.push_back( lexeme_t(ID::operator_, b, stream.current(), stream.position()) );
+		switch (stream.cv())
+		{
+			case '-': case '+': case '*': case '/':
+			case '<': case '>': case '=': case '!':
+			case '&': case '|': case '%': case '^':
+			case '.': case '[': case ']': case '(':
+			case ')': case '{': case '}':
+				stream.increment();
+				break;
+
+			default:
+				if (stream.current() != b)
+					result.push_back( lexeme_t(ID::operator_, b, stream.current(), stream.position()) );
+				goto done;
+		}
 	}
+
+done:;
 }
 #endif
 
