@@ -114,8 +114,8 @@ namespace
 	};
 	#undef X
 
-	uint32_t const keywords_begin = static_cast<uint32_t>(jigl::lexing::ID::lower_bound) + 1;
-	uint32_t const keywords_end = static_cast<uint32_t>(jigl::lexing::ID::upper_bound);
+	uint32_t const keywords_begin = static_cast<uint32_t>(jigl::lexing::ID::keyword_lower_bound) + 1;
+	uint32_t const keywords_end = static_cast<uint32_t>(jigl::lexing::ID::keyword_upper_bound);
 }
 
 

@@ -45,12 +45,12 @@ namespace lexing {
 		X(integer_literal, "", 0) \
 		X(real_literal, "", 0)  \
 		X(punctuation, "", 0) \
-		X(lower_bound, "", 0) \
+		X(keyword_lower_bound, "", 0) \
 		X(if_keyword, "if", 2) \
 		X(else_keyword, "else", 4) \
 		X(type_keyword, "type", 4) \
 		X(function_keyword, "function", 8) \
-		X(upper_bound, "", 0)
+		X(keyword_upper_bound, "", 0)
 
 	#define X(name, string, strlen) name,
 	enum class ID
