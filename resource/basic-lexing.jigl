@@ -4,6 +4,6 @@ type @dragon
 	var age as @int
 end
 
-var henry as @dragon("henry", 4)
+var henry as @dragon("henry", 4, 'a')
 
 

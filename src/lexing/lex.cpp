@@ -292,12 +292,27 @@ auto string_literal(state_t& state, stream_t& stream) -> void
 	if (stream.cv() == '"')
 	{
 		stream.increment();
-		while (stream.cv() != '"')
+		while (stream.valid() && stream.cv() != '"')
 			stream.increment();
 		stream.increment();
 	}
 
 	state.push_back(ID::string_literal, m, stream.current(), stream.marked_position());
+}
+
+
+auto character_literal(state_t& state, stream_t& stream) -> void
+{
+	char const* m = stream.mark();
+	if (stream.cv() == '\'')
+	{
+		stream.increment();
+		while (stream.valid() && stream.cv() != '\'')
+			stream.increment();
+		stream.increment();
+	}
+
+	state.push_back(ID::character_literal, m, stream.current(), stream.marked_position());
 }
 
 
@@ -338,6 +353,10 @@ begin:
 
 		case '"':
 			string_literal(state, stream);
+			break;
+
+		case '\'':
+			character_literal(state, stream);
 			break;
 
 		default:
