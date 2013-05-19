@@ -38,13 +38,33 @@ namespace lexing {
 		position_t marked_position_;
 	};
 
-	auto lex(lexemes_t&, stream_t&) -> void;
+	struct state_t
+	{
+		state_t();
+
+		auto push_back(lexeme_t::id_t, char const* begin, char const* end, position_t const&) -> void;
+		auto non_whitespace_token() -> void;
+		auto reset_whitespace() -> void;
+		auto increment_tabs() -> void;
+
+	private:
+		uint32_t tabs_, previous_tabs_;
+		bool empty_line_;
+		lexemes_t lexemes_;
+	};
+
+
+
+
+	auto lex(state_t&, stream_t&) -> void;
 	
 	#define JIGL_LEXING_IDS() \
 		X(identifier, "", 0) \
 		X(integer_literal, "", 0) \
 		X(real_literal, "", 0)  \
 		X(punctuation, "", 0) \
+		X(block_begin, "", 0) \
+		X(block_end, "", 0) \
 		X(keyword_lower_bound, "", 0) \
 		X(if_keyword, "if", 2) \
 		X(else_keyword, "else", 4) \

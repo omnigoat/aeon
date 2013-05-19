@@ -4,6 +4,7 @@
 using jigl::lexing::lexeme_t;
 using jigl::lexing::lexemes_t;
 using jigl::lexing::stream_t;
+using jigl::lexing::state_t;
 using jigl::lexing::ID;
 using jigl::lexing::position_t;
 
@@ -64,6 +65,43 @@ auto stream_t::marked_position() const -> position_t const& {
 }
 
 
+state_t::state_t()
+	: empty_line_(true), previous_tabs_(), tabs_()
+{
+}
+
+auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position) -> void
+{
+	lexemes_.push_back( lexeme_t(id, begin, end, position) );
+}
+
+auto state_t::non_whitespace_token() -> void
+{
+	if (empty_line_)
+	{
+		if (tabs_ > previous_tabs_)
+			while (previous_tabs_++ != tabs_)
+				lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_t()));
+		else if (tabs_ < previous_tabs_)
+			while (previous_tabs_-- != tabs_)
+				lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_t()));
+
+		previous_tabs_ = tabs_;
+	}
+
+	empty_line_ = false;
+}
+
+auto state_t::reset_whitespace() -> void
+{
+	empty_line_ = true;
+	tabs_ = 0;
+}
+
+auto state_t::increment_tabs() -> void
+{
+	++tabs_;
+}
 
 
 
@@ -72,26 +110,24 @@ auto stream_t::marked_position() const -> position_t const& {
 
 
 
+#define BLOCK_NEWLINE_PREDICATE \
+	case '\n': case '\r':
 
+#define BLOCK_WHITESPACE_PREDICATE \
+	case '\t':
 
-
-
-
-
-
-
-
+#define BLOCK_PREDICATE BLOCK_NEWLINE_PREDICATE BLOCK_WHITESPACE_PREDICATE
 
 #define IDENTIFIER_PREDICATE \
 	case 'a': case 'b': case 'c': case 'd': case 'e': \
 	case 'f': case 'g': case 'h': case 'i': case 'j': \
 	case 'k': case 'l': case 'm': case 'n': case 'o': \
 	case 'p': case 'q': case 'r': case 's': case 't': \
-	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z'
+	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
 
 #define NUMBER_PREDICATE \
 	case '0': case '1': case '2': case '3': case '4': \
-	case '5': case '6': case '7': case '8': case '9'
+	case '5': case '6': case '7': case '8': case '9':
 
 #define PUNCTUATION_PREDICATE \
 	case '-': case '+': case '*': case '/': \
@@ -99,7 +135,36 @@ auto stream_t::marked_position() const -> position_t const& {
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
 	case ')': case '{': case '}': case ':': \
-	case '@'
+	case '@':
+
+
+
+//
+//
+//
+auto block(state_t& state, stream_t& stream) -> void
+{
+	while (stream.valid())
+	{
+		switch (stream.cv()) {
+			BLOCK_NEWLINE_PREDICATE
+				state.reset_whitespace();
+				stream.increment();
+				break;
+
+			BLOCK_WHITESPACE_PREDICATE
+				state.increment_tabs();
+				stream.increment();
+				break;
+
+			default:
+				goto done;
+		}
+	}
+done:;
+}
+
+
 
 namespace
 {
@@ -123,7 +188,7 @@ namespace
 //
 // identifier/keyword
 //
-auto identifier(lexemes_t& result, stream_t& stream) -> void
+auto identifier(state_t& state, stream_t& stream) -> void
 {
 	//char const* b = stream.current();
 	char const* b = stream.mark();
@@ -133,7 +198,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (stream.current() - b) && !strncmp(b, keywords[x], keyword_lengths[x])) {
-			result.push_back(lexeme_t(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position()));
+			state.push_back(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position());
 			return;
 		}
 		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
@@ -141,7 +206,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 		}
 	}
 
-	result.push_back(lexeme_t(ID::identifier, b, stream.current(), stream.marked_position()));
+	state.push_back(ID::identifier, b, stream.current(), stream.marked_position());
 }
 
 
@@ -149,7 +214,7 @@ auto identifier(lexemes_t& result, stream_t& stream) -> void
 //
 // numbers
 //
-auto number_literal(lexemes_t& result, stream_t& stream) -> void
+auto number_literal(state_t& state, stream_t& stream) -> void
 {
 	// do the integer literal
 	char const* m = stream.mark();
@@ -170,14 +235,14 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 
 		// integer or real
 		if (i > 0)
-			result.push_back(lexeme_t(ID::real_literal, m, stream.current(), stream.marked_position()));
+			state.push_back(ID::real_literal, m, stream.current(), stream.marked_position());
 		else {
-			result.push_back(lexeme_t(ID::integer_literal, m, dot, stream.marked_position()));
+			state.push_back(ID::integer_literal, m, dot, stream.marked_position());
 			stream.reset(dot);
 		}
 	}
 	else {
-		result.push_back(lexeme_t(ID::integer_literal, m, stream.current(), stream.marked_position()));
+		state.push_back(ID::integer_literal, m, stream.current(), stream.marked_position());
 	}
 }
 
@@ -185,7 +250,7 @@ auto number_literal(lexemes_t& result, stream_t& stream) -> void
 //
 // punctuation
 //
-auto punctuation(lexemes_t& result, stream_t& stream) -> void
+auto punctuation(state_t& state, stream_t& stream) -> void
 {
 	char const* b = stream.mark();
 	
@@ -193,13 +258,13 @@ auto punctuation(lexemes_t& result, stream_t& stream) -> void
 	{
 		switch (stream.cv())
 		{
-			PUNCTUATION_PREDICATE:
+			PUNCTUATION_PREDICATE
 				stream.increment();
 				break;
 
 			default:
 				if (stream.current() != b)
-					result.push_back( lexeme_t(ID::punctuation, b, stream.current(), stream.marked_position()) );
+					state.push_back(ID::punctuation, b, stream.current(), stream.marked_position());
 				goto done;
 		}
 	}
@@ -208,7 +273,7 @@ done:;
 }
 
 
-auto jigl::lexing::lex(lexemes_t& result, stream_t& stream) -> void
+auto jigl::lexing::lex(state_t& state, stream_t& stream) -> void
 {
 begin:
 	if (!stream.valid())
@@ -216,21 +281,37 @@ begin:
 
 	switch (stream.cv())
 	{
-		IDENTIFIER_PREDICATE:
-			identifier(result, stream);
+		BLOCK_NEWLINE_PREDICATE
+			state.reset_whitespace();
 			break;
 
-		NUMBER_PREDICATE:
-			number_literal(result, stream);
+		default:
+			state.non_whitespace_token();
+	}
+
+	switch (stream.cv())
+	{
+		BLOCK_PREDICATE
+			block(state, stream);
 			break;
 
-		PUNCTUATION_PREDICATE:
-			punctuation(result, stream);
+		IDENTIFIER_PREDICATE
+			identifier(state, stream);
+			break;
+
+		NUMBER_PREDICATE
+			number_literal(state, stream);
+			break;
+
+		PUNCTUATION_PREDICATE
+			punctuation(state, stream);
 			break;
 
 		default:
 			stream.increment();
 	}
+
+	
 
 	goto begin;
 

@@ -2,5 +2,6 @@
 type @dragon
 	var name as @string
 	var age as @int
+		more scope
 end
 
