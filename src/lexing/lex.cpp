@@ -72,6 +72,7 @@ state_t::state_t()
 
 auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position) -> void
 {
+	ATMA_ASSERT(begin != end);
 	lexemes_.push_back( lexeme_t(id, begin, end, position) );
 }
 
@@ -123,7 +124,8 @@ auto state_t::increment_tabs() -> void
 	case 'f': case 'g': case 'h': case 'i': case 'j': \
 	case 'k': case 'l': case 'm': case 'n': case 'o': \
 	case 'p': case 'q': case 'r': case 's': case 't': \
-	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z': \
+	case '@':
 
 #define NUMBER_PREDICATE \
 	case '0': case '1': case '2': case '3': case '4': \
@@ -134,8 +136,7 @@ auto state_t::increment_tabs() -> void
 	case '<': case '>': case '=': case '!': \
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
-	case ')': case '{': case '}': case ':': \
-	case '@':
+	case ')': case '{': case '}': case ':':
 
 
 
@@ -192,8 +193,19 @@ auto identifier(state_t& state, stream_t& stream) -> void
 {
 	//char const* b = stream.current();
 	char const* b = stream.mark();
+	ID id = ID::identifier;
+	int types = 0;
+
+	while (stream.cv() == '@') {
+		stream.increment();
+		++types;
+	}
+
 	while (stream.valid() && ('a' <= stream.cv() && stream.cv() <='z' || stream.cv() == '-'))
 		stream.increment();
+
+	if (types == 1)
+		id = ID::type;
 
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
@@ -206,7 +218,7 @@ auto identifier(state_t& state, stream_t& stream) -> void
 		}
 	}
 
-	state.push_back(ID::identifier, b, stream.current(), stream.marked_position());
+	state.push_back(id, b, stream.current(), stream.marked_position());
 }
 
 
