@@ -136,7 +136,8 @@ auto state_t::increment_tabs() -> void
 	case '<': case '>': case '=': case '!': \
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
-	case ')': case '{': case '}': case ':':
+	case ')': case '{': case '}': case ':': \
+	case ',':
 
 
 
@@ -285,6 +286,22 @@ done:;
 }
 
 
+auto string_literal(state_t& state, stream_t& stream) -> void
+{
+	char const* m = stream.mark();
+	if (stream.cv() == '"')
+	{
+		stream.increment();
+		while (stream.cv() != '"')
+			stream.increment();
+		stream.increment();
+	}
+
+	state.push_back(ID::string_literal, m, stream.current(), stream.marked_position());
+}
+
+
+
 auto jigl::lexing::lex(state_t& state, stream_t& stream) -> void
 {
 begin:
@@ -317,6 +334,10 @@ begin:
 
 		PUNCTUATION_PREDICATE
 			punctuation(state, stream);
+			break;
+
+		case '"':
+			string_literal(state, stream);
 			break;
 
 		default:

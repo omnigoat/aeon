@@ -66,8 +66,10 @@ namespace lexing {
 		X(block_begin, "", 0) \
 		X(block_end, "", 0) \
 		X(type, "", 0) \
+		X(string_literal, "", 0) \
 		X(keyword_lower_bound, "", 0) \
 		X(if_keyword, "if", 2) \
+		X(as_keyword, "as", 2) \
 		X(else_keyword, "else", 4) \
 		X(type_keyword, "type", 4) \
 		X(function_keyword, "function", 8) \
