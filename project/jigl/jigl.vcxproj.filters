@@ -29,6 +29,9 @@
     <ClInclude Include="..\..\include\jigl\lexing\lex.hpp">
       <Filter>include\lexing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\jigl\lexing\id.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lexeme.cpp">

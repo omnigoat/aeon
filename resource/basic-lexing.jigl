@@ -1,9 +1,6 @@
 
-type @dragon
-	var name as @string
-	var age as @int
+
+function main ::-> @int
+	return 0
 end
-
-var henry as @dragon("henry", 4, 'a')
-
 

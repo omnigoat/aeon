@@ -77,6 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\jigl\lexing\id.hpp" />
     <ClInclude Include="..\..\include\jigl\lexing\lex.hpp" />
     <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp" />
     <ClInclude Include="..\..\include\jigl\lexing\lexemes.hpp" />

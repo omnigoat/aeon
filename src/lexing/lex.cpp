@@ -1,4 +1,5 @@
 #include <jigl/lexing/lex.hpp>
+#include <jigl/lexing/id.hpp>
 #include <atma/assert.hpp>
 
 using jigl::lexing::lexeme_t;

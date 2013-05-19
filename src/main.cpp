@@ -48,7 +48,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	for (auto x : file)
 		std::cout << x;
 
-	//jigl::lexing::lexemes_t lexemes;
 	jigl::lexing::state_t state;
 	jigl::lexing::lex(state, jigl::lexing::stream_t(file.begin(), file.end()));
 }
+
