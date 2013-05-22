@@ -9,7 +9,8 @@ using jigl::lexing::state_t;
 using jigl::lexing::ID;
 using jigl::lexing::position_t;
 
-//namespace LXID = jigl::lexing::ID;
+jigl::lexing::channel_t jigl::lexing::channel_t::all(0xffff);
+
 
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)

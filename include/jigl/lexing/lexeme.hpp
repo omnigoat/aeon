@@ -50,11 +50,18 @@ namespace lexing {
 		auto operator == (channel_t const& rhs) const -> bool {
 			return bits_ == rhs.bits_;
 		}
+		
+		friend auto operator & (channel_t const& lhs, channel_t const& rhs) -> bool {
+			return (lhs.bits_ & rhs.bits_) != 0;
+		}
+
+		static channel_t all;
 
 	private:
 		uint32_t bits_;
 	};
 
+	
 
 	//=====================================================================
 	// lexeme
