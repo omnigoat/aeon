@@ -203,7 +203,8 @@ auto identifier(state_t& state, stream_t& stream) -> void
 		++types;
 	}
 
-	while (stream.valid() && ('a' <= stream.cv() && stream.cv() <='z' || stream.cv() == '-'))
+	char c;
+	while (stream.valid() && (c = stream.cv()) && ('a' <= c && c <='z' || '0' <= c && c <= '9' || c == '-'))
 		stream.increment();
 
 	if (types == 1)

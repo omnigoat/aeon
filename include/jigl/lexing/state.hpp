@@ -3,17 +3,30 @@
 //
 //
 //=====================================================================
-#ifndef JIGL_LEXING_LEX_HPP
-#define JIGL_LEXING_LEX_HPP
+#ifndef JIGL_LEXING_LEXING_STATE_HPP
+#define JIGL_LEXING_LEXING_STATE_HPP
 //=====================================================================
-#include <jigl/lexing/stream.hpp>
-#include <jigl/lexing/state.hpp>
+#include <jigl/lexing/lexeme.hpp>
+#include <jigl/lexing/lexemes.hpp>
 //=====================================================================
 namespace jigl {
 namespace lexing {
 //=====================================================================
 	
-	auto lex(state_t&, stream_t&) -> void;
+	struct state_t
+	{
+		state_t();
+
+		auto push_back(lexeme_t::id_t, char const* begin, char const* end, position_t const&) -> void;
+		auto non_whitespace_token() -> void;
+		auto reset_whitespace() -> void;
+		auto increment_tabs() -> void;
+
+	private:
+		uint32_t tabs_, previous_tabs_;
+		bool empty_line_;
+		lexemes_t lexemes_;
+	};
 
 //=====================================================================
 } // namespace lexing

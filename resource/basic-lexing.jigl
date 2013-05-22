@@ -1,6 +1,6 @@
 
 
-function main ::-> @int
+function main :: args as @uint32[] -> @int32
 	return 0
 end
 

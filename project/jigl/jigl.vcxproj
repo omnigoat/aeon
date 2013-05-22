@@ -81,6 +81,8 @@
     <ClInclude Include="..\..\include\jigl\lexing\lex.hpp" />
     <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp" />
     <ClInclude Include="..\..\include\jigl\lexing\lexemes.hpp" />
+    <ClInclude Include="..\..\include\jigl\lexing\state.hpp" />
+    <ClInclude Include="..\..\include\jigl\lexing\stream.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
