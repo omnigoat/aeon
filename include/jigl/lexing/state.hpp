@@ -17,6 +17,8 @@ namespace lexing {
 	{
 		state_t();
 
+		auto lexemes() const -> lexemes_t const& { return lexemes_; }
+		
 		auto push_back(lexeme_t::id_t, char const* begin, char const* end, position_t const&) -> void;
 		auto non_whitespace_token() -> void;
 		auto reset_whitespace() -> void;

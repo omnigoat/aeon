@@ -8,6 +8,8 @@
 //=====================================================================
 #include <vector>
 //=====================================================================
+#include <atma/assert.hpp>
+//=====================================================================
 #include <jigl/lexing/lexeme.hpp>
 //=====================================================================
 namespace jigl {
@@ -25,24 +27,57 @@ namespace lexing {
 		template <typename T>
 		struct iterator
 		{
-			auto operator * () -> T& {
-				return *iterator_;
-			}
+			typedef int32_t difference_type;
+			typedef typename std::remove_const<T>::type value_type;
+			typedef T& reference;
+			typedef T* pointer;
+			typedef std::bidirectional_iterator_tag iterator_category;
 
+			auto operator * () -> T&;
 			auto operator ++ () -> iterator&;
+			auto operator -- () -> iterator&;
 
 		private:
-			iterator(lexemes_t&, elements_t::iterator const&, channel_t const&);
+			// if T is a const T, then we need elements_t::const_iterator
+			typedef typename std::conditional<std::is_const<T>::value, 
+				typename elements_t::const_iterator, typename elements_t::iterator>::type elements_iterator_t;
 
-			lexemes_t& owner_;
-			elements_t::iterator iterator_;
+			typedef typename std::conditional<std::is_const<T>::value, 
+				const lexemes_t&, lexemes_t&>::type owner_ref;
+
+
+			// normal constructor
+			iterator(owner_ref, elements_iterator_t const&, channel_t const&);
+
+			// constructor for const_iterator being constructed from iterator
+			template <typename Y = typename std::enable_if<std::is_const<T>::value, typename std::remove_const<T>::type>::type>
+			iterator(iterator<Y> const&);
+
+			owner_ref owner_;
+			elements_iterator_t iterator_;
 			channel_t channel_;
 
 			friend struct lexemes_t;
+
+			template <typename T>
+			friend auto operator == (iterator<T> const& lhs, iterator<T> const& rhs) -> bool;
+
+			template <typename Y>
+			friend struct iterator;
 		};
+
+		template <typename T>
+		inline auto operator == (iterator<T> const& lhs, iterator<T> const& rhs) -> bool {
+			return &lhs.owner_ == &rhs.owner_ && lhs.iterator_ == rhs.iterator_ && lhs.channel_ == rhs.channel_;
+		}
+
+		template <typename T>
+		inline auto operator != (iterator<T> const& lhs, iterator<T> const& rhs) -> bool {
+			return !operator == (lhs, rhs);
+		}
 	}
 
-
+	
 	
 
 
@@ -69,8 +104,18 @@ namespace lexing {
 			return iterator(*this, i.base(), channel);
 		}
 
+		auto begin(channel_t const& channel = channel_t::all) const -> const_iterator {
+			return const_cast<lexemes_t*>(this)->begin();
+		}
+
+		auto end(channel_t const& channel = channel_t::all) const -> const_iterator {
+			auto i = elements_.rbegin();
+			while (i != elements_.rend() && !(i->channel() & channel))
+				++i;
+			return const_iterator(*this, i.base(), channel);
+		}
+
 	private:
-		
 		detail::elements_t elements_;
 
 		template <typename T>
@@ -82,33 +127,38 @@ namespace lexing {
 	// iterator implementation
 	//=====================================================================
 	template <typename T>
-	detail::iterator<T>::iterator(lexemes_t& owner, elements_t::iterator const& iter, channel_t const& channel)
+	detail::iterator<T>::iterator(owner_ref owner, elements_iterator_t const& iter, channel_t const& channel)
 		: owner_(owner), iterator_(iter), channel_(channel)
 	{
-		while (iterator_ != owner_.elements_.end() && !(iterator_->channel() & channel))
-			++iterator_;
+		ATMA_ASSERT(iterator_ == owner_.elements_.end() || iterator_->channel() & channel);
+	}
+
+	template <typename T>
+	template <typename Y>
+	detail::iterator<T>::iterator(iterator<Y> const& rhs)
+		: owner_(rhs.owner_), iterator_(rhs.iterator_), channel_(rhs.channel_)
+	{
+	}
+
+	template <typename T>
+	auto detail::iterator<T>::operator * () -> T& {
+		return *iterator_;
 	}
 	
 
 	template <typename T>
 	auto detail::iterator<T>::operator ++ () -> iterator& {
-		while (++iterator != owner_.elements_.end() && !(iterator->channel() & channel_))
+		while (++iterator_ != owner_.elements_.end() && !(iterator_->channel() & channel_))
 			;
 		return *this;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	template <typename T>
+	auto detail::iterator<T>::operator -- () -> iterator& {
+		while (--iterator_ != owner_.elements_.end() && !(iterator_->channel() & channel_))
+			;
+		return *this;
+	}
 
 
 
