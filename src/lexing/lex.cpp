@@ -9,7 +9,7 @@ using jigl::lexing::state_t;
 using jigl::lexing::ID;
 using jigl::lexing::position_t;
 
-jigl::lexing::channel_t jigl::lexing::channel_t::all(0xffff);
+jigl::lexing::multichannel_t jigl::lexing::multichannel_t::all(0xffffffff);
 
 
 stream_t::stream_t(char const* begin, char const* end)
@@ -75,7 +75,7 @@ state_t::state_t()
 auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position) -> void
 {
 	ATMA_ASSERT(begin != end);
-	lexemes_.push_back( lexeme_t(id, begin, end, position) );
+	lexemes_.push_back( lexeme_t(id, begin, end, position, channel_t(1)) );
 }
 
 auto state_t::non_whitespace_token() -> void

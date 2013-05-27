@@ -16,10 +16,11 @@ namespace lexing {
 //=====================================================================
 	
 	//=====================================================================
-	// forward declare of ID type
+	// forward declares
 	//=====================================================================
 	enum class ID;
-
+	struct channel_t;
+	struct multichannel_t;
 
 	//=====================================================================
 	// position in file
@@ -42,8 +43,9 @@ namespace lexing {
 	//=====================================================================
 	struct channel_t
 	{
-		channel_t() : bits_(1) {}
-		explicit channel_t(uint32_t ch) : bits_(1 | (1 << ch)) {}
+		channel_t() : bits_() {}
+		explicit channel_t(uint32_t ch) : bits_(1 << ch) {}
+		channel_t(multichannel_t const&);
 
 		auto as_int() const -> uint32_t { return bits_; }
 
@@ -55,11 +57,29 @@ namespace lexing {
 			return (lhs.bits_ & rhs.bits_) != 0;
 		}
 
-		static channel_t all;
+	private:
+		uint32_t bits_;
+
+		friend struct multichannel_t;
+	};
+
+	struct multichannel_t
+	{
+		multichannel_t() : bits_() {}
+		explicit multichannel_t(uint32_t chs) : bits_(chs) {}
+
+		static multichannel_t all;
 
 	private:
 		uint32_t bits_;
+
+		friend struct channel_t;
 	};
+
+	inline channel_t::channel_t(multichannel_t const& rhs)
+	 : bits_(rhs.bits_)
+	{
+	}
 
 	
 

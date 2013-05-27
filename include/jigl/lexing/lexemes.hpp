@@ -112,22 +112,22 @@ namespace lexing {
 			elements_.push_back(L);
 		}
 
-		auto begin(channel_t const& channel = channel_t::all) -> iterator {
+		auto begin(channel_t const& channel = multichannel_t::all) -> iterator {
 			auto i = begin_of(channel);
 			return iterator(this, i, end_of(channel), i, channel);
 		}
 
-		auto end(channel_t const& channel) -> iterator {
+		auto end(channel_t const& channel = multichannel_t::all) -> iterator {
 			auto i = end_of(channel);
 			return iterator(this, begin_of(channel), i, i, channel);
 		}
 
-		auto begin(channel_t const& channel = channel_t::all) const -> const_iterator {
+		auto begin(channel_t const& channel = multichannel_t::all) const -> const_iterator {
 			auto i = begin_of(channel);
 			return const_iterator(this, i, end_of(channel), i, channel);
 		}
 
-		auto end(channel_t const& channel = channel_t::all) const -> const_iterator {
+		auto end(channel_t const& channel = multichannel_t::all) const -> const_iterator {
 			auto i = end_of(channel);
 			return const_iterator(this, begin_of(channel), i, i, channel);
 		}
@@ -198,7 +198,7 @@ namespace lexing {
 	detail::iterator<T>::iterator(owner_ptr owner, elements_iterator_t const& lbound, elements_iterator_t const& ubound, elements_iterator_t const& iter, channel_t const& channel)
 		: owner_(owner), lbound_(lbound), ubound_(ubound), iterator_(iter), channel_(channel)
 	{
-		//ATMA_ASSERT(iterator_ == owner_->elements_.end() || iterator_->channel() & channel);
+		ATMA_ASSERT(iterator_ == owner_->elements_.end() || (iterator_->channel() & channel));
 	}
 	
 	template <typename T>

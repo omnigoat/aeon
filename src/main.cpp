@@ -47,10 +47,8 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 	jigl::lexing::state_t state;
 	jigl::lexing::lex(state, jigl::lexing::stream_t(file.begin(), file.end()));
-	auto B = state.lexemes().begin();
+	auto B = state.lexemes().begin(jigl::lexing::multichannel_t(0xffff));
 	jigl::lexing::lexemes_t::const_iterator ci = jigl::lexing::lexemes_t::iterator();
 	std::cout << state.lexemes() << std::endl;
-	//for (auto i = state.lexemes().begin(); i != state.lexemes().end(); ++i)
-		//std::cout << *i << std::endl;
 }
 
