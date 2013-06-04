@@ -8,9 +8,9 @@ using jigl::lexing::stream_t;
 using jigl::lexing::state_t;
 using jigl::lexing::ID;
 using jigl::lexing::position_t;
+using jigl::lexing::multichannel_t;
 
 jigl::lexing::multichannel_t jigl::lexing::multichannel_t::all(0xffffffff);
-
 
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)
@@ -72,10 +72,10 @@ state_t::state_t()
 {
 }
 
-auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position) -> void
+auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel) -> void
 {
 	ATMA_ASSERT(begin != end);
-	lexemes_.push_back( lexeme_t(id, begin, end, position, channel_t(1)) );
+	lexemes_.push_back( lexeme_t(id, begin, end, position, channel) );
 }
 
 auto state_t::non_whitespace_token() -> void
@@ -141,7 +141,8 @@ auto state_t::increment_tabs() -> void
 	case ')': case '{': case '}': case ':': \
 	case ',':
 
-
+#define WHITESPACE_PREDICATE \
+	case ' ':
 
 //
 //
@@ -167,18 +168,24 @@ auto block(state_t& state, stream_t& stream) -> void
 	}
 done:;
 }
-
-
-
 namespace
 {
-	#define X(n,s,l) s,
+	namespace {
+		using namespace jigl::lexing;
+		#define X(n,s,l,c) c,
+		jigl::lexing::channel_t const channels[] = {
+			JIGL_LEXING_IDS()
+		};
+		#undef X
+	}
+
+	#define X(n,s,l,c) s,
 	char const* keywords[] = {
 		JIGL_LEXING_IDS()
 	};
 	#undef X
 
-	#define X(n,s,l) l,
+	#define X(n,s,l,c) l,
 	uint32_t keyword_lengths[] = {
 		JIGL_LEXING_IDS()
 	};
@@ -194,7 +201,6 @@ namespace
 //
 auto identifier(state_t& state, stream_t& stream) -> void
 {
-	//char const* b = stream.current();
 	char const* b = stream.mark();
 	ID id = ID::identifier;
 	int types = 0;
@@ -214,7 +220,7 @@ auto identifier(state_t& state, stream_t& stream) -> void
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (stream.current() - b) && !strncmp(b, keywords[x], keyword_lengths[x])) {
-			state.push_back(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position());
+			state.push_back(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position(), channels[x]);
 			return;
 		}
 		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
@@ -222,8 +228,30 @@ auto identifier(state_t& state, stream_t& stream) -> void
 		}
 	}
 
-	state.push_back(id, b, stream.current(), stream.marked_position());
+	state.push_back(id, b, stream.current(), stream.marked_position(), channels[static_cast<int>(id)]);
 }
+
+
+//
+// whitespace
+//
+auto whitespace_tokeniser(state_t& state, stream_t& stream) -> void
+{
+	char const* m = stream.mark();
+	while (stream.valid())
+	{
+		switch (stream.cv()) {
+			WHITESPACE_PREDICATE
+				stream.increment();
+				break;
+
+			default:
+				state.push_back(ID::whitespace, m, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::whitespace)]);
+				return;
+		}
+	}
+}
+
 
 
 
@@ -251,14 +279,14 @@ auto number_literal(state_t& state, stream_t& stream) -> void
 
 		// integer or real
 		if (i > 0)
-			state.push_back(ID::real_literal, m, stream.current(), stream.marked_position());
+			state.push_back(ID::real_literal, m, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::real_literal)]);
 		else {
-			state.push_back(ID::integer_literal, m, dot, stream.marked_position());
+			state.push_back(ID::integer_literal, m, dot, stream.marked_position(), channels[static_cast<int>(ID::integer_literal)]);
 			stream.reset(dot);
 		}
 	}
 	else {
-		state.push_back(ID::integer_literal, m, stream.current(), stream.marked_position());
+		state.push_back(ID::integer_literal, m, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::integer_literal)]);
 	}
 }
 
@@ -280,7 +308,7 @@ auto punctuation(state_t& state, stream_t& stream) -> void
 
 			default:
 				if (stream.current() != b)
-					state.push_back(ID::punctuation, b, stream.current(), stream.marked_position());
+					state.push_back(ID::punctuation, b, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::punctuation)]);
 				goto done;
 		}
 	}
@@ -300,7 +328,7 @@ auto string_literal(state_t& state, stream_t& stream) -> void
 		stream.increment();
 	}
 
-	state.push_back(ID::string_literal, m, stream.current(), stream.marked_position());
+	state.push_back(ID::string_literal, m, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::string_literal)]);
 }
 
 
@@ -315,7 +343,7 @@ auto character_literal(state_t& state, stream_t& stream) -> void
 		stream.increment();
 	}
 
-	state.push_back(ID::character_literal, m, stream.current(), stream.marked_position());
+	state.push_back(ID::character_literal, m, stream.current(), stream.marked_position(), channels[static_cast<int>(ID::character_literal)]);
 }
 
 
@@ -360,6 +388,10 @@ begin:
 
 		case '\'':
 			character_literal(state, stream);
+			break;
+
+		WHITESPACE_PREDICATE
+			whitespace_tokeniser(state, stream);
 			break;
 
 		default:

@@ -2,10 +2,10 @@
 //=====================================================================
 using jigl::lexing::lexeme_t;
 using jigl::lexing::position_t;
-using jigl::lexing::channel_t;
+using jigl::lexing::multichannel_t;
 //=====================================================================
 
-lexeme_t::lexeme_t( id_t id, char const* begin, char const* end, position_t const& position, channel_t const& channel)
+lexeme_t::lexeme_t( id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)
 : id_(id), begin_(begin), end_(end), position_(position), channel_(channel)
 {
 }
@@ -20,7 +20,7 @@ auto lexeme_t::position() const -> position_t const&
 	return position_;
 }
 
-auto lexeme_t::channel() const -> channel_t const&
+auto lexeme_t::channel() const -> multichannel_t const&
 {
 	return channel_;
 }

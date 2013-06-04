@@ -18,6 +18,9 @@
     <Filter Include="resource">
       <UniqueIdentifier>{9d14fb63-180e-41e3-b616-cf3b5abd1d0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\parsing">
+      <UniqueIdentifier>{3c5f50ff-76cd-40d7-ae95-624ecb56f572}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp">
