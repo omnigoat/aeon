@@ -41,6 +41,12 @@
     <ClInclude Include="..\..\include\jigl\lexing\state.hpp">
       <Filter>include\lexing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\jigl\parsing\parseme.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\jigl\parsing\parse.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lexeme.cpp">
@@ -51,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
       <Filter>source\lexing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\jigl\parsing\parseme.cpp">
+      <Filter>include\parsing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
