@@ -12,6 +12,7 @@
 #include <memory>
 //=====================================================================
 #include <jigl/lexing/lexeme.hpp>
+#include <jigl/parsing/parsemes.hpp>
 //=====================================================================
 namespace jigl {
 namespace parsing {
@@ -19,9 +20,8 @@ namespace parsing {
 	
 	struct parseme_t;
 	typedef std::shared_ptr<parseme_t> parseme_ptr;
-	typedef std::vector<parseme_ptr> parsemes_t;
-
-	struct parseme_t
+	
+	struct parseme_t : std::enable_shared_from_this<parseme_t>
 	{
 		enum class id_t;
 
@@ -32,11 +32,14 @@ namespace parsing {
 		auto parent() const -> parseme_ptr const&;
 		auto children() const -> parsemes_t const&;
 
+		auto set_parent(parseme_ptr const&) -> void;
+
 		// child mutators
+		#if 0
 		auto add_child(parseme_ptr const&) -> void;
 		auto remove_child(parsemes_t::const_iterator const&) -> void;
 		auto replace_child(parsemes_t::const_iterator const&, parseme_ptr const&) -> void;
-		
+		#endif
 
 	private:
 		id_t id_;

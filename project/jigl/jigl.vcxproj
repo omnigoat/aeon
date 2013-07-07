@@ -85,12 +85,14 @@
     <ClInclude Include="..\..\include\jigl\lexing\stream.hpp" />
     <ClInclude Include="..\..\include\jigl\parsing\parse.hpp" />
     <ClInclude Include="..\..\include\jigl\parsing\parseme.hpp" />
+    <ClInclude Include="..\..\include\jigl\parsing\parsemes.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\include\jigl\parsing\parseme.cpp" />
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
     <ClCompile Include="..\..\src\lexing\lexeme.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\parsing\parseme.cpp" />
+    <ClCompile Include="..\..\src\parsing\parsemes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resource\basic-lexing.jigl" />

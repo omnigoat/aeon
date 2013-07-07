@@ -21,6 +21,9 @@
     <Filter Include="include\parsing">
       <UniqueIdentifier>{3c5f50ff-76cd-40d7-ae95-624ecb56f572}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\parsing">
+      <UniqueIdentifier>{95a49241-9b05-47d4-a2e7-937fd8484c25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp">
@@ -47,6 +50,9 @@
     <ClInclude Include="..\..\include\jigl\parsing\parse.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\jigl\parsing\parsemes.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lexeme.cpp">
@@ -58,8 +64,11 @@
     <ClCompile Include="..\..\src\lexing\lex.cpp">
       <Filter>source\lexing</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\jigl\parsing\parseme.cpp">
-      <Filter>include\parsing</Filter>
+    <ClCompile Include="..\..\src\parsing\parseme.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parsing\parsemes.cpp">
+      <Filter>source\parsing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
