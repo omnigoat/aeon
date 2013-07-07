@@ -3,10 +3,10 @@
 //
 //
 //=====================================================================
-#ifndef JIGL_LEXING_ID_HPP
-#define JIGL_LEXING_ID_HPP
+#ifndef AEON_LEXING_ID_HPP
+#define AEON_LEXING_ID_HPP
 //=====================================================================
-namespace jigl {
+namespace aeon {
 namespace lexing {
 //=====================================================================
 	
@@ -15,7 +15,7 @@ namespace lexing {
 	static channel_t const whitespace(1);
 	static channel_t const control(2);
 
-	#define JIGL_LEXING_IDS() \
+	#define AEON_LEXING_IDS() \
 		X(identifier, "", 0, basic) \
 		X(integer_literal, "", 0, basic) \
 		X(real_literal, "", 0, basic)  \
@@ -38,14 +38,14 @@ namespace lexing {
 	#define X(name, string, strlen, channel) name,
 	enum class ID
 	{
-		JIGL_LEXING_IDS()
+		AEON_LEXING_IDS()
 	};
 	#undef X
 
 
 //=====================================================================
 } // namespace lexing
-} // namespace jigl
+} // namespace aeon
 //=====================================================================
 #endif
 //=====================================================================

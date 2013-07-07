@@ -1,16 +1,16 @@
-#include <jigl/lexing/lex.hpp>
-#include <jigl/lexing/id.hpp>
+#include <aeon/lexing/lex.hpp>
+#include <aeon/lexing/id.hpp>
 #include <atma/assert.hpp>
 
-using jigl::lexing::lexeme_t;
-using jigl::lexing::lexemes_t;
-using jigl::lexing::stream_t;
-using jigl::lexing::state_t;
-using jigl::lexing::ID;
-using jigl::lexing::position_t;
-using jigl::lexing::multichannel_t;
+using aeon::lexing::lexeme_t;
+using aeon::lexing::lexemes_t;
+using aeon::lexing::stream_t;
+using aeon::lexing::state_t;
+using aeon::lexing::ID;
+using aeon::lexing::position_t;
+using aeon::lexing::multichannel_t;
 
-jigl::lexing::multichannel_t jigl::lexing::multichannel_t::all(0xffffffff);
+aeon::lexing::multichannel_t aeon::lexing::multichannel_t::all(0xffffffff);
 
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)
@@ -37,7 +37,7 @@ auto stream_t::valid() const -> bool {
 	return current_ != end_;
 }
 
-auto stream_t::position() const -> jigl::lexing::position_t const& {
+auto stream_t::position() const -> aeon::lexing::position_t const& {
 	return position_;
 }
 
@@ -171,28 +171,28 @@ done:;
 namespace
 {
 	namespace {
-		using namespace jigl::lexing;
+		using namespace aeon::lexing;
 		#define X(n,s,l,c) c,
-		jigl::lexing::channel_t const channels[] = {
-			JIGL_LEXING_IDS()
+		aeon::lexing::channel_t const channels[] = {
+			AEON_LEXING_IDS()
 		};
 		#undef X
 	}
 
 	#define X(n,s,l,c) s,
 	char const* keywords[] = {
-		JIGL_LEXING_IDS()
+		AEON_LEXING_IDS()
 	};
 	#undef X
 
 	#define X(n,s,l,c) l,
 	uint32_t keyword_lengths[] = {
-		JIGL_LEXING_IDS()
+		AEON_LEXING_IDS()
 	};
 	#undef X
 
-	uint32_t const keywords_begin = static_cast<uint32_t>(jigl::lexing::ID::keyword_lower_bound) + 1;
-	uint32_t const keywords_end = static_cast<uint32_t>(jigl::lexing::ID::keyword_upper_bound);
+	uint32_t const keywords_begin = static_cast<uint32_t>(aeon::lexing::ID::keyword_lower_bound) + 1;
+	uint32_t const keywords_end = static_cast<uint32_t>(aeon::lexing::ID::keyword_upper_bound);
 }
 
 
@@ -220,7 +220,7 @@ auto identifier(state_t& state, stream_t& stream) -> void
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (stream.current() - b) && !strncmp(b, keywords[x], keyword_lengths[x])) {
-			state.push_back(static_cast<jigl::lexing::ID>(x), b, stream.current(), stream.marked_position(), channels[x]);
+			state.push_back(static_cast<aeon::lexing::ID>(x), b, stream.current(), stream.marked_position(), channels[x]);
 			return;
 		}
 		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
@@ -348,7 +348,7 @@ auto character_literal(state_t& state, stream_t& stream) -> void
 
 
 
-auto jigl::lexing::lex(state_t& state, stream_t& stream) -> void
+auto aeon::lexing::lex(state_t& state, stream_t& stream) -> void
 {
 begin:
 	if (!stream.valid())

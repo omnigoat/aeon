@@ -3,17 +3,17 @@
 //
 //
 //=====================================================================
-#ifndef JIGL_PARSING_PARSEMES_HPP
-#define JIGL_PARSING_PARSEMES_HPP
+#ifndef AEON_PARSING_PARSEMES_HPP
+#define AEON_PARSING_PARSEMES_HPP
 //=====================================================================
 #include <cstdint>
 #include <ostream>
 #include <vector>
 #include <memory>
 //=====================================================================
-#include <jigl/parsing/parsemes.hpp>
+#include <aeon/parsing/parsemes.hpp>
 //=====================================================================
-namespace jigl {
+namespace aeon {
 namespace parsing {
 //=====================================================================
 	
@@ -50,7 +50,7 @@ namespace parsing {
 
 //=====================================================================
 } // namespace parsing
-} // namespace jigl
+} // namespace aeon
 //=====================================================================
 #endif
 //=====================================================================

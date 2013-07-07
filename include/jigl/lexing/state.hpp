@@ -3,13 +3,13 @@
 //
 //
 //=====================================================================
-#ifndef JIGL_LEXING_LEXING_STATE_HPP
-#define JIGL_LEXING_LEXING_STATE_HPP
+#ifndef AEON_LEXING_LEXING_STATE_HPP
+#define AEON_LEXING_LEXING_STATE_HPP
 //=====================================================================
-#include <jigl/lexing/lexeme.hpp>
-#include <jigl/lexing/lexemes.hpp>
+#include <aeon/lexing/lexeme.hpp>
+#include <aeon/lexing/lexemes.hpp>
 //=====================================================================
-namespace jigl {
+namespace aeon {
 namespace lexing {
 //=====================================================================
 	
@@ -32,7 +32,7 @@ namespace lexing {
 
 //=====================================================================
 } // namespace lexing
-} // namespace jigl
+} // namespace aeon
 //=====================================================================
 #endif
 //=====================================================================

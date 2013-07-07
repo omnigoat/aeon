@@ -1,8 +1,8 @@
-#include <jigl/lexing/lexeme.hpp>
+#include <aeon/lexing/lexeme.hpp>
 //=====================================================================
-using jigl::lexing::lexeme_t;
-using jigl::lexing::position_t;
-using jigl::lexing::multichannel_t;
+using aeon::lexing::lexeme_t;
+using aeon::lexing::position_t;
+using aeon::lexing::multichannel_t;
 //=====================================================================
 
 lexeme_t::lexeme_t( id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)

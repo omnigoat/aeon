@@ -1,9 +1,9 @@
 #include <cstdint>
 #include <iostream>
 
-#include <jigl/lexing/lex.hpp>
-#include <jigl/lexing/id.hpp>
-#include <jigl/parsing/parse.hpp>
+#include <aeon/lexing/lex.hpp>
+#include <aeon/lexing/id.hpp>
+#include <aeon/parsing/parse.hpp>
 
 #define ATMA_ASSERT_RETURN(x) \
 	if (!(x)) { \
@@ -43,7 +43,7 @@ private:
 
 auto main(uint32_t arg_count, char const** args) -> int
 {
-	using namespace jigl;
+	using namespace aeon;
 
 
 	if (arg_count <= 1)
@@ -55,21 +55,21 @@ auto main(uint32_t arg_count, char const** args) -> int
 	// lexical analysis
 	lexing::lexemes_t lexemes;
 	{
-		using namespace jigl::lexing;
+		using namespace aeon::lexing;
 
 		state_t state(lexemes);
-		lex(state, jigl::lexing::stream_t(file.begin(), file.end()));
-		auto B = state.lexemes().begin(jigl::lexing::multichannel_t(0xffff));
-		lexemes_t::const_iterator ci = jigl::lexing::lexemes_t::iterator();
+		lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
+		auto B = state.lexemes().begin(aeon::lexing::multichannel_t(0xffff));
+		lexemes_t::const_iterator ci = aeon::lexing::lexemes_t::iterator();
 
-		for (auto i = state.lexemes().begin(jigl::lexing::basic); i != state.lexemes().end(jigl::lexing::basic); ++i)
+		for (auto i = state.lexemes().begin(aeon::lexing::basic); i != state.lexemes().end(aeon::lexing::basic); ++i)
 			std::cout << *i << std::endl;
 	}
 	
 	// syntactic analysis
 	parsing::parsemes_t parsemes;
 	{
-		using namespace jigl::parsing;
+		using namespace aeon::parsing;
 
 		parse(parsemes, lexemes);
 	}

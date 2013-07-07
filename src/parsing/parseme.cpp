@@ -1,16 +1,16 @@
-#include <jigl/parsing/parseme.hpp>
+#include <aeon/parsing/parseme.hpp>
 #include <atma/assert.hpp>
 
-using jigl::parsing::parseme_t;
-using jigl::parsing::parseme_ptr;
-using jigl::parsing::parsemes_t;
+using aeon::parsing::parseme_t;
+using aeon::parsing::parseme_ptr;
+using aeon::parsing::parsemes_t;
 
 parseme_t::parseme_t(id_t id)
 	: id_(id)
 {
 }
 
-parseme_t::parseme_t(parseme_ptr const& parent, id_t id, jigl::lexing::lexeme_t* lexeme)
+parseme_t::parseme_t(parseme_ptr const& parent, id_t id, aeon::lexing::lexeme_t* lexeme)
 	: id_(id), parent_(parent), children_(this), lexeme_(lexeme)
 {
 }
@@ -25,7 +25,7 @@ auto parseme_t::parent() const -> parseme_ptr const&
 	return parent_;
 }
 
-auto parseme_t::children() const -> jigl::parsing::parsemes_t const&
+auto parseme_t::children() const -> aeon::parsing::parsemes_t const&
 {
 	return children_;
 }
