@@ -31,6 +31,7 @@ namespace parsing {
 		auto id() const -> id_t;
 		auto parent() const -> parseme_ptr const&;
 		auto children() const -> parsemes_t const&;
+		auto children() -> parsemes_t&;
 
 		auto set_parent(parseme_ptr const&) -> void;
 

@@ -67,8 +67,8 @@ auto stream_t::marked_position() const -> position_t const& {
 }
 
 
-state_t::state_t()
-	: empty_line_(true), previous_tabs_(), tabs_()
+state_t::state_t(lexemes_t& lexemes)
+	: empty_line_(true), previous_tabs_(), tabs_(), lexemes_(lexemes)
 {
 }
 

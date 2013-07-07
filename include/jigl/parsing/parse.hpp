@@ -9,7 +9,8 @@
 #include <cstdint>
 #include <ostream>
 //=====================================================================
-#include <jigl/parsing/parseme.hpp>
+#include <jigl/lexing/lexemes.hpp>
+#include <jigl/parsing/parsemes.hpp>
 //=====================================================================
 namespace jigl {
 namespace parsing {
@@ -22,8 +23,11 @@ namespace parsing {
 			parsemes_t root;
 		};
 
-		void module();
+		void module(parsemes_t&, lexing::lexemes_t const&);
 	}
+
+
+	auto parse(parsemes_t&, lexing::lexemes_t const&) -> void;
 
 //=====================================================================
 } // namespace parsing

@@ -15,7 +15,7 @@ namespace lexing {
 	
 	struct state_t
 	{
-		state_t();
+		state_t(lexemes_t& lexemes);
 
 		auto lexemes() const -> lexemes_t const& { return lexemes_; }
 		
@@ -27,7 +27,7 @@ namespace lexing {
 	private:
 		uint32_t tabs_, previous_tabs_;
 		bool empty_line_;
-		lexemes_t lexemes_;
+		lexemes_t& lexemes_;
 	};
 
 //=====================================================================
