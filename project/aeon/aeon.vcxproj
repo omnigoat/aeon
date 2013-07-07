@@ -77,15 +77,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\jigl\lexing\id.hpp" />
-    <ClInclude Include="..\..\include\jigl\lexing\lex.hpp" />
-    <ClInclude Include="..\..\include\jigl\lexing\lexeme.hpp" />
-    <ClInclude Include="..\..\include\jigl\lexing\lexemes.hpp" />
-    <ClInclude Include="..\..\include\jigl\lexing\state.hpp" />
-    <ClInclude Include="..\..\include\jigl\lexing\stream.hpp" />
-    <ClInclude Include="..\..\include\jigl\parsing\parse.hpp" />
-    <ClInclude Include="..\..\include\jigl\parsing\parseme.hpp" />
-    <ClInclude Include="..\..\include\jigl\parsing\parsemes.hpp" />
+    <None Include="..\..\resource\basic-lexing.jigl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\aeon\lexing\id.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\lex.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\lexeme.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\lexemes.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\state.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\parseme.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\parsemes.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
@@ -94,9 +97,6 @@
     <ClCompile Include="..\..\src\parsing\parse.cpp" />
     <ClCompile Include="..\..\src\parsing\parseme.cpp" />
     <ClCompile Include="..\..\src\parsing\parsemes.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\resource\basic-lexing.jigl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

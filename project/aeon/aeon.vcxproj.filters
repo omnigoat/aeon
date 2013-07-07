@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="resources">
+      <UniqueIdentifier>{9a4950b0-1ead-4beb-a213-b032a34e2b96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{8675a374-28ee-403d-93bb-6af00341f5ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\lexing">
+      <UniqueIdentifier>{cc6eb56b-d08c-4d2b-ad7a-b3b1c6be01fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{682809eb-bc38-4a09-93d0-a40cc1e421d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\lexing">
+      <UniqueIdentifier>{fda9c729-4f58-4e95-b80f-ab233ba6efb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\parsing">
+      <UniqueIdentifier>{586b2512-0df8-4ccc-ba16-74a7ae44e84d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\parsing">
+      <UniqueIdentifier>{1fbcae71-5cca-4d60-b77a-306037f78c6c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\resource\basic-lexing.jigl">
+      <Filter>resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\aeon\lexing\id.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\lex.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\lexeme.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\lexemes.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\state.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\stream.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\parse.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\parseme.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\parsemes.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\lexing\lex.cpp">
+      <Filter>source\lexing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lexing\lexeme.cpp">
+      <Filter>source\lexing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parsing\parse.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parsing\parseme.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parsing\parsemes.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp" />
+  </ItemGroup>
+</Project>

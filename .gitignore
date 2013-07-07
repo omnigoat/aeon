@@ -20,8 +20,8 @@ project/*.log
 ; jigl
 project/Debug/
 project/Release/
-project/jigl/Debug/
-project/jigl/Release/
+project/aeon/Debug/
+project/aeon/Release/
 
 
 
