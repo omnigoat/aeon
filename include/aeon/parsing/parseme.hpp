@@ -52,7 +52,9 @@ namespace parsing {
 	enum class parseme_t::id_t{
 		module,
 		function,
-		type
+		parameter_list,
+		parameter,
+		type_name
 	};
 
 

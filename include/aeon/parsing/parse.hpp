@@ -23,7 +23,8 @@ namespace parsing {
 			parsemes_t root;
 		};
 
-		void module(parsemes_t&, lexing::lexemes_t const&);
+		auto module(parsemes_t&, lexing::lexemes_t const&) -> bool;
+		auto function(parsemes_t&, lexing::lexemes_t const&) -> bool;
 	}
 
 
