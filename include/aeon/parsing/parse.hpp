@@ -3,8 +3,8 @@
 //
 //
 //=====================================================================
-#ifndef AEON_PARSING_PARSEME_HPP
-#define AEON_PARSING_PARSEME_HPP
+#ifndef AEON_PARSING_PARSE_HPP
+#define AEON_PARSING_PARSE_HPP
 //=====================================================================
 #include <cstdint>
 #include <ostream>
@@ -20,11 +20,11 @@ namespace parsing {
 	{
 		struct context_t
 		{
-			parsemes_t root;
+			lexing::lexemes_t::const_iterator begin;
 		};
 
-		auto module(parsemes_t&, lexing::lexemes_t const&) -> bool;
-		auto function(parsemes_t&, lexing::lexemes_t const&) -> bool;
+		auto module(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
+		auto function(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 	}
 
 

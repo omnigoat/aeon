@@ -9,7 +9,6 @@
 #include <vector>
 //=====================================================================
 #include <atma/assert.hpp>
-#include <atma/type.hpp>
 //=====================================================================
 #include <aeon/lexing/lexeme.hpp>
 //=====================================================================
@@ -54,6 +53,7 @@ namespace lexing {
 
 			// operators
 			auto operator * () -> T&;
+			auto operator -> () -> T*;
 			auto operator ++ () -> iterator&;
 			auto operator -- () -> iterator&;
 
@@ -213,6 +213,10 @@ namespace lexing {
 		return *iterator_;
 	}
 	
+	template <typename T>
+	auto detail::iterator<T>::operator -> () -> T* {
+		return &*iterator_;
+	}
 
 	template <typename T>
 	auto detail::iterator<T>::operator ++ () -> iterator& {
