@@ -28,6 +28,11 @@ auto parsemes_t::end() const -> const_iterator
 	return elements_.cend();
 }
 
+auto parsemes_t::push_back(parseme_ptr const& x) -> void
+{
+	elements_.push_back(x);
+}
+
 auto parsemes_t::replace(const_iterator const& i, parseme_ptr const& n) -> void
 {
 	parseme_ptr p = *i;

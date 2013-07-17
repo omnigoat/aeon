@@ -56,6 +56,8 @@ namespace lexing {
 			auto operator -> () -> T*;
 			auto operator ++ () -> iterator&;
 			auto operator -- () -> iterator&;
+			auto operator ++ (int) -> iterator;
+			auto operator -- (int) -> iterator;
 
 		private:
 			typedef typename elements_iterator_pred<T>::type elements_iterator_t;
@@ -234,7 +236,19 @@ namespace lexing {
 		return *this;
 	}
 
+	template <typename T>
+	auto detail::iterator<T>::operator ++ (int) -> iterator {
+		auto r = *this;
+		++*this;
+		return r;
+	}
 
+	template <typename T>
+	auto detail::iterator<T>::operator -- (int) -> iterator {
+		auto r = *this;
+		--*this;
+		return r;
+	}
 
 	
 

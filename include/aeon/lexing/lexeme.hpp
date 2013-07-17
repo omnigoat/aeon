@@ -73,6 +73,10 @@ namespace lexing {
 		multichannel_t(channel_t const& ch) : bits_(ch.bits_) {}
 		static multichannel_t all;
 
+		auto as_int() const -> uint32_t { return bits_; }
+
+		operator bool() const { return bits_ != 0; }
+
 	private:
 		uint32_t bits_;
 
@@ -88,6 +92,10 @@ namespace lexing {
 		return multichannel_t(lhs.as_int() | rhs.as_int());
 	}
 	
+	inline auto operator & (multichannel_t const& lhs, channel_t const& rhs) -> multichannel_t {
+		return multichannel_t(lhs.as_int() & rhs.as_int());
+	}
+
 
 	//=====================================================================
 	// lexeme

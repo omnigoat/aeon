@@ -26,7 +26,7 @@ namespace parsing {
 		enum class id_t;
 
 		parseme_t(id_t);
-		parseme_t(id_t id, lexing::lexeme_t* = nullptr);
+		parseme_t(id_t id, lexing::lexeme_t const* = nullptr);
 		
 		auto id() const -> id_t;
 		auto parent() const -> parseme_ptr const&;
@@ -39,7 +39,7 @@ namespace parsing {
 		id_t id_;
 		parseme_ptr parent_;
 		parsemes_t children_;
-		lexing::lexeme_t* lexeme_;
+		lexing::lexeme_t const* lexeme_;
 	};
 	
 	enum class parseme_t::id_t

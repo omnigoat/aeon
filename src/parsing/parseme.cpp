@@ -10,8 +10,8 @@ parseme_t::parseme_t(id_t id)
 {
 }
 
-parseme_t::parseme_t(parseme_ptr const& parent, id_t id, aeon::lexing::lexeme_t* lexeme)
-	: id_(id), parent_(parent), children_(this), lexeme_(lexeme)
+parseme_t::parseme_t(id_t id, aeon::lexing::lexeme_t const* lexeme)
+	: id_(id), children_(this), lexeme_(lexeme)
 {
 }
 
