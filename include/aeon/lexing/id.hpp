@@ -14,6 +14,8 @@ namespace lexing {
 	static channel_t const basic(0);
 	static channel_t const whitespace(1);
 	static channel_t const control(2);
+	
+	static multichannel_t const all(3);
 
 	#define AEON_LEXING_IDS() \
 		X(identifier, "", 0, basic) \

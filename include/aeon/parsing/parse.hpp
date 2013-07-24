@@ -25,6 +25,7 @@ namespace parsing {
 
 		auto module(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 		auto function(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
+		auto parameters(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 	}
 
 

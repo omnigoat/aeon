@@ -6,7 +6,7 @@ using aeon::parsing::parseme_ptr;
 using aeon::parsing::parsemes_t;
 
 parseme_t::parseme_t(id_t id)
-	: id_(id)
+	: id_(id), children_(this)
 {
 }
 
@@ -25,7 +25,12 @@ auto parseme_t::parent() const -> parseme_ptr const&
 	return parent_;
 }
 
-auto parseme_t::children() const -> aeon::parsing::parsemes_t const&
+auto parseme_t::children() const -> children_t const&
+{
+	return children_;
+}
+
+auto parseme_t::children() -> children_t&
 {
 	return children_;
 }

@@ -59,18 +59,20 @@ namespace lexing {
 			auto operator ++ (int) -> iterator;
 			auto operator -- (int) -> iterator;
 
+			// mutators
+			auto set_channel(multichannel_t const& mc) -> void;
+
 		private:
 			typedef typename elements_iterator_pred<T>::type elements_iterator_t;
 			typedef typename owner_ptr_pred<T>::type owner_ptr;
 
 			// constructors
-			
-			iterator(owner_ptr, elements_iterator_t const& lbound, elements_iterator_t const& ubound, elements_iterator_t const& iter, channel_t const&);
+			iterator(owner_ptr, elements_iterator_t const& lbound, elements_iterator_t const& ubound, elements_iterator_t const& iter, multichannel_t const&);
 
 			// members
 			owner_ptr owner_;
 			elements_iterator_t lbound_, ubound_, iterator_;
-			channel_t channel_;
+			multichannel_t channel_;
 
 			// friends
 			friend struct lexemes_t;
@@ -197,7 +199,7 @@ namespace lexing {
 	}
 
 	template <typename T>
-	detail::iterator<T>::iterator(owner_ptr owner, elements_iterator_t const& lbound, elements_iterator_t const& ubound, elements_iterator_t const& iter, channel_t const& channel)
+	detail::iterator<T>::iterator(owner_ptr owner, elements_iterator_t const& lbound, elements_iterator_t const& ubound, elements_iterator_t const& iter, multichannel_t const& channel)
 		: owner_(owner), lbound_(lbound), ubound_(ubound), iterator_(iter), channel_(channel)
 	{
 		ATMA_ASSERT(iterator_ == owner_->elements_.end() || (iterator_->channel() & channel));
@@ -250,6 +252,10 @@ namespace lexing {
 		return r;
 	}
 
+	template <typename T>
+	auto detail::iterator<T>::set_channel(multichannel_t const& mc) -> void {
+		channel_ = mc;
+	}
 	
 
 //=====================================================================

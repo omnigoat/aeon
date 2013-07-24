@@ -23,22 +23,23 @@ namespace parsing {
 	
 	struct parseme_t : std::enable_shared_from_this<parseme_t>
 	{
+		typedef parsemes_t children_t;
 		enum class id_t;
 
 		parseme_t(id_t);
-		parseme_t(id_t id, lexing::lexeme_t const* = nullptr);
+		parseme_t(id_t id, lexing::lexeme_t const*);
 		
 		auto id() const -> id_t;
 		auto parent() const -> parseme_ptr const&;
-		auto children() const -> parsemes_t const&;
-		auto children() -> parsemes_t&;
+		auto children() const -> children_t const&;
+		auto children() -> children_t&;
 
 		auto set_parent(parseme_ptr const&) -> void;
 
 	private:
 		id_t id_;
 		parseme_ptr parent_;
-		parsemes_t children_;
+		children_t children_;
 		lexing::lexeme_t const* lexeme_;
 	};
 	
