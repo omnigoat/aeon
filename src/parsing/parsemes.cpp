@@ -18,6 +18,21 @@ parsemes_t::parsemes_t(parseme_t* owner)
 	ATMA_ASSERT(owner_);
 }
 
+auto parsemes_t::size() const -> uint32_t
+{
+	return elements_.size();
+}
+
+auto parsemes_t::front() const -> parseme_ptr const&
+{
+	return elements_.front();
+}
+
+auto parsemes_t::back() const -> parseme_ptr const&
+{
+	return elements_.back();
+}
+
 auto parsemes_t::begin() const -> const_iterator
 {
 	return elements_.cbegin();
@@ -53,3 +68,10 @@ auto parsemes_t::unconst(const_iterator const& i) -> iterator
 {
 	return elements_.erase(i, i);
 }
+
+auto parsemes_t::pop_back() -> void
+{
+	elements_.back()->set_parent(nullptr);
+	elements_.pop_back();
+}
+

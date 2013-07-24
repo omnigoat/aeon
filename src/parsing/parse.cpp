@@ -76,38 +76,78 @@ auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t con
 	{
 		if (context.begin->id() != lexid::identifier)
 			goto fail;
-		id_node.reset(new parseme_t(parsid::function_name, &*context.begin++));
+		id_node.reset(new parseme_t(parsid::identifier, &*context.begin++));
 		fn_node->children().push_back(id_node);
 	}
 
 	// parameter list
 	{
-		if (!match(context.begin, lexing::all)(lexid::punctuation, ":")(lexid::punctuation, ":"))
+		if (!match(context.begin, lexing::basic)(lexid::punctuation, "::"))
 			goto fail;
 		parameter_list_node.reset(new parseme_t(parsid::parameter_list));
 	
 		detail::context_t ctx = { context.begin };
 		if (!parameters(parameter_list_node->children(), lexemes, ctx))
 			goto fail;
+
+		// last parameter moved to return-type
+		ATMA_ASSERT( parameter_list_node->children().size() >= 2 );
+		parseme_ptr return_type = parameter_list_node->children().back();
+		parameter_list_node->children().pop_back();
+		fn_node->children().push_back(return_type);
+
+		fn_node->children().push_back(parameter_list_node);
 	}
 
 	// function body.
 	{
 	}
 
-	goto done;
 
-fail:
-	
-	return false;
-
-done:
+	// done!
 	parsemes.push_back(fn_node);
 	return true;
+
+fail:
+	return false;
 }
 
 auto aeon::parsing::detail::parameters(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
+	for (;;)
+	{
+		parseme_ptr parameter_node(new parseme_t(parsid::parameter));
+		parseme_ptr id_node;
+
+		// <optional identifier> as <typename>
+		{
+			if (context.begin->id() != lexid::identifier)
+				goto param_type;
+			id_node.reset(new parseme_t(parsid::identifier, &*context.begin++));
+
+			if (context.begin->id() != lexid::as_keyword)
+				goto fail;
+			++context.begin;
+
+			parameter_node->children().push_back(id_node);
+
+param_type:
+			if (context.begin->id() != lexid::type)
+				goto fail;
+
+			parseme_ptr param_type_node(new parseme_t(parsid::type_name, &*context.begin++));
+			parameter_node->children().push_back(param_type_node);
+		}
+
+		parsemes.push_back(parameter_node);
+
+		if ( !match(context.begin, lexing::basic)(lexid::punctuation, "->") )
+			break;
+	}
+
 	return true;
+
+fail:
+	return false;
 }
 

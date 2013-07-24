@@ -47,10 +47,10 @@ namespace parsing {
 	{
 		module,
 		function,
-		function_name,
 		parameter_list,
 		parameter,
-		type_name
+		type_name,
+		identifier
 	};
 
 

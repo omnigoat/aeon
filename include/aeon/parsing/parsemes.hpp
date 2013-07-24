@@ -28,6 +28,11 @@ namespace parsing {
 
 		parsemes_t();
 
+		auto size() const -> uint32_t;
+
+		auto front() const -> parseme_ptr const&;
+		auto back() const -> parseme_ptr const&;
+
 		auto begin() const -> const_iterator;
 		auto end() const -> const_iterator;
 		
@@ -35,7 +40,7 @@ namespace parsing {
 		auto detach(const_iterator const&) -> parseme_ptr;
 
 		auto push_back(parseme_ptr const&) -> void;
-		
+		auto pop_back() -> void;
 
 	private:
 		parsemes_t(parseme_t*);
