@@ -3,15 +3,14 @@
 //
 //
 //=====================================================================
-#ifndef AEON_PARSING_PARSE_HPP
-#define AEON_PARSING_PARSE_HPP
+#ifndef AEON_PARSING_CONTEXT_HPP
+#define AEON_PARSING_CONTEXT_HPP
 //=====================================================================
 #include <cstdint>
 #include <ostream>
 //=====================================================================
 #include <aeon/lexing/lexemes.hpp>
 #include <aeon/parsing/parsemes.hpp>
-#include <aeon/parsing/context.hpp>
 //=====================================================================
 namespace aeon {
 namespace parsing {
@@ -19,16 +18,16 @@ namespace parsing {
 	
 	namespace detail
 	{
-		struct context_t;
+		struct context_t
+		{
+			context_t(lexing::lexemes_t::const_iterator const&);
 
-		auto module(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto function(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto parameters(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto function_body(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
+			auto match_make(lexing::ID, parseme_t::id_t) -> parseme_ptr;
+
+		private:
+			lexing::lexemes_t::const_iterator begin_;
+		};
 	}
-
-
-	auto parse(parsemes_t&, lexing::lexemes_t const&) -> void;
 
 //=====================================================================
 } // namespace parsing

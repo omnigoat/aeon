@@ -56,6 +56,9 @@
     <ClInclude Include="..\..\include\aeon\parsing\parsemes.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\context.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -74,5 +77,8 @@
       <Filter>source\parsing</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\parsing\context.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
