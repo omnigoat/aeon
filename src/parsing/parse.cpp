@@ -94,13 +94,16 @@ auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t con
 		ATMA_ASSERT( parameter_list_node->children().size() >= 2 );
 		parseme_ptr return_type = parameter_list_node->children().back();
 		parameter_list_node->children().pop_back();
-		fn_node->children().push_back(return_type);
 
 		fn_node->children().push_back(parameter_list_node);
+		fn_node->children().push_back(return_type);
 	}
 
 	// function body.
 	{
+		if (!function_body(function_body_node->children(), lexemes, context))
+			goto fail;
+
 	}
 
 
@@ -151,3 +154,15 @@ fail:
 	return false;
 }
 
+auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+{
+	if (context.begin->id() != lexid::block_begin)
+		goto fail;
+	function_body_node.reset(new parseme_t(parsid::function_body, &*context.begin++));
+	
+
+	return true;
+
+fail:
+	return false;
+}

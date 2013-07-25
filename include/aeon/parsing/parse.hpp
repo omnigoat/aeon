@@ -20,12 +20,18 @@ namespace parsing {
 	{
 		struct context_t
 		{
-			lexing::lexemes_t::const_iterator begin;
+			context_t(lexing::lexemes_t::const_iterator const&);
+
+			auto match_make(lexing::ID, parseme_t::id_t) -> parseme_ptr;
+
+		private:
+			lexing::lexemes_t::const_iterator begin_;
 		};
 
 		auto module(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 		auto function(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 		auto parameters(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
+		auto function_body(parsemes_t&, lexing::lexemes_t const&, detail::context_t&) -> bool;
 	}
 
 
