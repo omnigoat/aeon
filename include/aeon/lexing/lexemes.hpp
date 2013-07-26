@@ -53,7 +53,9 @@ namespace lexing {
 
 			// operators
 			auto operator * () -> T&;
+			auto operator * () const -> T const&;
 			auto operator -> () -> T*;
+			auto operator -> () const -> T const*;
 			auto operator ++ () -> iterator&;
 			auto operator -- () -> iterator&;
 			auto operator ++ (int) -> iterator;
@@ -219,6 +221,16 @@ namespace lexing {
 	
 	template <typename T>
 	auto detail::iterator<T>::operator -> () -> T* {
+		return &*iterator_;
+	}
+
+	template <typename T>
+	auto detail::iterator<T>::operator * () const -> T const& {
+		return *iterator_;
+	}
+	
+	template <typename T>
+	auto detail::iterator<T>::operator -> () const -> T const* {
 		return &*iterator_;
 	}
 

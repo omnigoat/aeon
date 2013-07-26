@@ -10,8 +10,7 @@ typedef aeon::parsing::parseme_t::id_t parsid;
 
 auto aeon::parsing::parse(parsemes_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
-	detail::context_t context;
-	context.begin = lexemes.begin(lexing::basic);
+	detail::context_t context(lexemes.begin(lexing::basic));
 	detail::module(parsemes, lexemes, context);
 }
 
@@ -62,41 +61,43 @@ match_t match(aeon::lexing::lexemes_t::const_iterator& i, aeon::lexing::multicha
 
 auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	parseme_ptr fn_node, id_node, parameter_list_node;
+	parseme_ptr fn_node, id_node, parameter_list_node, function_body_node;
 
-	if (context.begin->id() != lexid::function_keyword)
-		goto fail;
-	
 	// function keyword
 	{
-		fn_node.reset(new parseme_t(parsid::function, &*context.begin++));
+		fn_node = context.match_make(parsid::function, lexid::function_keyword);
+		if (!fn_node)
+			goto fail;
 	}
 
 	// identifier
 	{
-		if (context.begin->id() != lexid::identifier)
+		id_node = context.match_make(parsid::identifier, lexid::identifier);
+		if (!id_node)
 			goto fail;
-		id_node.reset(new parseme_t(parsid::identifier, &*context.begin++));
 		fn_node->children().push_back(id_node);
 	}
 
 	// parameter list
 	{
-		if (!match(context.begin, lexing::basic)(lexid::punctuation, "::"))
+		parameter_list_node = context.match_make(parsid::parameter_list, lexid::punctuation, "::");
+		if (!parameter_list_node)
 			goto fail;
-		parameter_list_node.reset(new parseme_t(parsid::parameter_list));
-	
-		detail::context_t ctx = { context.begin };
-		if (!parameters(parameter_list_node->children(), lexemes, ctx))
+		
+		if (!parameters(parameter_list_node->children(), lexemes, context))
 			goto fail;
 
-		// last parameter moved to return-type
-		ATMA_ASSERT( parameter_list_node->children().size() >= 2 );
-		parseme_ptr return_type = parameter_list_node->children().back();
-		parameter_list_node->children().pop_back();
+		parseme_ptr return_type_node = context.match_make(parsid::type, lexid::type);
+		if (!return_type_node)
+			goto fail;
+
+		//// last parameter moved to return-type
+		//ATMA_ASSERT( parameter_list_node->children().size() >= 2 );
+		//parseme_ptr return_type = parameter_list_node->children().back();
+		//parameter_list_node->children().pop_back();
 
 		fn_node->children().push_back(parameter_list_node);
-		fn_node->children().push_back(return_type);
+		fn_node->children().push_back(return_type_node);
 	}
 
 	// function body.
@@ -120,32 +121,32 @@ auto aeon::parsing::detail::parameters(parsemes_t& parsemes, lexing::lexemes_t c
 	for (;;)
 	{
 		parseme_ptr parameter_node(new parseme_t(parsid::parameter));
-		parseme_ptr id_node;
-
+		
 		// <optional identifier> as <typename>
+		detail::context_t old_context = context;
 		{
-			if (context.begin->id() != lexid::identifier)
-				goto param_type;
-			id_node.reset(new parseme_t(parsid::identifier, &*context.begin++));
+			parseme_ptr id_node = context.match_make(parsid::identifier, lexid::identifier);
+			if (id_node) {
+				if (!context.skip(lexid::as_keyword))
+					goto fail;
 
-			if (context.begin->id() != lexid::as_keyword)
-				goto fail;
-			++context.begin;
+				parameter_node->children().push_back(id_node);
+			}
 
-			parameter_node->children().push_back(id_node);
-
-param_type:
-			if (context.begin->id() != lexid::type)
+			parseme_ptr param_type_node = context.match_make(parsid::type_name, lexid::type);
+			if (!param_type_node)
 				goto fail;
 
-			parseme_ptr param_type_node(new parseme_t(parsid::type_name, &*context.begin++));
 			parameter_node->children().push_back(param_type_node);
 		}
 
-		parsemes.push_back(parameter_node);
-
-		if ( !match(context.begin, lexing::basic)(lexid::punctuation, "->") )
+		if ( !context.skip(lexid::punctuation, "->") ) //!match(context.begin, lexing::basic)(lexid::punctuation, "->") )
+		{
+			context = old_context;
 			break;
+		}
+
+		parsemes.push_back(parameter_node);
 	}
 
 	return true;
@@ -156,7 +157,8 @@ fail:
 
 auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	if (context.begin->id() != lexid::block_begin)
+#if 0
+	if (context->id() != lexid::block_begin)
 		goto fail;
 	function_body_node.reset(new parseme_t(parsid::function_body, &*context.begin++));
 	
@@ -165,4 +167,6 @@ auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_
 
 fail:
 	return false;
+#endif
+	return true;
 }

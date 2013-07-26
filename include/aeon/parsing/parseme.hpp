@@ -50,7 +50,8 @@ namespace parsing {
 		parameter_list,
 		parameter,
 		type_name,
-		identifier
+		identifier,
+		type
 	};
 
 

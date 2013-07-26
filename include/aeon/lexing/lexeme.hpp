@@ -113,7 +113,10 @@ namespace lexing {
 		auto begin() const -> char const*;
 		auto end() const -> char const*;
 		auto text() const -> std::string;
-		
+
+		auto streq(char const*) const -> bool;
+		auto streq(char const*, char const*) const -> bool;
+
 	private:
 		id_t id_;
 		char const* begin_;
