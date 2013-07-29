@@ -6,7 +6,7 @@ using aeon::parsing::parseme_ptr;
 using aeon::parsing::parsemes_t;
 
 parseme_t::parseme_t(id_t id)
-	: id_(id), children_(this)
+	: id_(id), children_(this), lexeme_()
 {
 }
 
@@ -18,6 +18,14 @@ parseme_t::parseme_t(id_t id, aeon::lexing::lexeme_t const* lexeme)
 auto parseme_t::id() const -> id_t
 {
 	return id_;
+}
+
+auto parseme_t::text() const -> aeon::lexing::lexeme_t::text_t const&
+{
+	if (lexeme_)
+		return lexeme_->text();
+	else
+		return lexing::lexeme_t::empty_text;
 }
 
 auto parseme_t::parent() const -> parseme_ptr const&
@@ -41,20 +49,3 @@ auto parseme_t::set_parent(parseme_ptr const& p) -> void
 	parent_ = p;
 }
 
-#if 0
-auto parseme_t::add_child(parseme_ptr const& child) -> void
-{
-	children_.push_back(child);
-}
-
-auto parseme_t::remove_child(parsemes_t::const_iterator const& child) -> void
-{
-	children_.erase(child);
-}
-
-auto parseme_t::replace_child(parsemes_t::const_iterator const& old_child, parseme_ptr const& new_child) -> void
-{
-	// what a weird way to get an iterator from a const_iterator
-	*children_.erase(old_child, old_child) = new_child;
-}
-#endif

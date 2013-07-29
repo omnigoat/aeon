@@ -30,10 +30,11 @@ namespace parsing {
 		parseme_t(id_t id, lexing::lexeme_t const*);
 		
 		auto id() const -> id_t;
+		auto text() const -> lexing::lexeme_t::text_t const&;
 		auto parent() const -> parseme_ptr const&;
 		auto children() const -> children_t const&;
 		auto children() -> children_t&;
-
+		
 		auto set_parent(parseme_ptr const&) -> void;
 
 	private:
@@ -43,6 +44,10 @@ namespace parsing {
 		lexing::lexeme_t const* lexeme_;
 	};
 	
+	inline std::ostream& operator << (std::ostream& stream, parseme_t const& x) {
+		return stream << static_cast<int>(x.id()) << ": " << x.text();
+	}
+
 	enum class parseme_t::id_t
 	{
 		module,
@@ -51,7 +56,9 @@ namespace parsing {
 		parameter,
 		type_name,
 		identifier,
-		type
+		type,
+		block,
+		return_statement
 	};
 
 

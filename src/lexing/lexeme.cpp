@@ -6,8 +6,10 @@ using aeon::lexing::position_t;
 using aeon::lexing::multichannel_t;
 //=====================================================================
 
-lexeme_t::lexeme_t( id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)
-: id_(id), begin_(begin), end_(end), position_(position), channel_(channel)
+lexeme_t::text_t const lexeme_t::empty_text;
+
+lexeme_t::lexeme_t(id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)
+: id_(id), text_(begin, end), position_(position), channel_(channel)
 {
 }
 
@@ -25,36 +27,36 @@ auto lexeme_t::channel() const -> multichannel_t const&
 {
 	return channel_;
 }
+//
+//auto lexeme_t::begin() const -> char const*
+//{
+//	return begin_;
+//}
+//
+//auto lexeme_t::end() const -> char const*
+//{
+//	return end_;
+//}
 
-auto lexeme_t::begin() const -> char const*
+auto lexeme_t::text() const -> text_t const&
 {
-	return begin_;
-}
-
-auto lexeme_t::end() const -> char const*
-{
-	return end_;
-}
-
-auto lexeme_t::text() const -> std::string
-{
-	return std::string(begin_, end_);
+	return text_;
 }
 
 auto lexeme_t::streq(char const* begin) const -> bool
 {
-	char const* x = begin_, *y = begin;
-	while (x != end_ && *y)
+	char const* x = text_.begin(), *y = begin;
+	while (x != text_.end() && *y)
 		++x, ++y;
-	return x == end_ && !*y;
+	return x == text_.end() && !*y;
 }
 
 auto lexeme_t::streq(char const* begin, char const* end) const -> bool
 {
-	int32_t xsize = end_ - begin_,
+	int32_t xsize = text_.bytes(),
 		    ysize = end - begin
 			;
 	ATMA_ASSERT(xsize >= 0 && ysize >= 0);
 
-	return strncmp(begin_, begin, xsize) == 0;
+	return strncmp(text_.begin(), begin, xsize) == 0;
 }

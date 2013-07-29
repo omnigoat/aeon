@@ -72,6 +72,8 @@ auto main(uint32_t arg_count, char const** args) -> int
 		using namespace aeon::parsing;
 
 		parse(parsemes, lexemes);
+
+		std::cout << parsemes << std::endl;
 	}
 }
 

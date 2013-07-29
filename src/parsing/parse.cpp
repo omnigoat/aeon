@@ -35,7 +35,7 @@ struct match_t
 		if (good_ == false)
 			return *this;
 
-		if ((ch_ & i_->channel()) && (i_->id() != id || (id == lexid::punctuation && i_->text() != std::string(token)))) {
+		if ((ch_ & i_->channel()) && (i_->id() != id || (id == lexid::punctuation && !i_->streq(token)))) {
 			i_ = orig_;
 			good_ = false;
 		}
@@ -91,20 +91,17 @@ auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t con
 		if (!return_type_node)
 			goto fail;
 
-		//// last parameter moved to return-type
-		//ATMA_ASSERT( parameter_list_node->children().size() >= 2 );
-		//parseme_ptr return_type = parameter_list_node->children().back();
-		//parameter_list_node->children().pop_back();
-
 		fn_node->children().push_back(parameter_list_node);
 		fn_node->children().push_back(return_type_node);
 	}
 
 	// function body.
 	{
-		if (!function_body(function_body_node->children(), lexemes, context))
-			goto fail;
-
+		parseme_ptr function_body_node = context.match_make(parsid::block, lexid::block_begin);
+		if (function_body_node) {
+			function_body(function_body_node->children(), lexemes, context);
+			fn_node->children().push_back(function_body_node);
+		}
 	}
 
 
@@ -157,16 +154,24 @@ fail:
 
 auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-#if 0
-	if (context->id() != lexid::block_begin)
-		goto fail;
-	function_body_node.reset(new parseme_t(parsid::function_body, &*context.begin++));
-	
+	while (statement(parsemes, lexemes, context))
+		;
 
 	return true;
+}
 
-fail:
+
+auto aeon::parsing::detail::statement(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+{
+	if (parseme_ptr return_statement_node = context.match_make(parsid::return_statement, lexid::return_keyword)) {
+		expression(return_statement_node->children(), lexemes, context);
+		return true;
+	}
+
 	return false;
-#endif
+}
+
+auto aeon::parsing::detail::expression(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+{
 	return true;
 }

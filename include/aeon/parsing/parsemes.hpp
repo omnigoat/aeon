@@ -51,6 +51,16 @@ namespace parsing {
 		friend parseme_t;
 	};
 
+
+	namespace detail
+	{
+		auto print_parsemes(std::ostream&, parsemes_t const&, uint32_t = 0) -> std::ostream&;
+	}
+
+	inline std::ostream& operator << (std::ostream& stream, parsemes_t const& x) {
+		return detail::print_parsemes(stream, x);
+	}
+
 //=====================================================================
 } // namespace parsing
 } // namespace aeon

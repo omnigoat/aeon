@@ -35,6 +35,7 @@ namespace lexing {
 		X(else_keyword, "else", 4, basic) \
 		X(type_keyword, "type", 4, basic) \
 		X(function_keyword, "function", 8, basic) \
+		X(return_keyword, "return", 6, basic) \
 		X(keyword_upper_bound, "", 0, basic)
 
 	#define X(name, string, strlen, channel) name,

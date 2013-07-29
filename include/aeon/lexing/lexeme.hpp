@@ -8,6 +8,8 @@
 //=====================================================================
 #include <cstdint>
 #include <ostream>
+#include <string>
+#include <atma/utf/utf8_string_range.hpp>
 //=====================================================================
 
 //=====================================================================
@@ -103,30 +105,32 @@ namespace lexing {
 	struct lexeme_t
 	{
 		typedef ID id_t;
-		static std::string empty_text;
-		
+		typedef atma::utf8_string_range_t text_t;
+		static text_t const empty_text;
+
 		lexeme_t(id_t, char const* begin, char const* end, position_t const&, multichannel_t const& = multichannel_t());
 
 		auto id() const -> id_t const&;
 		auto position() const -> position_t const&;
 		auto channel() const -> multichannel_t const&;
-		auto begin() const -> char const*;
-		auto end() const -> char const*;
-		auto text() const -> std::string;
-
+		//auto begin() const -> char const*;
+		//auto end() const -> char const*;
+		auto text() const -> text_t const&;
+		
 		auto streq(char const*) const -> bool;
 		auto streq(char const*, char const*) const -> bool;
 
 	private:
 		id_t id_;
-		char const* begin_;
-		char const* end_;
+		text_t text_;
+		//char const* begin_;
+		//char const* end_;
 		position_t position_;
 		multichannel_t channel_;
 	};
 	
 	inline std::ostream& operator << (std::ostream& stream, lexeme_t const& L) {
-		return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text().c_str();
+		return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text();
 	}
 	
 	
