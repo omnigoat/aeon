@@ -62,8 +62,9 @@ auto main(uint32_t arg_count, char const** args) -> int
 		auto B = state.lexemes().begin(aeon::lexing::multichannel_t(0xffff));
 		lexemes_t::const_iterator ci = aeon::lexing::lexemes_t::iterator();
 
-		for (auto i = state.lexemes().begin(aeon::lexing::basic); i != state.lexemes().end(aeon::lexing::basic); ++i)
-			std::cout << *i << std::endl;
+		//for (auto i = state.lexemes().begin(aeon::lexing::basic); i != state.lexemes().end(aeon::lexing::basic); ++i)
+			//std::cout << *i << std::endl;
+		std::cout << lexemes << std::endl;
 	}
 	
 	// syntactic analysis

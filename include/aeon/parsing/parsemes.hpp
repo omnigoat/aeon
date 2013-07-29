@@ -58,6 +58,7 @@ namespace parsing {
 	}
 
 	inline std::ostream& operator << (std::ostream& stream, parsemes_t const& x) {
+		stream << "parsemes\n----------\n";
 		return detail::print_parsemes(stream, x);
 	}
 
