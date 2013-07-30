@@ -97,8 +97,9 @@ auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t con
 
 	// function body.
 	{
-		parseme_ptr function_body_node = context.match_make(parsid::block, lexid::block_begin);
+		parseme_ptr function_body_node = context.match_make(parsid::block, lexid::block_begin, lexing::all);
 		if (function_body_node) {
+			context.align(lexing::basic);
 			function_body(function_body_node->children(), lexemes, context);
 			fn_node->children().push_back(function_body_node);
 		}
@@ -165,6 +166,7 @@ auto aeon::parsing::detail::statement(parsemes_t& parsemes, lexing::lexemes_t co
 {
 	if (parseme_ptr return_statement_node = context.match_make(parsid::return_statement, lexid::return_keyword)) {
 		expression(return_statement_node->children(), lexemes, context);
+		parsemes.push_back(return_statement_node);
 		return true;
 	}
 
@@ -173,5 +175,21 @@ auto aeon::parsing::detail::statement(parsemes_t& parsemes, lexing::lexemes_t co
 
 auto aeon::parsing::detail::expression(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	return true;
+	return additive_expression(parsemes, context);
+}
+
+auto aeon::parsing::detail::additive_expression(parsemes_t& parsemes, detail::context_t& context) -> bool
+{
+	parseme_ptr lhs = context.match_make(parsid::identifier, lexid::identifier);
+	bool plus = context.skip(lexid::punctuation, "+");
+	parseme_ptr rhs = context.match_make(parsid::identifier, lexid::identifier);
+	if (lhs && plus && rhs) {
+		parseme_ptr k(new parseme_t(parsid::addition_expr));
+		k->children().push_back(lhs);
+		k->children().push_back(rhs);
+		parsemes.push_back(k);
+		return true;
+	}
+
+	return false;
 }

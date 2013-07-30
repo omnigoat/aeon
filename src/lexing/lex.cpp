@@ -12,6 +12,35 @@ using aeon::lexing::multichannel_t;
 
 aeon::lexing::multichannel_t aeon::lexing::multichannel_t::all(0xffffffff);
 
+namespace
+{
+	namespace {
+		using namespace aeon::lexing;
+		#define X(n,s,l,c) c,
+		aeon::lexing::channel_t const channels[] = {
+			AEON_LEXING_IDS()
+		};
+		#undef X
+	}
+
+	#define X(n,s,l,c) s,
+	char const* keywords[] = {
+		AEON_LEXING_IDS()
+	};
+	#undef X
+
+	#define X(n,s,l,c) l,
+	uint32_t keyword_lengths[] = {
+		AEON_LEXING_IDS()
+	};
+	#undef X
+
+	uint32_t const keywords_begin = static_cast<uint32_t>(aeon::lexing::ID::keyword_lower_bound) + 1;
+	uint32_t const keywords_end = static_cast<uint32_t>(aeon::lexing::ID::keyword_upper_bound);
+}
+
+
+
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)
 {
@@ -47,7 +76,12 @@ auto stream_t::increment() -> void {
 	++position_.column;
 	++current_;
 
-	if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
+	if (current_ != end_ && (*current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
+		++current_;
+		++position_.row;
+		position_.column = 1;
+	}
+	else if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
 		++position_.row;
 		position_.column = 1;
 	}
@@ -84,10 +118,10 @@ auto state_t::non_whitespace_token() -> void
 	{
 		if (tabs_ > previous_tabs_)
 			while (previous_tabs_++ != tabs_)
-				lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_t()));
+				lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_t(), channels[static_cast<uint32_t>(ID::block_begin)]));
 		else if (tabs_ < previous_tabs_)
 			while (previous_tabs_-- != tabs_)
-				lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_t()));
+				lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_t(), channels[static_cast<uint32_t>(ID::block_begin)]));
 
 		previous_tabs_ = tabs_;
 	}
@@ -168,32 +202,7 @@ auto block(state_t& state, stream_t& stream) -> void
 	}
 done:;
 }
-namespace
-{
-	namespace {
-		using namespace aeon::lexing;
-		#define X(n,s,l,c) c,
-		aeon::lexing::channel_t const channels[] = {
-			AEON_LEXING_IDS()
-		};
-		#undef X
-	}
 
-	#define X(n,s,l,c) s,
-	char const* keywords[] = {
-		AEON_LEXING_IDS()
-	};
-	#undef X
-
-	#define X(n,s,l,c) l,
-	uint32_t keyword_lengths[] = {
-		AEON_LEXING_IDS()
-	};
-	#undef X
-
-	uint32_t const keywords_begin = static_cast<uint32_t>(aeon::lexing::ID::keyword_lower_bound) + 1;
-	uint32_t const keywords_end = static_cast<uint32_t>(aeon::lexing::ID::keyword_upper_bound);
-}
 
 
 //

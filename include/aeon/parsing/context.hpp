@@ -25,8 +25,12 @@ namespace parsing {
 
 			auto id() const -> lexing::ID;
 			
+			auto align(lexing::multichannel_t const&) -> void;
+
 			auto match_make(parseme_t::id_t, lexing::ID) -> parseme_ptr;
 			auto match_make(parseme_t::id_t, lexing::ID, char const*) -> parseme_ptr;
+			auto match_make(parseme_t::id_t, lexing::ID, lexing::multichannel_t const&) -> parseme_ptr;
+
 			auto skip(lexing::ID) -> bool;
 			auto skip(lexing::ID, char const*) -> bool;
 

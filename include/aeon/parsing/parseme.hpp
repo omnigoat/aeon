@@ -58,7 +58,8 @@ namespace parsing {
 		identifier,
 		type,
 		block,
-		return_statement
+		return_statement,
+		addition_expr
 	};
 
 

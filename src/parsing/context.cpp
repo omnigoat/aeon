@@ -17,6 +17,11 @@ auto context_t::id() const -> aeon::lexing::ID
 	return begin_->id();
 }
 
+auto context_t::align(aeon::lexing::multichannel_t const& ch) -> void
+{
+	begin_.set_channel(ch);
+}
+
 auto context_t::match_make(parsid pid, lexid lid) -> parseme_ptr
 {
 	parseme_ptr result;
@@ -34,6 +39,19 @@ auto context_t::match_make(parsid pid, lexid lid, char const* str) -> parseme_pt
 	parseme_ptr result;
 	
 	if (begin_->id() == lid && begin_->streq(str)) {
+		result.reset(new parseme_t(pid, &*begin_));
+		++begin_;
+	}
+
+	return result;
+}
+
+auto context_t::match_make(parsid pid, lexid lid, aeon::lexing::multichannel_t const& ch) -> parseme_ptr
+{
+	parseme_ptr result;
+	
+	begin_.set_channel(ch);
+	if (begin_->id() == lid) {
 		result.reset(new parseme_t(pid, &*begin_));
 		++begin_;
 	}

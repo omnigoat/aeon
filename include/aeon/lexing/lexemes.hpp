@@ -267,6 +267,8 @@ namespace lexing {
 	template <typename T>
 	auto detail::iterator<T>::set_channel(multichannel_t const& mc) -> void {
 		channel_ = mc;
+		while (iterator_ != ubound_ && !(iterator_->channel() & channel_))
+			++iterator_;
 	}
 	
 
