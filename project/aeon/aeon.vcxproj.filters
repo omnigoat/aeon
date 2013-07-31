@@ -71,6 +71,9 @@
     <ClInclude Include="..\..\include\aeon\semantics\analyse.hpp">
       <Filter>include\semantics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\marshall.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">

@@ -88,6 +88,7 @@
     <ClInclude Include="..\..\include\aeon\lexing\state.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\marshall.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parseme.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parsemes.hpp" />
