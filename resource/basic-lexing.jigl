@@ -1,4 +1,4 @@
-function add :: lhs as @int -> rhs as @int -> @int
+function add :: lhs as @int32 -> rhs as @int32 -> @int32
 	return lhs + rhs
 end
 
