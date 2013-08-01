@@ -74,6 +74,12 @@
     <ClInclude Include="..\..\include\aeon\parsing\children.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\semantics\resolve.hpp">
+      <Filter>include\semantics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -97,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\parsing\children.cpp">
       <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\semantics\resolve.cpp">
+      <Filter>source\semantics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

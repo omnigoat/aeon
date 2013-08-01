@@ -20,7 +20,8 @@ namespace parsing {
 	
 	struct parseme_t;
 	typedef std::shared_ptr<parseme_t> parseme_ptr;
-	
+	typedef std::vector<parseme_ptr> parsemes_t;
+
 	struct parseme_t : std::enable_shared_from_this<parseme_t>
 	{
 		typedef children_t children_t;

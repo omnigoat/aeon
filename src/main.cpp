@@ -4,6 +4,7 @@
 #include <aeon/lexing/lex.hpp>
 #include <aeon/lexing/id.hpp>
 #include <aeon/parsing/parse.hpp>
+#include <aeon/semantics/analyse.hpp>
 
 #define ATMA_ASSERT_RETURN(x) \
 	if (!(x)) { \
@@ -76,5 +77,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 		std::cout << parsemes << std::endl;
 	}
+
+	semantics::analyse::function(parsemes[0]);
 }
 
