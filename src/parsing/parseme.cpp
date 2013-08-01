@@ -5,6 +5,8 @@ using aeon::parsing::parseme_t;
 using aeon::parsing::parseme_ptr;
 using aeon::parsing::children_t;
 
+parseme_ptr const aeon::parsing::null_parseme_ptr;
+
 parseme_t::parseme_t(id_t id)
 	: id_(id), children_(this), lexeme_()
 {

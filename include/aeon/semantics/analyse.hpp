@@ -17,6 +17,7 @@ namespace semantics {
 	
 	struct error_t
 	{
+		error_t(std::string const& text) : text(text) {}
 		std::string text;
 	};
 

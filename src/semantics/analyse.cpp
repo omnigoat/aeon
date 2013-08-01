@@ -1,8 +1,10 @@
 #include <aeon/semantics/analyse.hpp>
 #include <aeon/parsing/marshall.hpp>
 #include <aeon/parsing/algorithm.hpp>
+#include <aeon/semantics/resolve.hpp>
 
 namespace marshall = aeon::parsing::marshall;
+namespace resolve = aeon::semantics::resolve;
 
 auto aeon::semantics::analyse::function(parseme_ptr const& fn) -> analysis_t
 {
@@ -28,8 +30,10 @@ auto aeon::semantics::analyse::function(parseme_ptr const& fn) -> analysis_t
 	parseme_ptr const& resolved_return_type = resolve::type_of(return_type);
 	for (auto const& x : return_statements) {
 		if (resolve::type_of(x) != resolved_return_type)
-			analysis.errors.push_back("bad return type for return statement!");
+			analysis.errors.push_back(error_t("bad return type for return statement!"));
 	}
+
+
 
 	return analysis;
 }

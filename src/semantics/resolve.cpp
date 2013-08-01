@@ -36,6 +36,15 @@ parsing::parseme_ptr const& aeon::semantics::resolve::identifier_to_definition(p
 		[](parsing::parseme_ptr const& y) { return y->id() == id::function; });
 
 	// loop through until we find one
-	return x;
+	for (auto const& y : locations) {
+		// try parameters
+		parsing::parseme_ptr const& params = marshall::function::parameter_list(y);
+		for (auto const& param : params->children()) {
+			if ( marshall::parameter::identifier(param)->text() == x->text() )
+				return param;
+		}
+	}
+
+	return parsing::null_parseme_ptr;
 }
 
