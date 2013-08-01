@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <ostream>
 //=====================================================================
-#include <aeon/parsing/parsemes.hpp>
+#include <aeon/parsing/children.hpp>
 //=====================================================================
 namespace aeon {
 namespace semantics {
@@ -31,7 +31,7 @@ namespace semantics {
 	{
 		using parsing::parseme_t;
 		using parsing::parseme_ptr;
-		using parsing::parsemes_t;
+		using parsing::children_t;
 
 		auto function(parseme_ptr const&) -> analysis_t;
 	}

@@ -12,7 +12,7 @@
 #include <memory>
 //=====================================================================
 #include <aeon/lexing/lexeme.hpp>
-#include <aeon/parsing/parsemes.hpp>
+#include <aeon/parsing/children.hpp>
 //=====================================================================
 namespace aeon {
 namespace parsing {
@@ -23,7 +23,7 @@ namespace parsing {
 	
 	struct parseme_t : std::enable_shared_from_this<parseme_t>
 	{
-		typedef parsemes_t children_t;
+		typedef children_t children_t;
 		enum class id_t;
 
 		parseme_t(id_t);

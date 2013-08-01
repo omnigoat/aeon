@@ -68,7 +68,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	}
 	
 	// syntactic analysis
-	parsing::parsemes_t parsemes;
+	parsing::children_t parsemes;
 	{
 		using namespace aeon::parsing;
 

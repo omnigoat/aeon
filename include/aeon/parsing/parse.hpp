@@ -10,7 +10,7 @@
 #include <ostream>
 //=====================================================================
 #include <aeon/lexing/lexemes.hpp>
-#include <aeon/parsing/parsemes.hpp>
+#include <aeon/parsing/children.hpp>
 #include <aeon/parsing/context.hpp>
 //=====================================================================
 namespace aeon {
@@ -21,17 +21,17 @@ namespace parsing {
 	{
 		struct context_t;
 
-		auto module(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto function(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto parameters(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto function_body(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto statement(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto expression(parsemes_t&, lexing::lexemes_t const&, context_t&) -> bool;
-		auto additive_expression(parsemes_t&, context_t&) -> bool;
+		auto module(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto function(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto parameters(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto function_body(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto statement(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto expression(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto additive_expression(children_t&, context_t&) -> bool;
 	}
 
 
-	auto parse(parsemes_t&, lexing::lexemes_t const&) -> void;
+	auto parse(children_t&, lexing::lexemes_t const&) -> void;
 
 //=====================================================================
 } // namespace parsing

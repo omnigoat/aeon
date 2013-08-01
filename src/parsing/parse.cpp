@@ -8,13 +8,13 @@ using namespace aeon::parsing;
 typedef aeon::lexing::ID lexid;
 typedef aeon::parsing::parseme_t::id_t parsid;
 
-auto aeon::parsing::parse(parsemes_t& parsemes, lexing::lexemes_t const& lexemes) -> void
+auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
 	detail::context_t context(lexemes.begin(lexing::basic));
 	detail::module(parsemes, lexemes, context);
 }
 
-auto aeon::parsing::detail::module(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::module(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	while (function(parsemes, lexemes, context))
 		;
@@ -59,7 +59,7 @@ match_t match(aeon::lexing::lexemes_t::const_iterator& i, aeon::lexing::multicha
 	return match_t(i, ch);
 }
 
-auto aeon::parsing::detail::function(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	parseme_ptr fn_node, id_node, parameter_list_node, function_body_node;
 
@@ -114,7 +114,7 @@ fail:
 	return false;
 }
 
-auto aeon::parsing::detail::parameters(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	for (;;)
 	{
@@ -153,7 +153,7 @@ fail:
 	return false;
 }
 
-auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::function_body(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	while (statement(parsemes, lexemes, context))
 		;
@@ -162,7 +162,7 @@ auto aeon::parsing::detail::function_body(parsemes_t& parsemes, lexing::lexemes_
 }
 
 
-auto aeon::parsing::detail::statement(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	if (parseme_ptr return_statement_node = context.match_make(parsid::return_statement, lexid::return_keyword)) {
 		expression(return_statement_node->children(), lexemes, context);
@@ -173,12 +173,12 @@ auto aeon::parsing::detail::statement(parsemes_t& parsemes, lexing::lexemes_t co
 	return false;
 }
 
-auto aeon::parsing::detail::expression(parsemes_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	return additive_expression(parsemes, context);
 }
 
-auto aeon::parsing::detail::additive_expression(parsemes_t& parsemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::additive_expression(children_t& parsemes, detail::context_t& context) -> bool
 {
 	parseme_ptr lhs = context.match_make(parsid::identifier, lexid::identifier);
 	bool plus = context.skip(lexid::punctuation, "+");
