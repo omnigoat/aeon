@@ -9,6 +9,8 @@ typedef parsing::parseme_t::id_t id;
 
 parsing::parseme_ptr const& aeon::semantics::resolve::type_of(parsing::parseme_ptr const& x)
 {
+	ATMA_ASSERT(x);
+
 	switch (x->id())
 	{
 		case id::return_statement:

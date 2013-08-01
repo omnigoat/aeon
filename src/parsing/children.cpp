@@ -50,7 +50,10 @@ auto children_t::end() const -> const_iterator
 
 auto children_t::push_back(parseme_ptr const& x) -> void
 {
+	ATMA_ASSERT(!x->parent());
 	elements_.push_back(x);
+	if (owner_)
+		x->set_parent(owner_->shared_from_this());
 }
 
 auto children_t::replace(const_iterator const& i, parseme_ptr const& n) -> void
@@ -83,7 +86,7 @@ auto children_t::pop_back() -> void
 auto aeon::parsing::detail::print_parsemes(std::ostream& stream, children_t const& xs, uint32_t spaces) -> std::ostream&
 {
 	for (auto const& x : xs) {
-		stream << std::string(spaces, ' ') << *x << std::endl;
+		stream << std::string(spaces, ' ') << x.get() << " " << *x << " <- " << x->parent().get() << std::endl;
 		print_parsemes(stream, x->children(), spaces + 2);
 	}
 
