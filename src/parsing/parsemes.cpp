@@ -18,6 +18,11 @@ parsemes_t::parsemes_t(parseme_t* owner)
 	ATMA_ASSERT(owner_);
 }
 
+auto parsemes_t::operator[] (int i) -> parseme_ptr const&
+{
+	return elements_[i];
+}
+
 auto parsemes_t::size() const -> uint32_t
 {
 	return elements_.size();

@@ -26,6 +26,8 @@ namespace parsing {
 
 		parsemes_t();
 
+		auto operator [](int) -> parseme_ptr const&;
+
 		auto size() const -> uint32_t;
 
 		auto front() const -> parseme_ptr const&;
