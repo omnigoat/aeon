@@ -20,6 +20,7 @@ namespace parsing {
 	
 	struct parseme_t;
 	typedef std::shared_ptr<parseme_t> parseme_ptr;
+	typedef std::weak_ptr<parseme_t> parseme_wptr;
 	typedef std::vector<parseme_ptr> parsemes_t;
 
 	extern const parseme_ptr null_parseme_ptr;
@@ -34,7 +35,7 @@ namespace parsing {
 		
 		auto id() const -> id_t;
 		auto text() const -> lexing::lexeme_t::text_t const&;
-		auto parent() const -> parseme_ptr const&;
+		auto parent() const -> parseme_ptr;
 		auto children() const -> children_t const&;
 		auto children() -> children_t&;
 		
@@ -42,7 +43,7 @@ namespace parsing {
 
 	private:
 		id_t id_;
-		parseme_ptr parent_;
+		parseme_wptr parent_;
 		children_t children_;
 		lexing::lexeme_t const* lexeme_;
 	};
@@ -53,6 +54,7 @@ namespace parsing {
 
 	enum class parseme_t::id_t
 	{
+		root,
 		module,
 		function,
 		parameter_list,

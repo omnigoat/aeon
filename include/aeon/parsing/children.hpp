@@ -28,16 +28,21 @@ namespace parsing {
 
 		auto operator [](int) -> parseme_ptr const&;
 
+		auto owner() const -> parseme_t const*;
 		auto size() const -> uint32_t;
+		auto empty() const -> bool;
 
 		auto front() const -> parseme_ptr const&;
 		auto back() const -> parseme_ptr const&;
 
+		auto begin() -> iterator;
+		auto end() -> iterator;
 		auto begin() const -> const_iterator;
 		auto end() const -> const_iterator;
 		
 		auto replace(const_iterator const&, parseme_ptr const&) -> void;
 		auto detach(const_iterator const&) -> parseme_ptr;
+		auto insert(iterator const&, iterator const&, iterator const&) -> void;
 
 		auto push_back(parseme_ptr const&) -> void;
 		auto pop_back() -> void;

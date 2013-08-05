@@ -76,12 +76,15 @@ auto stream_t::increment() -> void {
 	++position_.column;
 	++current_;
 
+	#if 0
 	if (current_ != end_ && (*current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
 		++current_;
 		++position_.row;
 		position_.column = 1;
 	}
-	else if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
+	else 
+	#endif
+	if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
 		++position_.row;
 		position_.column = 1;
 	}

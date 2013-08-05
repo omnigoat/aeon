@@ -23,9 +23,19 @@ auto children_t::operator[] (int i) -> parseme_ptr const&
 	return elements_[i];
 }
 
+auto children_t::owner() const -> parseme_t const*
+{
+	return owner_;
+}
+
 auto children_t::size() const -> uint32_t
 {
 	return elements_.size();
+}
+
+auto children_t::empty() const -> bool
+{
+	return elements_.empty();
 }
 
 auto children_t::front() const -> parseme_ptr const&
@@ -46,6 +56,16 @@ auto children_t::begin() const -> const_iterator
 auto children_t::end() const -> const_iterator
 {
 	return elements_.cend();
+}
+
+auto children_t::begin() -> iterator
+{
+	return elements_.begin();
+}
+
+auto children_t::end() -> iterator
+{
+	return elements_.end();
 }
 
 auto children_t::push_back(parseme_ptr const& x) -> void
@@ -70,6 +90,11 @@ auto children_t::detach(const_iterator const& i) -> parseme_ptr
 	elements_.erase( unconst(i) );
 	p->set_parent(nullptr);
 	return p;
+}
+
+auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> void
+{
+	elements_.insert(where_, begin, end);
 }
 
 auto children_t::unconst(const_iterator const& i) -> iterator

@@ -1,22 +1,67 @@
 #include <aeon/parsing/parse.hpp>
 #include <aeon/parsing/parseme.hpp>
 #include <aeon/lexing/id.hpp>
+#include <aeon/parsing/ape.hpp>
 #include <string>
 
-using namespace aeon::parsing;
+namespace parsing = aeon::parsing;
+namespace ape = aeon::parsing::ape;
 
 typedef aeon::lexing::ID lexid;
 typedef aeon::parsing::parseme_t::id_t parsid;
 
+
+char const* intrinsic_text = "@int16@int32";
+
+aeon::lexing::position_t intrinsic_position(0, 0);
+aeon::lexing::lexeme_t int16_lexeme(aeon::lexing::ID::intrinsic_type_int16, intrinsic_text, intrinsic_text + 6, intrinsic_position);
+aeon::lexing::lexeme_t int32_lexeme(aeon::lexing::ID::intrinsic_type_int32, intrinsic_text + 6, intrinsic_text + 12, intrinsic_position);
+
+
+auto add_prelude(parsing::children_t& parsemes) -> void
+{
+	typedef parsing::parseme_t::id_t id;
+
+	parsing::children_t xs;
+
+	ape::insert_into(xs, (
+		ape::make(id::type_definition) [
+			ape::make(id::identifier, int16_lexeme),
+			ape::make(id::intrinsic_type_int16)
+		],
+
+		ape::make(id::type_definition) [
+			ape::make(id::identifier, int32_lexeme),
+			ape::make(id::intrinsic_type_int32)
+		]
+	));
+
+	parsemes.insert(parsemes.begin(), xs.begin(), xs.end());
+}
+
+
+
+
+
 auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
 	detail::context_t context(lexemes.begin(lexing::basic));
-	detail::module(parsemes, lexemes, context);
+
+	parseme_ptr root_node(new parseme_t(parsid::root));
+
+	add_prelude(root_node->children());
+
+	detail::module(root_node->children(), lexemes, context);
+	parsemes.push_back(root_node);
 }
 
 auto aeon::parsing::detail::module(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	while (function(parsemes, lexemes, context))
+	parseme_ptr module_node(new parseme_t(parsid::module));
+
+	parsemes.push_back(module_node);
+
+	while (function(module_node->children(), lexemes, context))
 		;
 
 	return true;
@@ -87,7 +132,7 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		if (!parameters(parameter_list_node->children(), lexemes, context))
 			goto fail;
 
-		parseme_ptr return_type_node = context.match_make(parsid::type, lexid::type);
+		parseme_ptr return_type_node = context.match_make(parsid::type_name, lexid::type);
 		if (!return_type_node)
 			goto fail;
 

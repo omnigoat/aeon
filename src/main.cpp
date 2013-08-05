@@ -78,6 +78,16 @@ auto main(uint32_t arg_count, char const** args) -> int
 		std::cout << parsemes << std::endl;
 	}
 
-	semantics::analyse::function(parsemes[0]);
+	ATMA_ASSERT(!parsemes.empty());
+	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
+
+	for (auto const& x : parsemes[0]->children()) {
+		if (x->id() == aeon::parsing::parseme_t::id_t::module) {
+			for (auto const& fn : x->children()) {
+				if (fn->id() == aeon::parsing::parseme_t::id_t::function)
+					semantics::analyse::function(fn);
+			}
+		}
+	}
 }
 

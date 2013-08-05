@@ -13,6 +13,11 @@ namespace parsing {
 namespace marshall {
 //=====================================================================
 	
+	namespace type_definition {
+		inline parseme_ptr const& name(parseme_ptr const& x) { return x->children()[0]; }
+		inline parseme_ptr const& definition(parseme_ptr const& x) { return x->children()[1]; }
+	}
+
 	namespace function {
 		inline parseme_ptr const& name(parseme_ptr const& x) { return x->children()[0]; }
 		inline parseme_ptr const& parameter_list(parseme_ptr const& x) { return x->children()[1]; }

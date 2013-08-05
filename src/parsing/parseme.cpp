@@ -30,9 +30,12 @@ auto parseme_t::text() const -> aeon::lexing::lexeme_t::text_t const&
 		return lexing::lexeme_t::empty_text;
 }
 
-auto parseme_t::parent() const -> parseme_ptr const&
+auto parseme_t::parent() const -> parseme_ptr
 {
-	return parent_;
+	if (parseme_ptr p = parent_.lock())
+		return p;
+	else
+		return parseme_ptr();
 }
 
 auto parseme_t::children() const -> children_t const&
@@ -47,7 +50,7 @@ auto parseme_t::children() -> children_t&
 
 auto parseme_t::set_parent(parseme_ptr const& p) -> void
 {
-	ATMA_ASSERT(!p || !parent_);
+	ATMA_ASSERT(!p || parent_.expired());
 	parent_ = p;
 }
 
