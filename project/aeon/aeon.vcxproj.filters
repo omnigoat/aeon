@@ -28,6 +28,9 @@
     <Filter Include="source\semantics">
       <UniqueIdentifier>{0751ef7e-75ab-4899-9b4b-d7b55e9e220d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\semantics\resolve">
+      <UniqueIdentifier>{51161d72-f790-4671-9c0c-065ea246a338}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resource\basic-lexing.jigl">
@@ -80,6 +83,9 @@
     <ClInclude Include="..\..\include\aeon\semantics\resolve.hpp">
       <Filter>include\semantics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\ape.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -106,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\semantics\resolve.cpp">
       <Filter>source\semantics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\semantics\resolve\type.cpp">
+      <Filter>source\semantics\resolve</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -62,7 +62,10 @@ namespace parsing {
 		type,
 		block,
 		return_statement,
-		addition_expr
+		addition_expr,
+		type_definition,
+		intrinsic_type_int16,
+		intrinsic_type_int32
 	};
 
 

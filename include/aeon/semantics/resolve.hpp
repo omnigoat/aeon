@@ -21,6 +21,9 @@ namespace resolve {
 	//
 	parsing::parseme_ptr const& identifier_to_definition(parsing::parseme_ptr const&);
 
+	//
+	parsing::parseme_ptr const& typename_to_definition(parsing::parseme_ptr const&);
+
 //=====================================================================
 } // namespace resolve
 } // namespace semantics

@@ -88,6 +88,7 @@
     <ClInclude Include="..\..\include\aeon\lexing\state.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\ape.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\marshall.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
@@ -107,6 +108,7 @@
     <ClCompile Include="..\..\src\parsing\children.cpp" />
     <ClCompile Include="..\..\src\semantics\analyse.cpp" />
     <ClCompile Include="..\..\src\semantics\resolve.cpp" />
+    <ClCompile Include="..\..\src\semantics\resolve\type.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

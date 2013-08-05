@@ -129,10 +129,10 @@ namespace lexing {
 		multichannel_t channel_;
 	};
 	
+
 	inline std::ostream& operator << (std::ostream& stream, lexeme_t const& L) {
 		return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text();
 	}
-	
 	
 	
 //=====================================================================

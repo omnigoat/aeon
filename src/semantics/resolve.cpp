@@ -24,6 +24,9 @@ parsing::parseme_ptr const& aeon::semantics::resolve::type_of(parsing::parseme_p
 
 		case id::parameter:
 			return type_of( marshall::parameter::type_name(x) );
+
+		case id::type_name:
+			return typename_to_definition(x);
 	}
 
 	return x;

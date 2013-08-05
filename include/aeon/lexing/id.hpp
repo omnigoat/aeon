@@ -36,7 +36,9 @@ namespace lexing {
 		X(type_keyword, "type", 4, basic) \
 		X(return_keyword, "return", 6, basic) \
 		X(function_keyword, "function", 8, basic) \
-		X(keyword_upper_bound, "", 0, basic)
+		X(keyword_upper_bound, "", 0, basic) \
+		X(intrinsic_type_int16, "", 0, basic) \
+		X(intrinsic_type_int32, "", 0, basic)
 
 	#define X(name, string, strlen, channel) name,
 	enum class ID
