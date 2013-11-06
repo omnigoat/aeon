@@ -81,6 +81,7 @@
     <None Include="..\..\resource\basic-lexing.jigl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\aeon\generation\generation.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\id.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lex.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lexeme.hpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="..\..\include\aeon\semantics\resolve.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\generation\generation.cpp" />
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
     <ClCompile Include="..\..\src\lexing\lexeme.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />

@@ -6,6 +6,8 @@
 #include <aeon/parsing/parse.hpp>
 #include <aeon/semantics/analyse.hpp>
 
+#include <aeon/generation/generation.hpp>
+
 #define ATMA_ASSERT_RETURN(x) \
 	if (!(x)) { \
 		__debugbreak(); \
@@ -87,6 +89,8 @@ auto main(uint32_t arg_count, char const** args) -> int
 				if (fn->id() == aeon::parsing::parseme_t::id_t::function)
 					semantics::analyse::function(fn);
 			}
+
+			generation::module(x);
 		}
 	}
 }
