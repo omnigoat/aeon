@@ -10,12 +10,20 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	
 	atma::string result;
 
+	// function name
 	auto name = marshall::function::name(fn);
-	auto return_type = marshall::function::return_type(fn);
-	
 	result += atma::to_string(name->text().bytes()) + name->text();
+
+	// return-type
+	auto return_type = marshall::function::return_type(fn);
 	result += type_name_mangle(return_type);
-	
+
+	// parameters
+	result += "_";
+	auto parameter_list = marshall::function::parameter_list(fn);
+	for (auto const& x : parameter_list->children())
+		result += type_name_mangle(marshall::parameter::type_name(x));
+
 	return result;
 }
 

@@ -52,7 +52,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	if (arg_count <= 1)
 		return EXIT_FAILURE;
 
-	input_file_t file("../../resource/basic-lexing.jigl"); //args[1]);
+	input_file_t file(args[1]);
 
 
 	// lexical analysis
