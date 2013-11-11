@@ -29,6 +29,8 @@ namespace lexing {
 	//=====================================================================
 	struct position_t
 	{
+		static position_t zero;
+
 		position_t() : row(), column() {}
 
 		position_t(uint32_t row, uint32_t column)
@@ -113,8 +115,6 @@ namespace lexing {
 		auto id() const -> id_t const&;
 		auto position() const -> position_t const&;
 		auto channel() const -> multichannel_t const&;
-		//auto begin() const -> char const*;
-		//auto end() const -> char const*;
 		auto text() const -> text_t const&;
 		
 		auto streq(char const*) const -> bool;
@@ -123,8 +123,6 @@ namespace lexing {
 	private:
 		id_t id_;
 		text_t text_;
-		//char const* begin_;
-		//char const* end_;
 		position_t position_;
 		multichannel_t channel_;
 	};
@@ -132,6 +130,13 @@ namespace lexing {
 
 	inline std::ostream& operator << (std::ostream& stream, lexeme_t const& L) {
 		return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text();
+	}
+
+	inline lexeme_t const* make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel = multichannel_t())
+	{
+		// return a pointer with the lowest bit set, to show that we should delete it
+		auto L = new lexeme_t(id, begin, end, position, channel);
+		return (lexeme_t const*)(((intptr_t)L) | 1);
 	}
 	
 	

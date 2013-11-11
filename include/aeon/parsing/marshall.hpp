@@ -16,6 +16,7 @@ namespace marshall {
 	namespace type_definition {
 		inline parseme_ptr const& name(parseme_ptr const& x) { return x->children()[0]; }
 		inline parseme_ptr const& definition(parseme_ptr const& x) { return x->children()[1]; }
+		inline parseme_ptr const& intrinsic_info(parseme_ptr const& x) { return x->children()[2]; }
 	}
 
 	namespace function {

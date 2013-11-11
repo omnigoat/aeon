@@ -32,9 +32,11 @@ namespace parsing {
 
 		parseme_t(id_t);
 		parseme_t(id_t id, lexing::lexeme_t const*);
-		
+		~parseme_t();
+
 		auto id() const -> id_t;
 		auto text() const -> lexing::lexeme_t::text_t const&;
+		auto position() const -> lexing::position_t const&;
 		auto parent() const -> parseme_ptr;
 		auto children() const -> children_t const&;
 		auto children() -> children_t&;
@@ -42,6 +44,8 @@ namespace parsing {
 		auto set_parent(parseme_ptr const&) -> void;
 
 	private:
+		auto lexeme() const -> lexing::lexeme_t const*;
+
 		id_t id_;
 		parseme_wptr parent_;
 		children_t children_;
@@ -66,11 +70,17 @@ namespace parsing {
 		return_statement,
 		addition_expr,
 		type_definition,
+		intrinsic_type_int,
+		intrinsic_bitsize,
 		intrinsic_type_int16,
 		intrinsic_type_int32
 	};
 
-
+	inline auto is_intrinsic_int_typename(parsing::parseme_ptr const& x) -> bool
+	{
+		auto i = x->text().begin();
+		return *i == '@' && *++i == 'i' && *++i == 'n' && *++i == 't' && isdigit(*++i);
+	}
 
 //=====================================================================
 } // namespace parsing

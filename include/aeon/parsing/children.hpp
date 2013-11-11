@@ -21,6 +21,8 @@ namespace parsing {
 
 	struct children_t
 	{
+		typedef parseme_ptr const& const_reference;
+		typedef parseme_ptr value_type;
 		typedef std::vector<parseme_ptr>::iterator iterator;
 		typedef std::vector<parseme_ptr>::const_iterator const_iterator;
 

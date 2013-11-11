@@ -65,8 +65,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 		auto B = state.lexemes().begin(aeon::lexing::multichannel_t(0xffff));
 		lexemes_t::const_iterator ci = aeon::lexing::lexemes_t::iterator();
 
-		//for (auto i = state.lexemes().begin(aeon::lexing::basic); i != state.lexemes().end(aeon::lexing::basic); ++i)
-			//std::cout << *i << std::endl;
 		std::cout << lexemes << std::endl;
 	}
 	
@@ -83,15 +81,34 @@ auto main(uint32_t arg_count, char const** args) -> int
 	ATMA_ASSERT(!parsemes.empty());
 	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
 
-	for (auto const& x : parsemes[0]->children()) {
-		if (x->id() == aeon::parsing::parseme_t::id_t::module) {
-			for (auto const& fn : x->children()) {
-				if (fn->id() == aeon::parsing::parseme_t::id_t::function)
-					semantics::analyse::function(fn);
-			}
+	FILE* out = fopen(args[2], "w+");
 
-			generation::module(x);
-		}
+	auto stream = new generation::file_output_stream_t(out);
+
+	// collect the root
+	parsing::parsemes_t root_list;
+	std::copy_if(parsemes.begin(), parsemes.end(), std::back_inserter(root_list), [](parsing::parseme_ptr const& x){
+		return x->id() == parsing::parseme_t::id_t::root;
+	});
+	auto root = root_list.back();
+	ATMA_ASSERT(root);
+
+
+	// collect the modules
+	parsing::parsemes_t modules;
+	std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(modules), [](parsing::parseme_ptr const& x) {
+		return x->id() == parsing::parseme_t::id_t::module;
+	});
+
+	for (auto const& x : modules)
+	{
+		//if (x->id() == aeon::parsing::parseme_t::id_t::function)
+			//semantics::analyse::function(x);
+		//}
+
+		generation::module(*stream, x);
 	}
+
+	std::cout << parsemes << std::endl;
 }
 

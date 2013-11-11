@@ -33,7 +33,5 @@ auto aeon::semantics::analyse::function(parseme_ptr const& fn) -> analysis_t
 			analysis.errors.push_back(error_t("bad return type for return statement!"));
 	}
 
-
-
 	return analysis;
 }

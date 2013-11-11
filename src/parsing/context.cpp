@@ -1,4 +1,6 @@
 #include <aeon/parsing/context.hpp>
+#include <aeon/parsing/ape.hpp>
+#include <aeon/lexing/id.hpp>
 
 using namespace aeon::parsing;
 using aeon::parsing::detail::context_t;
@@ -48,15 +50,8 @@ auto context_t::match_make(parsid pid, lexid lid, char const* str) -> parseme_pt
 
 auto context_t::match_make(parsid pid, lexid lid, aeon::lexing::multichannel_t const& ch) -> parseme_ptr
 {
-	parseme_ptr result;
-	
 	begin_.set_channel(ch);
-	if (begin_->id() == lid) {
-		result.reset(new parseme_t(pid, &*begin_));
-		++begin_;
-	}
-
-	return result;
+	return match_make(pid, lid);
 }
 
 auto context_t::skip(lexid lid) -> bool

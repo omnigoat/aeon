@@ -7,6 +7,7 @@ using aeon::lexing::multichannel_t;
 //=====================================================================
 
 lexeme_t::text_t const lexeme_t::empty_text;
+position_t aeon::lexing::position_t::zero;
 
 lexeme_t::lexeme_t(id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)
 : id_(id), text_(begin, end), position_(position), channel_(channel)
@@ -27,16 +28,6 @@ auto lexeme_t::channel() const -> multichannel_t const&
 {
 	return channel_;
 }
-//
-//auto lexeme_t::begin() const -> char const*
-//{
-//	return begin_;
-//}
-//
-//auto lexeme_t::end() const -> char const*
-//{
-//	return end_;
-//}
 
 auto lexeme_t::text() const -> text_t const&
 {
