@@ -28,14 +28,14 @@
     <Filter Include="source\semantics">
       <UniqueIdentifier>{0751ef7e-75ab-4899-9b4b-d7b55e9e220d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\semantics\resolve">
-      <UniqueIdentifier>{51161d72-f790-4671-9c0c-065ea246a338}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\generation">
       <UniqueIdentifier>{4aaecb59-a72d-4fb7-b464-d86976c6b06f}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\generation">
       <UniqueIdentifier>{6c2444c3-f4a3-4db3-937f-a934060ae4ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\resolve">
+      <UniqueIdentifier>{0d721fba-290c-46b0-aaae-4f97d7797570}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +83,6 @@
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\aeon\semantics\resolve.hpp">
-      <Filter>include\semantics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\aeon\parsing\ape.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
       <Filter>include\generation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\aeon\marshall.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\resolve.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -119,14 +119,14 @@
     <ClCompile Include="..\..\src\parsing\children.cpp">
       <Filter>source\parsing</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\semantics\resolve.cpp">
-      <Filter>source\semantics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\semantics\resolve\type.cpp">
-      <Filter>source\semantics\resolve</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\generation\generation.cpp">
       <Filter>source\generation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\resolve\type.cpp">
+      <Filter>source\resolve</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\resolve\identifier.cpp">
+      <Filter>source\resolve</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

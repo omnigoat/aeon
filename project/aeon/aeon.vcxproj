@@ -95,9 +95,9 @@
     <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parseme.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\children.hpp" />
+    <ClInclude Include="..\..\include\aeon\resolve.hpp" />
     <ClInclude Include="..\..\include\aeon\semantics\analyse.hpp" />
     <ClInclude Include="..\..\include\aeon\semantics\function.hpp" />
-    <ClInclude Include="..\..\include\aeon\semantics\resolve.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\generation\generation.cpp" />
@@ -108,9 +108,9 @@
     <ClCompile Include="..\..\src\parsing\parse.cpp" />
     <ClCompile Include="..\..\src\parsing\parseme.cpp" />
     <ClCompile Include="..\..\src\parsing\children.cpp" />
+    <ClCompile Include="..\..\src\resolve\identifier.cpp" />
+    <ClCompile Include="..\..\src\resolve\type.cpp" />
     <ClCompile Include="..\..\src\semantics\analyse.cpp" />
-    <ClCompile Include="..\..\src\semantics\resolve.cpp" />
-    <ClCompile Include="..\..\src\semantics\resolve\type.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

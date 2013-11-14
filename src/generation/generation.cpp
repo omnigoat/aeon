@@ -1,6 +1,6 @@
 #include <aeon/generation/generation.hpp>
 
-#include <aeon/semantics/resolve.hpp>
+#include <aeon/resolve.hpp>
 #include <aeon/marshall.hpp>
 
 using namespace aeon;
@@ -65,8 +65,6 @@ auto aeon::generation::module(abstract_output_stream_t& stream, parsing::parseme
 
 auto aeon::generation::function(abstract_output_stream_t& stream, parsing::parseme_ptr const& fn) -> void
 {
-	namespace resolve = semantics::resolve;
-
 	auto const& return_type = marshall::function::return_type(fn);
 	auto const& return_type_definition = resolve::typename_to_definition(return_type);
 	auto const& parameters = marshall::function::parameter_list(fn)->children();
@@ -77,7 +75,7 @@ auto aeon::generation::function(abstract_output_stream_t& stream, parsing::parse
 		if (i != parameters.begin())
 			stream << ", ";
 
-		auto type_definition = semantics::resolve::typename_to_definition(marshall::parameter::type_name(*i));
+		auto type_definition = resolve::typename_to_definition(marshall::parameter::type_name(*i));
 		
 		stream << generation::type_structure(type_definition) << " " << marshall::parameter::identifier(*i)->text();
 	}

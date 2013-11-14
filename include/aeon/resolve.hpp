@@ -3,16 +3,12 @@
 //
 //
 //=====================================================================
-#ifndef AEON_SEMANTICS_RESOLVE_HPP
-#define AEON_SEMANTICS_RESOLVE_HPP
+#ifndef AEON_RESOLVE_HPP
+#define AEON_RESOLVE_HPP
 //=====================================================================
-#include <cstdint>
-#include <ostream>
-//=====================================================================
-#include <aeon/parsing/children.hpp>
+#include <aeon/parsing/parseme.hpp>
 //=====================================================================
 namespace aeon {
-namespace semantics {
 namespace resolve {
 //=====================================================================
 	
@@ -26,7 +22,6 @@ namespace resolve {
 
 //=====================================================================
 } // namespace resolve
-} // namespace semantics
 } // namespace aeon
 //=====================================================================
 #endif

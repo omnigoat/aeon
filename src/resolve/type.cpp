@@ -1,4 +1,4 @@
-#include <aeon/semantics/resolve.hpp>
+#include <aeon/resolve.hpp>
 #include <aeon/parsing/parseme.hpp>
 #include <aeon/parsing/algorithm.hpp>
 #include <aeon/marshall.hpp>
@@ -9,9 +9,32 @@ namespace parsing = aeon::parsing;
 
 typedef parsing::parseme_t::id_t id;
 
+parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x)
+{
+	ATMA_ASSERT(x);
 
+	switch (x->id())
+	{
+		case id::return_statement:
+			return type_of(marshall::unary_expr::child(x));
 
-parsing::parseme_ptr const& aeon::semantics::resolve::typename_to_definition(parsing::parseme_ptr const& x)
+		case id::addition_expr:
+			return type_of(marshall::binary_expr::lhs(x));
+
+		case id::identifier:
+			return type_of(identifier_to_definition(x));
+
+		case id::parameter:
+			return type_of(marshall::parameter::type_name(x));
+
+		case id::type_name:
+			return typename_to_definition(x);
+	}
+
+	return x;
+}
+
+parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parseme_ptr const& x)
 {
 	ATMA_ASSERT(x->id() == id::type_name);
 
