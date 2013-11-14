@@ -77,9 +77,6 @@
     <ClInclude Include="..\..\include\aeon\semantics\analyse.hpp">
       <Filter>include\semantics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\aeon\parsing\marshall.hpp">
-      <Filter>include\parsing</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\aeon\parsing\children.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
@@ -94,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\aeon\generation\generation.hpp">
       <Filter>include\generation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\marshall.hpp">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

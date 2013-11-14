@@ -1,10 +1,9 @@
 #include <aeon/generation/generation.hpp>
 
 #include <aeon/semantics/resolve.hpp>
-#include <aeon/parsing/marshall.hpp>
+#include <aeon/marshall.hpp>
 
 using namespace aeon;
-namespace marshall = parsing::marshall;
 
 auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> atma::string
 {

@@ -1,9 +1,8 @@
 #include <aeon/semantics/analyse.hpp>
-#include <aeon/parsing/marshall.hpp>
+#include <aeon/marshall.hpp>
 #include <aeon/parsing/algorithm.hpp>
 #include <aeon/semantics/resolve.hpp>
 
-namespace marshall = aeon::parsing::marshall;
 namespace resolve = aeon::semantics::resolve;
 
 auto aeon::semantics::analyse::function(parseme_ptr const& fn) -> analysis_t

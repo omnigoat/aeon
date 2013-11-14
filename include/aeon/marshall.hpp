@@ -3,16 +3,17 @@
 //
 //
 //=====================================================================
-#ifndef AEON_PARSING_MARSHALL_HPP
-#define AEON_PARSING_MARSHALL_HPP
+#ifndef AEON_MARSHALL_HPP
+#define AEON_MARSHALL_HPP
 //=====================================================================
 #include <aeon/parsing/parseme.hpp>
 //=====================================================================
 namespace aeon {
-namespace parsing {
 namespace marshall {
 //=====================================================================
 	
+	using parsing::parseme_ptr;
+
 	namespace type_definition {
 		inline parseme_ptr const& name(parseme_ptr const& x) { return x->children()[0]; }
 		inline parseme_ptr const& definition(parseme_ptr const& x) { return x->children()[1]; }
@@ -42,7 +43,6 @@ namespace marshall {
 
 //=====================================================================
 } // namespace marshall
-} // namespace parsing
 } // namespace aeon
 //=====================================================================
 #endif

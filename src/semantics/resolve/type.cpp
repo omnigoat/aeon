@@ -1,12 +1,11 @@
 #include <aeon/semantics/resolve.hpp>
 #include <aeon/parsing/parseme.hpp>
 #include <aeon/parsing/algorithm.hpp>
-#include <aeon/parsing/marshall.hpp>
+#include <aeon/marshall.hpp>
 #include <aeon/parsing/ape.hpp>
 #include <aeon/lexing/id.hpp>
 
 namespace parsing = aeon::parsing;
-namespace marshall = aeon::parsing::marshall;
 
 typedef parsing::parseme_t::id_t id;
 
