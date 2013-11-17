@@ -99,7 +99,33 @@ auto aeon::generation::function_body(abstract_output_stream_t& stream, parsing::
 	stream << "}\n";
 }
 
-auto aeon::generation::statement(abstract_output_stream_t& stream, parsing::parseme_ptr const& body) -> void
+auto aeon::generation::statement(abstract_output_stream_t& stream, parsing::parseme_ptr const& statement) -> void
 {
-	//stream << line_begin << 
+	switch (statement->id())
+	{
+		case parsing::parseme_t::id_t::return_statement:
+			return_statement(stream, statement);
+			break;
+	}
 }
+
+auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsing::parseme_ptr const& statement) -> void
+{
+	ATMA_ASSERT(statement->id() == parsing::ID::return_statement);
+
+	auto expr = marshall::return_statement::expression(statement);
+	expression(stream, expr);
+
+	//stream << "return " << context.typename_of(expr) << " " << context.register_of(expr);
+}
+
+auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
+{
+	switch (expr->id())
+	{
+		case parsing::ID::addition_expr:
+			
+			break;
+	}
+}
+

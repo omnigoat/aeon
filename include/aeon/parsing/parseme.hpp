@@ -76,6 +76,8 @@ namespace parsing {
 		intrinsic_type_int32
 	};
 
+	typedef parseme_t::id_t ID;
+
 	inline auto is_intrinsic_int_typename(parsing::parseme_ptr const& x) -> bool
 	{
 		auto i = x->text().begin();

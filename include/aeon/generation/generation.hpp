@@ -99,8 +99,8 @@ namespace generation {
 	auto function(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
 	auto function_body(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
 	auto statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	
-
+	auto return_statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
+	auto expression(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
 
 //=====================================================================
 } // namespace generation
