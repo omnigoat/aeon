@@ -23,7 +23,7 @@ namespace marshall {
 	namespace function {
 		using parsing::parseme_ptr;
 
-		inline parseme_ptr const& name(parseme_ptr const& x) { return x->children()[0]; }
+		inline parseme_ptr const& name_list(parseme_ptr const& x) { return x->children()[0]; }
 		inline parseme_ptr const& parameter_list(parseme_ptr const& x) { return x->children()[1]; }
 		inline parseme_ptr const& return_type(parseme_ptr const& x) { return x->children()[2]; }
 		inline parseme_ptr const& body(parseme_ptr const& x) { return x->children()[3]; }

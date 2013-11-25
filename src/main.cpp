@@ -81,7 +81,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	ATMA_ASSERT(!parsemes.empty());
 	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
 
-	FILE* out = fopen(args[2], "w+");
+	FILE* out = fopen(args[2], "w");
 
 	auto stream = new generation::file_output_stream_t(out);
 
@@ -102,10 +102,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 	for (auto const& x : modules)
 	{
-		//if (x->id() == aeon::parsing::parseme_t::id_t::function)
-			//semantics::analyse::function(x);
-		//}
-
 		generation::module(*stream, x);
 	}
 

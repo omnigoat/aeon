@@ -10,11 +10,23 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	atma::string result;
 
 	// function name
-	auto name = marshall::function::name(fn);
-	if (name->text() == "main")
+	auto name_list = marshall::function::name_list(fn);
+
+	if (name_list->children().size() == 1 && name_list->children().back()->text() == "main")
 		return "main";
+
+	result += atma::to_string(name_list->children().size());
 	result += "_";
-	result += atma::to_string(name->text().bytes()) + name->text();
+
+	for (auto const& x : name_list->children())
+	{
+		if (x->id() == parsing::ID::expr_placeholder)
+			result += "x";
+		else
+			result += atma::to_string(x->text().bytes()) + x->text();
+
+		result += "_";
+	}
 
 	// return-type
 	auto return_type = marshall::function::return_type(fn);

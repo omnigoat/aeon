@@ -62,9 +62,12 @@ namespace parsing {
 	{
 		root,
 		module,
+
+		identifier,
+
+		// function
 		function,
 		function_pattern,
-		identifier,
 		expr_placeholder,
 		parameter_list,
 		parameter,
