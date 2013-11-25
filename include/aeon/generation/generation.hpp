@@ -43,6 +43,15 @@ namespace generation {
 		return lhs;
 	}
 
+	template <int N>
+	inline auto operator << (abstract_output_stream_t& lhs, char const (&rhs)[N]) -> abstract_output_stream_t&
+	{
+		for (int i = 0; i != N; ++i)
+			lhs.putc(rhs[i]);
+
+		return lhs;
+	}
+
 	inline auto operator << (abstract_output_stream_t& lhs, abstract_output_stream_t& (*rhs)(abstract_output_stream_t&)) -> abstract_output_stream_t&
 	{
 		return (*rhs)(lhs);

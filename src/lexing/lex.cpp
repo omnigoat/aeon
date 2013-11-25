@@ -176,7 +176,7 @@ auto state_t::increment_tabs() -> void
 	case '&': case '|': case '%': case '^': \
 	case '.': case '[': case ']': case '(': \
 	case ')': case '{': case '}': case ':': \
-	case ',':
+	case ',': case '_':
 
 #define WHITESPACE_PREDICATE \
 	case ' ':

@@ -6,6 +6,7 @@
 #ifndef AEON_PARSING_APE_HPP
 #define AEON_PARSING_APE_HPP
 //=====================================================================
+#include <aeon/lexing/id.hpp>
 #include <aeon/parsing/parseme.hpp>
 //=====================================================================
 namespace aeon {
@@ -127,6 +128,12 @@ namespace ape {
 	inline auto make(parseme_t::id_t id, lexing::ID lid, lexing::lexeme_t::text_t const& text) -> detail::expr_t {
 		return make(id, lexing::make_synthetic_lexeme(lid, text.begin(), text.end(), lexing::position_t::zero));
 	}
+
+	inline auto make(parseme_t::id_t id, lexing::lexeme_t::text_t const& text) -> detail::expr_t {
+		return make(id, lexing::make_synthetic_lexeme(lexing::ID::dummy, text.begin(), text.end(), lexing::position_t::zero));
+	}
+
+	//inline auto make(parseme_t::id_t id, lexing::lexeme_t::text_t const&)
 
 	inline void insert_into(children_t& dest, detail::expr_t const& x) {
 		x(dest);

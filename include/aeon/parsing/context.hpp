@@ -34,6 +34,8 @@ namespace parsing {
 			auto skip(lexing::ID) -> bool;
 			auto skip(lexing::ID, char const*) -> bool;
 
+			auto current_lexeme() const -> lexing::lexeme_t const*;
+
 		private:
 			lexing::lexemes_t::const_iterator begin_;
 		};

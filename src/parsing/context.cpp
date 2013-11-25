@@ -69,3 +69,10 @@ auto context_t::skip(lexid lid, char const* str) -> bool
 	++begin_;
 	return true;
 }
+
+auto context_t::current_lexeme() const -> aeon::lexing::lexeme_t const*
+{
+	return &*begin_;
+}
+
+

@@ -31,7 +31,7 @@ namespace parsing {
 		enum class id_t;
 
 		parseme_t(id_t);
-		parseme_t(id_t id, lexing::lexeme_t const*);
+		parseme_t(id_t, lexing::lexeme_t const*);
 		~parseme_t();
 
 		auto id() const -> id_t;
@@ -42,6 +42,8 @@ namespace parsing {
 		auto children() -> children_t&;
 		
 		auto set_parent(parseme_ptr const&) -> void;
+
+		static auto make(id_t, lexing::lexeme_t const* = nullptr) -> parseme_ptr;
 
 	private:
 		auto lexeme() const -> lexing::lexeme_t const*;
@@ -61,19 +63,21 @@ namespace parsing {
 		root,
 		module,
 		function,
+		function_pattern,
+		identifier,
+		expr_placeholder,
 		parameter_list,
 		parameter,
 		type_name,
-		identifier,
 		type,
 		block,
 		return_statement,
+		expr,
 		addition_expr,
 		type_definition,
 		intrinsic_type_int,
 		intrinsic_bitsize,
-		intrinsic_type_int16,
-		intrinsic_type_int32
+		intrinsic_int_add
 	};
 
 	typedef parseme_t::id_t ID;

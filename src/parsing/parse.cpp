@@ -14,9 +14,6 @@ typedef aeon::parsing::parseme_t::id_t parsid;
 char const* intrinsic_text = "@int16@int32";
 
 aeon::lexing::position_t intrinsic_position(0, 0);
-aeon::lexing::lexeme_t int16_lexeme(aeon::lexing::ID::intrinsic_type_int16, intrinsic_text, intrinsic_text + 6, intrinsic_position);
-aeon::lexing::lexeme_t int32_lexeme(aeon::lexing::ID::intrinsic_type_int32, intrinsic_text + 6, intrinsic_text + 12, intrinsic_position);
-
 
 auto add_prelude(parsing::children_t& parsemes) -> void
 {
@@ -117,12 +114,26 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 			goto fail;
 	}
 
-	// identifier
+	// name expression
 	{
-		id_node = context.match_make(parsid::identifier, lexid::identifier);
-		if (!id_node)
+		auto pattern = parseme_t::make(parsid::function_pattern, context.current_lexeme());
+
+		for (;;)
+		{
+			id_node = context.match_make(parsid::identifier, lexid::identifier);
+			if (!id_node)
+				id_node = context.match_make(parsid::expr_placeholder, lexid::punctuation, "_");
+
+			if (!id_node)
+				break;
+
+			pattern->children().push_back(id_node);
+		}
+
+		if (pattern->children().empty())
 			goto fail;
-		fn_node->children().push_back(id_node);
+
+		fn_node->children().push_back(pattern);
 	}
 
 	// parameter list
@@ -134,11 +145,19 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		if (!parameters(parameter_list_node->children(), lexemes, context))
 			goto fail;
 
+		fn_node->children().push_back(parameter_list_node);
+	}
+
+	// return type
+	{
+		if (!context.skip(lexid::punctuation, "->"))
+			goto fail;
+
 		parseme_ptr return_type_node = context.match_make(parsid::type_name, lexid::type);
 		if (!return_type_node)
 			goto fail;
 
-		fn_node->children().push_back(parameter_list_node);
+		
 		fn_node->children().push_back(return_type_node);
 	}
 
@@ -167,7 +186,7 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 	{
 		parseme_ptr parameter_node(new parseme_t(parsid::parameter));
 		
-		// <optional identifier> as <typename>
+		// (<identifier> as)? <typename>
 		detail::context_t old_context = context;
 		{
 			parseme_ptr id_node = context.match_make(parsid::identifier, lexid::identifier);
@@ -185,9 +204,9 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 			parameter_node->children().push_back(param_type_node);
 		}
 
-		if ( !context.skip(lexid::punctuation, "->") ) //!match(context.begin, lexing::basic)(lexid::punctuation, "->") )
+		if ( !context.skip(lexid::punctuation, ",") )
 		{
-			context = old_context;
+			//context = old_context;
 			break;
 		}
 
@@ -222,7 +241,26 @@ auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t co
 
 auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	return additive_expression(parsemes, context);
+	//parsemes.push_back(  )
+	ape::insert_into(parsemes, ape::make(parsid::expr));
+
+	// expressions are simply a list of identifiers
+	for (;;)
+	{
+		if (auto p = context.match_make(parsid::identifier, lexid::identifier))
+		{
+			parsemes.back()->children().push_back(p);
+		}
+		else if (auto p = context.match_make(parsid::identifier, lexid::punctuation))
+		{
+			parsemes.back()->children().push_back(p);
+		}
+		else {
+			break;
+		}
+	}
+
+	return true;
 }
 
 auto aeon::parsing::detail::additive_expression(children_t& parsemes, detail::context_t& context) -> bool

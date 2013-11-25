@@ -75,11 +75,42 @@ parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parse
 
 		// if this is the first time an integer of this width is encountered, insert it into the prelude
 		ape::insert_into(root->children(), root->children().begin(),
-			ape::make(parsing::parseme_t::id_t::type_definition) [
+			ape::make(parsid::type_definition) [
 				ape::make(parsid::identifier, lexing::ID::identifier, x->text()),
 				ape::make(parsid::intrinsic_type_int),
-				ape::make(parsid::intrinsic_bitsize, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, 
-					x->text().begin() + 4, x->text().end(), x->position(), lexing::basic))
+				ape::make(parsid::intrinsic_bitsize, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, x->text().begin() + 4, x->text().end(), x->position(), lexing::basic))
+			]
+		);
+
+		ape::insert_into(root->children(), root->children().begin(),
+			ape::make(parsid::function) [
+				ape::make(parsid::function_pattern) [
+					ape::make(parsid::expr_placeholder),
+					ape::make(parsid::identifier, "+"),
+					ape::make(parsid::expr_placeholder)
+				],
+
+				ape::make(parsid::parameter_list)[
+					ape::make(parsid::parameter)[
+						ape::make(parsid::identifier, "lhs"),
+						ape::make(parsid::type_name, x->text())
+					],
+					ape::make(parsid::parameter)[
+						ape::make(parsid::identifier, "rhs"),
+						ape::make(parsid::type_name, x->text())
+					]
+				],
+
+				ape::make(parsid::type_name, x->text()),
+
+				ape::make(parsid::block) [
+					ape::make(parsid::return_statement)[
+						ape::make(parsid::intrinsic_int_add)[
+							ape::make(parsid::identifier, "lhs"),
+							ape::make(parsid::identifier, "rhs")
+						]
+					]
+				]
 			]
 		);
 

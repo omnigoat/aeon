@@ -20,6 +20,9 @@ namespace resolve {
 	//
 	parsing::parseme_ptr const& typename_to_definition(parsing::parseme_ptr const&);
 
+	//
+	parsing::parseme_ptr const& expression_to_ast(parsing::parseme_ptr const&);
+
 //=====================================================================
 } // namespace resolve
 } // namespace aeon

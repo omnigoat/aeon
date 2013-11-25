@@ -74,3 +74,8 @@ auto parseme_t::lexeme() const -> lexing::lexeme_t const*
 {
 	return (lexing::lexeme_t const*)((intptr_t)lexeme_ & intptr_t(-2));
 }
+
+auto parseme_t::make(id_t id, lexing::lexeme_t const* L) -> parseme_ptr
+{
+	return parseme_ptr(new parseme_t(id, L));
+}
