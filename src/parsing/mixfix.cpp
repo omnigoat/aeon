@@ -1,5 +1,6 @@
 #include <aeon/parsing/parse.hpp>
 #include <aeon/parsing/algorithm.hpp>
+#include <aeon/parsing/ape.hpp>
 
 #include <aeon/marshall.hpp>
 
@@ -68,10 +69,48 @@ namespace
 		return fns;
 	}
 
-	
+	struct function_pattern_filter_t
+	{
+		function_pattern_filter_t(parsemes_t const& ast) : ast_(ast) {}
+
+		auto operator() (parseme_ptr const& x) const -> bool
+		{
+			ATMA_ASSERT(x->id() == ID::function);
+
+			auto pattern = marshall::function::pattern(x);
+
+			if (pattern->children().size() < ast_.size())
+				return false;
+
+			return std::equal(ast_.begin(), ast_.end(), pattern->children().begin(), 
+				[](parseme_ptr const& lhs, parseme_ptr const& rhs)
+				{
+					// identifiers can be consumed by placeholders or matching identifiers
+					if (lhs->id() == ID::identifier) {
+						return rhs->id() == ID::placeholder || rhs->text() == lhs->text();
+					}
+					else {
+						return rhs->id() == ID::placeholder;
+					}
+				});
+		}
+
+	private:
+		parsemes_t const& ast_;
+	};
+
 	auto shift(parsemes_t& xs, children_t::iterator& x) -> void {
 		xs.push_back(*x);
 		++x;
+	}
+
+	auto reduce(parsemes_t& xs, parseme_ptr const& fn) -> void
+	{
+		//parseme_ptr k = parseme_t(ID::function_call, xs.front()->lexeme))
+		auto const& x = xs.front();
+
+		parsemes_t ys;
+		//ape::insert_into(ys, ape::make(ID::function_call, x->lexeme()));
 	}
 
 	auto mixfix_fixup(parseme_ptr const& expr) -> void
@@ -80,14 +119,32 @@ namespace
 
 		parsemes_t ast;
 		auto expri = expr->children().begin();
+		auto choice = parseme_ptr();
 
-		// step 1: shift
-		shift(ast, expri);
+		parsemes_t candidates(functions.begin(), functions.end());
+		while (expri != expr->children().end() && !choice && !candidates.empty())
+		{
+			shift(ast, expri);
+		
+			// filter candidate functions
+			parsemes_t filtered_candidates;
+			std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(filtered_candidates), function_pattern_filter_t(ast));
 
-		// step 2: pick candidate functions
-		parsemes_t candidates;
-		//std::copy_if(functions.begin(), functions.end(), std::back_inserter(candidates), function_pattern_filter(ast));
+			for (auto const& x : filtered_candidates) {
+				// fully consumed candidate, use it!
+				if (marshall::function::pattern(x)->children().size() == ast.size()) {
+					choice = x;
+					break;
+				}
+			}
 
+			// reduce expression (break if there's nothing left)
+			if (choice) {
+				reduce(ast, choice);
+			}
+
+			std::swap(candidates, filtered_candidates);
+		}
 	}
 }
 

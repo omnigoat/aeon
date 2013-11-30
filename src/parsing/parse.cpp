@@ -247,12 +247,13 @@ auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t c
 	// expressions are simply a list of identifiers
 	for (;;)
 	{
-		if (auto p = context.match_make(parsid::identifier, lexid::identifier))
-		{
+		if (auto p = context.match_make(parsid::identifier, lexid::identifier)) {
 			parsemes.back()->children().push_back(p);
 		}
-		else if (auto p = context.match_make(parsid::identifier, lexid::punctuation))
-		{
+		else if (auto p = context.match_make(parsid::identifier, lexid::punctuation)) {
+			parsemes.back()->children().push_back(p);
+		}
+		else if (auto p = context.match_make(parsid::integer_literal, lexid::integer_literal)) {
 			parsemes.back()->children().push_back(p);
 		}
 		else {
@@ -261,20 +262,4 @@ auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t c
 	}
 
 	return true;
-}
-
-auto aeon::parsing::detail::additive_expression(children_t& parsemes, detail::context_t& context) -> bool
-{
-	parseme_ptr lhs = context.match_make(parsid::identifier, lexid::identifier);
-	bool plus = context.skip(lexid::punctuation, "+");
-	parseme_ptr rhs = context.match_make(parsid::identifier, lexid::identifier);
-	if (lhs && plus && rhs) {
-		parseme_ptr k(new parseme_t(parsid::addition_expr));
-		k->children().push_back(lhs);
-		k->children().push_back(rhs);
-		parsemes.push_back(k);
-		return true;
-	}
-
-	return false;
 }

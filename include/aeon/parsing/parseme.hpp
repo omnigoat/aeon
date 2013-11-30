@@ -40,14 +40,13 @@ namespace parsing {
 		auto parent() const -> parseme_ptr;
 		auto children() const -> children_t const&;
 		auto children() -> children_t&;
-		
+		auto lexeme() const -> lexing::lexeme_t const*;
+
 		auto set_parent(parseme_ptr const&) -> void;
 
 		static auto make(id_t, lexing::lexeme_t const* = nullptr) -> parseme_ptr;
 
 	private:
-		auto lexeme() const -> lexing::lexeme_t const*;
-
 		id_t id_;
 		parseme_wptr parent_;
 		children_t children_;
@@ -63,6 +62,7 @@ namespace parsing {
 		root,
 		module,
 
+		integer_literal,
 		identifier,
 		placeholder,
 
@@ -71,6 +71,7 @@ namespace parsing {
 		parameter_list,
 		parameter,
 		
+		function_call,
 		type_name,
 		type,
 		block,
