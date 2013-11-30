@@ -78,6 +78,11 @@ auto main(uint32_t arg_count, char const** args) -> int
 		std::cout << parsemes << std::endl;
 	}
 
+	// second-phase parsing for mixfix
+	{
+		aeon::parsing::mixfix_resolution(parsemes);
+	}
+
 	ATMA_ASSERT(!parsemes.empty());
 	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
 

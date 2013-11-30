@@ -2,6 +2,7 @@
 
 #include <aeon/resolve.hpp>
 #include <aeon/marshall.hpp>
+#include <aeon/parsing/algorithm.hpp>
 
 using namespace aeon;
 
@@ -10,18 +11,18 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	atma::string result;
 
 	// function name
-	auto name_list = marshall::function::name_list(fn);
+	auto pattern = marshall::function::pattern(fn);
 
-	if (name_list->children().size() == 1 && name_list->children().back()->text() == "main")
+	if (pattern->children().size() == 1 && pattern->children().back()->text() == "main")
 		return "main";
 
-	result += atma::to_string(name_list->children().size());
+	result += atma::to_string(pattern->children().size());
 	result += "_";
 
-	for (auto const& x : name_list->children())
+	for (auto const& x : pattern->children())
 	{
-		if (x->id() == parsing::ID::expr_placeholder)
-			result += "x";
+		if (x->id() == parsing::ID::placeholder)
+			result += "$";
 		else
 			result += atma::to_string(x->text().bytes()) + x->text();
 
@@ -133,11 +134,8 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsin
 
 auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
 {
-	switch (expr->id())
-	{
-		case parsing::ID::addition_expr:
-			
-			break;
-	}
+	ATMA_ASSERT(expr->id() == parsing::ID::expr);
+	
+	
 }
 

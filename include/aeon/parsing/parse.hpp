@@ -33,6 +33,8 @@ namespace parsing {
 
 	auto parse(children_t&, lexing::lexemes_t const&) -> void;
 
+	auto mixfix_resolution(children_t&) -> void;
+
 //=====================================================================
 } // namespace parsing
 } // namespace aeon

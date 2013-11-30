@@ -64,13 +64,13 @@ namespace parsing {
 		module,
 
 		identifier,
+		placeholder,
 
-		// function
 		function,
 		function_pattern,
-		expr_placeholder,
 		parameter_list,
 		parameter,
+		
 		type_name,
 		type,
 		block,

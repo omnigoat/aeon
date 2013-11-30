@@ -85,9 +85,9 @@ parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parse
 		ape::insert_into(root->children(), root->children().begin(),
 			ape::make(parsid::function) [
 				ape::make(parsid::function_pattern) [
-					ape::make(parsid::expr_placeholder),
+					ape::make(parsid::placeholder),
 					ape::make(parsid::identifier, "+"),
-					ape::make(parsid::expr_placeholder)
+					ape::make(parsid::placeholder)
 				],
 
 				ape::make(parsid::parameter_list)[

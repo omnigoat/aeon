@@ -128,5 +128,8 @@
     <ClCompile Include="..\..\src\resolve\identifier.cpp">
       <Filter>source\resolve</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\parsing\mixfix.cpp">
+      <Filter>source\parsing</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace parsing {
 //=====================================================================
 	
 	template <typename OT, typename PR>
-	void copy_depth_first_if(OT& out, children_t const& xs, PR pred)
+	inline void copy_depth_first_if(OT& out, children_t const& xs, PR pred)
 	{
 		for (auto const& x : xs) {
 			if (pred(x))
@@ -23,11 +23,25 @@ namespace parsing {
 	}
 
 	template <typename OT, typename PR>
-	void copy_direct_upwards_if(OT& out, parseme_ptr const& x, PR pred)
+	inline void copy_direct_upwards_if(OT& out, parseme_ptr const& x, PR pred)
 	{
 		for (auto y = x; !!y; y = y->parent())
 			if (pred(y))
 				*out++ = y;
+	}
+
+	template <typename FN>
+	inline void for_each_direct_upwards(parseme_ptr const& x, FN fn) {
+		for (auto y = x; !!y; y = y->parent())
+			fn(y);
+	}
+
+	template <typename FN>
+	inline void for_each_depth_first(children_t const& xs, FN fn) {
+		for (auto const& x : xs) {
+			fn(x);
+			for_each_depth_first(x->children(), fn);
+		}
 	}
 
 //=====================================================================

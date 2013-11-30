@@ -122,7 +122,7 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		{
 			id_node = context.match_make(parsid::identifier, lexid::identifier);
 			if (!id_node)
-				id_node = context.match_make(parsid::expr_placeholder, lexid::punctuation, "_");
+				id_node = context.match_make(parsid::placeholder, lexid::punctuation, "_");
 
 			if (!id_node)
 				break;
