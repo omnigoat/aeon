@@ -90,7 +90,7 @@
     <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
     <ClInclude Include="..\..\include\aeon\marshall.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp" />
-    <ClInclude Include="..\..\include\aeon\parsing\ape.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\xpi.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parseme.hpp" />

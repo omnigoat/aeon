@@ -1,11 +1,11 @@
 #include <aeon/parsing/parse.hpp>
 #include <aeon/parsing/parseme.hpp>
 #include <aeon/lexing/id.hpp>
-#include <aeon/parsing/ape.hpp>
+#include <aeon/parsing/xpi.hpp>
 #include <string>
 
 namespace parsing = aeon::parsing;
-namespace ape = aeon::parsing::ape;
+namespace xpi = aeon::parsing::xpi;
 
 typedef aeon::lexing::ID lexid;
 typedef aeon::parsing::parseme_t::id_t parsid;
@@ -22,15 +22,15 @@ auto add_prelude(parsing::children_t& parsemes) -> void
 	parsing::children_t xs;
 
 	#if 0
-	ape::insert_into(xs, (
-		ape::make(id::type_definition) [
-			ape::make(id::identifier, int16_lexeme),
-			ape::make(id::intrinsic_type_int16)
+	xpi::insert_into(xs, (
+		xpi::make(id::type_definition) [
+			xpi::make(id::identifier, int16_lexeme),
+			xpi::make(id::intrinsic_type_int16)
 		],
 
-		ape::make(id::type_definition) [
-			ape::make(id::identifier, int32_lexeme),
-			ape::make(id::intrinsic_type_int32)
+		xpi::make(id::type_definition) [
+			xpi::make(id::identifier, int32_lexeme),
+			xpi::make(id::intrinsic_type_int32)
 		]
 	));
 
@@ -242,7 +242,7 @@ auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t co
 auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	//parsemes.push_back(  )
-	ape::insert_into(parsemes, ape::make(parsid::expr));
+	xpi::insert_into(parsemes, xpi::make(parsid::expr));
 
 	// expressions are simply a list of identifiers
 	for (;;)
