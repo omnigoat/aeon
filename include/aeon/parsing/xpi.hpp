@@ -23,7 +23,7 @@ namespace xpi {
 		typedef std::shared_ptr<abstract_expr_t> abstract_expr_ptr;
 
 		struct abstract_expr_t : std::enable_shared_from_this<abstract_expr_t> {
-			virtual auto operator ()(children_t&) -> bool = 0;
+			virtual auto operator ()(parsemes_t&) -> bool = 0;
 		};
 
 		struct expr_t
@@ -34,7 +34,7 @@ namespace xpi {
 			}
 
 			auto operator [](expr_t const&) const -> expr_t;
-			auto operator ()(children_t&) const -> bool;
+			auto operator ()(parsemes_t&) const -> bool;
 
 		private:
 			abstract_expr_ptr backend_;
@@ -51,7 +51,7 @@ namespace xpi {
 			{
 			}
 
-			auto operator ()(children_t& dest) -> bool {
+			auto operator ()(parsemes_t& dest) -> bool {
 				dest.push_back( parseme_ptr(new parseme_t(id_, lexeme_)) );
 				return true;
 			}
@@ -69,8 +69,14 @@ namespace xpi {
 				ATMA_ASSERT( !!dynamic_cast<make_expr_t const*>(parent_.get()) );
 			}
 
-			auto operator ()(children_t& dest) -> bool {
-				return (*parent_)(dest) && (*child_)(dest.back()->children());
+			auto operator ()(parsemes_t& dest) -> bool {
+				parsemes_t tmp;
+				bool result = (*parent_)(dest) && (*child_)(tmp);
+				if (result) {
+					auto& ch = dest.back()->children();
+					ch.insert(ch.end(), tmp.begin(), tmp.end());
+				}
+				return result;
 			}
 
 		private:
@@ -84,7 +90,7 @@ namespace xpi {
 			{
 			}
 
-			auto operator ()(children_t& dest) -> bool {
+			auto operator ()(parsemes_t& dest) -> bool {
 				return (*x_)(dest) && (*y_)(dest);
 			}
 
@@ -92,14 +98,28 @@ namespace xpi {
 			abstract_expr_ptr x_, y_;
 		};
 
+		template <typename IT>
+		struct insert_expr_t : abstract_expr_t
+		{
+			insert_expr_t(IT begin, IT end)
+				: begin_(begin), end_(end)
+			{}
 
+			auto operator ()(parsemes_t& dest) -> bool {
+				dest.insert(dest.end(), begin_, end_);
+				return true;
+			}
+
+		private:
+			IT begin_, end_;
+		};
 
 		inline auto expr_t::operator [] (expr_t const& child) const -> expr_t
 		{
 			return expr_t(abstract_expr_ptr(new dive_expr_t(backend_, child.backend_)));
 		}
 
-		inline auto expr_t::operator ()(children_t& dest) const -> bool
+		inline auto expr_t::operator ()(parsemes_t& dest) const -> bool
 		{
 			return (*backend_)(dest);
 		}
@@ -133,25 +153,47 @@ namespace xpi {
 		return make(id, lexing::make_synthetic_lexeme(lexing::ID::dummy, text.begin(), text.end(), lexing::position_t::zero));
 	}
 
-	//inline auto make(parseme_t::id_t id, lexing::lexeme_t::text_t const&)
+	template <typename IT>
+	inline auto insert(IT begin, IT end) -> detail::expr_t {
+		return detail::expr_t(detail::abstract_expr_ptr(new detail::insert_expr_t<IT>(begin, end)));
+	}
 
-	inline void insert_into(children_t& dest, detail::expr_t const& x) {
+
+
+
+
+
+	inline void insert_into(parsemes_t& dest, detail::expr_t const& x) {
 		x(dest);
 	}
 	
+	inline void insert_into(children_t& dest, detail::expr_t const& x) {
+		parsemes_t tmp;
+		x(tmp);
+
+		dest.insert(dest.end(), tmp.begin(), tmp.end());
+	}
+
+	inline void insert_into(parsemes_t& dest, parsemes_t::iterator const& where_, detail::expr_t const& x) {
+		parsemes_t c;
+		x(c);
+		dest.insert(where_, c.begin(), c.end());
+	}
+
 	inline void insert_into(children_t& dest, children_t::iterator const& where_, detail::expr_t const& x) {
-		children_t c;
+		parsemes_t c;
 		x(c);
 		dest.insert(where_, c.begin(), c.end());
 	}
 
 	inline void replace(parsing::parseme_ptr& dest, detail::expr_t const& x) {
-		children_t c;
+		parsemes_t c;
 		x(c);
 		ATMA_ASSERT(!c.empty());
 		dest = c.back();
 	}
 
+	
 //=====================================================================
 } // namespace xpi
 } // namespace parsing

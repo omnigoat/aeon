@@ -44,6 +44,14 @@ namespace parsing {
 		}
 	}
 
+	template <typename FN>
+	inline void ex_test_for_each_mutate(children_t& xs, FN fn) {
+		for (auto& x : xs) {
+			fn(xs, x);
+			ex_test_for_each_mutate(x->children(), fn);
+		}
+	}
+
 //=====================================================================
 } // namespace parsing
 } // namespace aeon

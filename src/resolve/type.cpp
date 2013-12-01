@@ -65,7 +65,7 @@ parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parse
 
 	// intrinsic integers are constructed on the fly, as all are acceptable
 	
-	if ( aeon::parsing::is_intrinsic_int_typename(x) )//atma::strncmp(x->text(), "@int", 4) == 0 && x->text() >= '0' && x->text()[4] <= '9')
+	if ( aeon::parsing::is_intrinsic_int_typename(x) )
 	{
 		// SERIOUSLY, do we ever need to provide an upper bound to atoi?
 		auto bitsize = std::atoi(x->text().begin() + 4);

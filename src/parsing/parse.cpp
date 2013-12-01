@@ -44,9 +44,10 @@ auto add_prelude(parsing::children_t& parsemes) -> void
 
 auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
-	detail::context_t context(lexemes.begin(lexing::basic));
-
 	parseme_ptr root_node(new parseme_t(parsid::root));
+
+	detail::context_t context(root_node, lexemes.begin(lexing::basic));
+
 
 	add_prelude(root_node->children());
 
@@ -153,12 +154,8 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		if (!context.skip(lexid::punctuation, "->"))
 			goto fail;
 
-		parseme_ptr return_type_node = context.match_make(parsid::type_name, lexid::type);
-		if (!return_type_node)
+		if (!type_name(fn_node->children(), lexemes, context))
 			goto fail;
-
-		
-		fn_node->children().push_back(return_type_node);
 	}
 
 	// function body.
@@ -197,11 +194,8 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 				parameter_node->children().push_back(id_node);
 			}
 
-			parseme_ptr param_type_node = context.match_make(parsid::type_name, lexid::type);
-			if (!param_type_node)
+			if (!type_name(parameter_node->children(), lexemes, context))
 				goto fail;
-
-			parameter_node->children().push_back(param_type_node);
 		}
 
 		if ( !context.skip(lexid::punctuation, ",") )
@@ -218,6 +212,23 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 fail:
 	return false;
 }
+
+auto aeon::parsing::detail::type_name(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+{
+	if (parseme_ptr type_name = context.match_make(parsid::type_name, lexid::type))
+	{
+		// check for missing intrinsic integer definitions
+		if (is_intrinsic_int_typename(type_name)) {
+			context.generate_intrinsic_integer_definition(type_name);
+		}
+
+		parsemes.push_back(type_name);
+		return true;
+	}
+
+	return false;
+}
+
 
 auto aeon::parsing::detail::function_body(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {

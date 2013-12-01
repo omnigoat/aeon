@@ -22,6 +22,7 @@ namespace parsing {
 		struct context_t;
 
 		auto module(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto type_name(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto function(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto parameters(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto function_body(children_t&, lexing::lexemes_t const&, context_t&) -> bool;

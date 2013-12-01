@@ -134,7 +134,7 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsin
 
 auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
 {
-	ATMA_ASSERT(expr->id() == parsing::ID::expr);
+	//ATMA_ASSERT(expr->id() == parsing::ID::expr);
 	
 	
 }

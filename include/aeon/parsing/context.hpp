@@ -8,9 +8,9 @@
 //=====================================================================
 #include <cstdint>
 #include <ostream>
+#include <set>
 //=====================================================================
 #include <aeon/lexing/lexemes.hpp>
-//#include <aeon/parsing/children.hpp>
 #include <aeon/parsing/parseme.hpp>
 //=====================================================================
 namespace aeon {
@@ -21,7 +21,7 @@ namespace parsing {
 	{
 		struct context_t
 		{
-			context_t(lexing::lexemes_t::const_iterator const&);
+			context_t(parseme_ptr const& root, lexing::lexemes_t::const_iterator const&);
 
 			auto id() const -> lexing::ID;
 			
@@ -36,8 +36,12 @@ namespace parsing {
 
 			auto current_lexeme() const -> lexing::lexeme_t const*;
 
+			auto generate_intrinsic_integer_definition(parseme_ptr const& type_name) -> void;
+
 		private:
+			parseme_ptr root_;
 			lexing::lexemes_t::const_iterator begin_;
+			std::set<uint32_t> intrinsic_integers_;
 		};
 	}
 

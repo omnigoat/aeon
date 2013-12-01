@@ -53,9 +53,7 @@ namespace parsing {
 		lexing::lexeme_t const* lexeme_;
 	};
 	
-	inline std::ostream& operator << (std::ostream& stream, parseme_t const& x) {
-		return stream << static_cast<int>(x.id()) << ": " << x.text();
-	}
+	std::ostream& operator << (std::ostream& stream, parseme_t const& x);
 
 	enum class parseme_t::id_t
 	{

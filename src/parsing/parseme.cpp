@@ -79,3 +79,7 @@ auto parseme_t::make(id_t id, lexing::lexeme_t const* L) -> parseme_ptr
 {
 	return parseme_ptr(new parseme_t(id, L));
 }
+
+std::ostream& aeon::parsing::operator << (std::ostream& stream, parseme_t const& x) {
+	return stream << static_cast<int>(x.id()) << ": " << "\"" << x.text() << "\"[" << x.position().row << ":" << x.position().column << "]";
+}

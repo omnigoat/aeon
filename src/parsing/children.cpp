@@ -92,9 +92,12 @@ auto children_t::detach(const_iterator const& i) -> parseme_ptr
 	return p;
 }
 
-auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> void
+auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator
 {
-	elements_.insert(where_, begin, end);
+	auto ni = elements_.insert(where_, begin, end);
+	for (auto i = begin; i != end; ++i, ++ni)
+		(*i)->set_parent(owner_->shared_from_this());
+	return ni;
 }
 
 auto children_t::unconst(const_iterator const& i) -> iterator
@@ -111,7 +114,7 @@ auto children_t::pop_back() -> void
 auto aeon::parsing::detail::print_parsemes(std::ostream& stream, children_t const& xs, uint32_t spaces) -> std::ostream&
 {
 	for (auto const& x : xs) {
-		stream << std::string(spaces, ' ') << x.get() << " " << *x << " <- " << x->parent().get() << std::endl;
+		stream << std::string(spaces, ' ') << x.get() << " " << *x << std::endl;
 		print_parsemes(stream, x->children(), spaces + 2);
 	}
 

@@ -51,8 +51,8 @@ namespace
 		// get all functions for this scope
 		parsing::parsemes_t fns;
 		parsing::for_each_direct_upwards(expr, [&fns](parsing::parseme_ptr const& x) {
-			if (x->id() == parsing::ID::module) {
-				parsing::copy_depth_first_if(std::back_inserter(fns), x->children(), [](parsing::parseme_ptr const& y) {
+			if (x->id() == parsing::ID::module || x->id() == parsing::ID::root) {
+				std::copy_if(x->children().begin(), x->children().end(), std::back_inserter(fns), [](parsing::parseme_ptr const& y) {
 					return y->id() == parsing::ID::function;
 				});
 			}
@@ -99,9 +99,10 @@ namespace
 		parsemes_t const& ast_;
 	};
 
-	auto shift(parsemes_t& xs, children_t::iterator& x) -> void {
-		xs.push_back(*x);
-		++x;
+	auto shift(parsemes_t& xs, children_t& children) -> void {
+		//children.detach(x);
+		xs.push_back(children.detach(children.begin()));
+		//++x;
 	}
 
 	auto reduce(parsemes_t& xs, parseme_ptr const& fn) -> void
@@ -110,21 +111,27 @@ namespace
 		auto const& x = xs.front();
 
 		parsemes_t ys;
-		//xpi::insert_into(ys, xpi::make(ID::function_call, x->lexeme()));
+		xpi::insert_into(ys,
+			xpi::make(ID::function_call, x->lexeme()) [
+				xpi::insert(xs.begin(), xs.end())
+			]);
+
+		xs.assign(ys.begin(), ys.end());
 	}
 
-	auto mixfix_fixup(parseme_ptr const& expr) -> void
+	auto mixfix_fixup(children_t& xs, parseme_ptr& expr) -> void
 	{
 		auto functions = functions_for_scope(expr);
 
 		parsemes_t ast;
-		auto expri = expr->children().begin();
 		auto choice = parseme_ptr();
 
 		parsemes_t candidates(functions.begin(), functions.end());
-		while (expri != expr->children().end() && !choice && !candidates.empty())
+		//std::copy_if(functions.begin(), functions.end(), std::back_inserter(candidates), function_pattern_filter_t(ast));
+
+		while (!expr->children().empty() && !choice && !candidates.empty())
 		{
-			shift(ast, expri);
+			shift(ast, expr->children());
 		
 			// filter candidate functions
 			parsemes_t filtered_candidates;
@@ -145,15 +152,23 @@ namespace
 
 			std::swap(candidates, filtered_candidates);
 		}
+
+		auto i = std::find(xs.begin(), xs.end(), expr);
+		i = xs.insert(i, ast.begin(), ast.end());
+		xs.detach(i);
 	}
 }
 
 auto aeon::parsing::mixfix_resolution(children_t& xs) -> void
 {
-	parsing::for_each_depth_first(xs, [](parseme_ptr const& x) {
-		if (x->id() == ID::expr)
-			mixfix_fixup(x);
+	parsemes_t exprs;
+	parsing::copy_depth_first_if(std::back_inserter(exprs), xs, [](parseme_ptr const& x) {
+		return x->id() == ID::expr;
 	});
+
+	for (auto& x : exprs) {
+		mixfix_fixup(x->parent()->children(), x);
+	}
 }
 
 
