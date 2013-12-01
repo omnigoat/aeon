@@ -124,33 +124,37 @@ namespace
 		auto functions = functions_for_scope(expr);
 
 		parsemes_t ast;
-		auto choice = parseme_ptr();
 
-		parsemes_t candidates(functions.begin(), functions.end());
-		//std::copy_if(functions.begin(), functions.end(), std::back_inserter(candidates), function_pattern_filter_t(ast));
-
-		while (!expr->children().empty() && !choice && !candidates.empty())
+		while (!expr->children().empty())
 		{
-			shift(ast, expr->children());
+			auto choice = parseme_ptr();
+
+			parsemes_t candidates(functions.begin(), functions.end());
+			//std::copy_if(functions.begin(), functions.end(), std::back_inserter(candidates), function_pattern_filter_t(ast));
+
+			while (!expr->children().empty() && !choice && !candidates.empty())
+			{
+				shift(ast, expr->children());
 		
-			// filter candidate functions
-			parsemes_t filtered_candidates;
-			std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(filtered_candidates), function_pattern_filter_t(ast));
+				// filter candidate functions
+				parsemes_t filtered_candidates;
+				std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(filtered_candidates), function_pattern_filter_t(ast));
 
-			for (auto const& x : filtered_candidates) {
-				// fully consumed candidate, use it!
-				if (marshall::function::pattern(x)->children().size() == ast.size()) {
-					choice = x;
-					break;
+				for (auto const& x : filtered_candidates) {
+					// fully consumed candidate, use it!
+					if (marshall::function::pattern(x)->children().size() == ast.size()) {
+						choice = x;
+						break;
+					}
 				}
-			}
 
-			// reduce expression (break if there's nothing left)
-			if (choice) {
-				reduce(ast, choice);
-			}
+				// reduce expression (break if there's nothing left)
+				if (choice) {
+					reduce(ast, choice);
+				}
 
-			std::swap(candidates, filtered_candidates);
+				std::swap(candidates, filtered_candidates);
+			}
 		}
 
 		auto i = std::find(xs.begin(), xs.end(), expr);
