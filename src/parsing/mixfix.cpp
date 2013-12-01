@@ -107,16 +107,29 @@ namespace
 
 	auto reduce(parsemes_t& xs, parseme_ptr const& fn) -> void
 	{
-		//parseme_ptr k = parseme_t(ID::function_call, xs.front()->lexeme))
-		auto const& x = xs.front();
+		ATMA_ASSERT(fn->id() == ID::function);
 
-		parsemes_t ys;
-		xpi::insert_into(ys,
-			xpi::make(ID::function_call, x->lexeme()) [
+		// lexeme we'll use for the synthetic function-call
+		auto L = xs.front()->lexeme();
+		auto const& ys = marshall::function::pattern(fn)->children();
+
+		auto xsi = xs.begin();
+		auto ysi = ys.begin();
+		while (ysi != ys.end()) {
+			if ((*ysi)->id() != ID::placeholder)
+				xsi = xs.erase(xsi);
+			else
+				++xsi;
+			++ysi;
+		}
+
+		parsemes_t zs;
+		xpi::insert_into(zs,
+			xpi::make(ID::function_call, L) [
 				xpi::insert(xs.begin(), xs.end())
 			]);
 
-		xs.assign(ys.begin(), ys.end());
+		xs.assign(zs.begin(), zs.end());
 	}
 
 	auto mixfix_fixup(children_t& xs, parseme_ptr& expr) -> void
