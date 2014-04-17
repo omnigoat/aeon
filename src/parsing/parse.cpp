@@ -147,10 +147,16 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 			goto fail;
 
 		fn_node->children().push_back(parameter_list_node);
+
+		auto r = parameter_list_node->children().back();
+		parameter_list_node->children().pop_back();
+		fn_node->children().push_back(parseme_t::make(parsing::ID::type_name, r->children()[0]->lexeme()));
+
+		
 	}
 
 	// return type
-	{
+	if (false) {
 		if (!context.skip(lexid::punctuation, "->"))
 			goto fail;
 
@@ -166,6 +172,8 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 			function_body(function_body_node->children(), lexemes, context);
 			fn_node->children().push_back(function_body_node);
 		}
+		else
+			goto fail;
 	}
 
 
@@ -198,13 +206,15 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 				goto fail;
 		}
 
-		if ( !context.skip(lexid::punctuation, ",") )
+		parsemes.push_back(parameter_node);
+
+		if ( !context.skip(lexid::punctuation, "->") )
 		{
 			//context = old_context;
 			break;
 		}
 
-		parsemes.push_back(parameter_node);
+		
 	}
 
 	return true;
