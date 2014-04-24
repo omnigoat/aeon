@@ -16,9 +16,6 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	if (pattern->children().size() == 1 && pattern->children().back()->text() == "main")
 		return "main";
 
-	result += atma::to_string(pattern->children().size());
-	result += "_";
-
 	for (auto const& x : pattern->children())
 	{
 		if (x->id() == parsing::ID::placeholder)
@@ -129,7 +126,10 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsin
 	auto expr = marshall::return_statement::expression(statement);
 	expression(stream, expr);
 
-	//stream << "return " << context.typename_of(expr) << " " << context.register_of(expr);
+	auto type = resolve::type_of(expr);
+	auto typen = type_name_mangle(type);
+	
+	stream << "\tret " << typen << " " << "4" << "\n";
 }
 
 auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void

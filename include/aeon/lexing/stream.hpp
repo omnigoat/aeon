@@ -32,6 +32,7 @@ namespace lexing {
 		char const* end_;
 		char const* current_;
 		char const* mark_;
+		bool consumed_newline_;
 
 		position_t position_;
 		position_t marked_position_;

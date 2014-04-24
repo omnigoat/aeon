@@ -66,7 +66,7 @@ namespace xpi {
 			dive_expr_t(abstract_expr_ptr const& parent, abstract_expr_ptr const& child)
 				: parent_(parent), child_(child)
 			{
-				ATMA_ASSERT( !!dynamic_cast<make_expr_t const*>(parent_.get()) );
+				//ATMA_ASSERT( !!dynamic_cast<make_expr_t const*>(parent_.get()) );
 			}
 
 			auto operator ()(parsemes_t& dest) -> bool {
@@ -114,6 +114,22 @@ namespace xpi {
 			IT begin_, end_;
 		};
 
+		struct insert_single_expr_t : abstract_expr_t
+		{
+			insert_single_expr_t(parseme_ptr const& x)
+				: x_(x)
+			{}
+
+			auto operator ()(parsemes_t& dest) -> bool {
+				dest.push_back(x_);
+				return true;
+			}
+
+		private:
+			parseme_ptr x_;
+		};
+
+
 		inline auto expr_t::operator [] (expr_t const& child) const -> expr_t
 		{
 			return expr_t(abstract_expr_ptr(new dive_expr_t(backend_, child.backend_)));
@@ -128,9 +144,6 @@ namespace xpi {
 		{
 			return expr_t(abstract_expr_ptr(new seq_and_expr_t(lhs.backend_, rhs.backend_)));
 		}
-
-
-
 	}
 
 	inline auto make(parseme_t::id_t id, lexing::lexeme_t const& L) -> detail::expr_t {
@@ -158,7 +171,9 @@ namespace xpi {
 		return detail::expr_t(detail::abstract_expr_ptr(new detail::insert_expr_t<IT>(begin, end)));
 	}
 
-
+	inline auto insert(parseme_ptr const& x) -> detail::expr_t {
+		return detail::expr_t(detail::abstract_expr_ptr(new detail::insert_single_expr_t(x)));
+	}
 
 
 

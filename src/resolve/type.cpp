@@ -29,6 +29,11 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 
 		case id::type_name:
 			return typename_to_definition(x);
+
+		case id::function_call: {
+			//auto f = resolve::fu
+			//return type_of(marshall::)
+		}
 	}
 
 	return x;

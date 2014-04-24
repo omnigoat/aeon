@@ -101,16 +101,15 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 	intrinsic_integers_.insert(size);
 
 	// if this is the first time an integer of this width is encountered, insert it into the prelude
-	xpi::insert_into(root_->children(), root_->children().begin(),
+	xpi::insert_into(root_->children(), root_->children().begin(), (
 		xpi::make(ID::type_definition) [
 			xpi::make(ID::identifier, lexing::ID::identifier, type_name->text()),
 			xpi::make(ID::intrinsic_type_int),
 			xpi::make(ID::intrinsic_bitsize, lexing::make_synthetic_lexeme(
 				lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end(), lexing::position_t::zero, lexing::basic))
-		]
-	);
+		],
 
-	xpi::insert_into(root_->children(), root_->children().begin(),
+
 		xpi::make(ID::function) [
 			xpi::make(ID::function_pattern) [
 				xpi::make(ID::placeholder),
@@ -140,6 +139,6 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 				]
 			]
 		]
-	);
+	));
 }
 

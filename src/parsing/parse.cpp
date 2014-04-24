@@ -3,6 +3,7 @@
 #include <aeon/lexing/id.hpp>
 #include <aeon/parsing/xpi.hpp>
 #include <string>
+#include <stack>
 
 namespace parsing = aeon::parsing;
 namespace xpi = aeon::parsing::xpi;
@@ -262,24 +263,42 @@ auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t co
 
 auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	//parsemes.push_back(  )
-	xpi::insert_into(parsemes, xpi::make(parsid::expr));
+	additive_expression(parsemes, context);
 
-	// expressions are simply a list of identifiers
+	return true;
+}
+
+
+// additive_expr: Term (+ Term)*
+auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t& ctx) -> bool
+{
+	parsemes_t adds;
+
+	// additive first
+	auto lhs = ctx.match_make(parsid::identifier, lexid::identifier);
+	if (!lhs)
+		return false;
+
+	// this is fine
 	for (;;)
 	{
-		if (auto p = context.match_make(parsid::identifier, lexid::identifier)) {
-			parsemes.back()->children().push_back(p);
+		auto op = ctx.match_make(parsid::addition_expr, lexid::punctuation, "+");
+		if (!op) {
+			parsemes.push_back(lhs);
+			return true;
 		}
-		else if (auto p = context.match_make(parsid::identifier, lexid::punctuation)) {
-			parsemes.back()->children().push_back(p);
-		}
-		else if (auto p = context.match_make(parsid::integer_literal, lexid::integer_literal)) {
-			parsemes.back()->children().push_back(p);
-		}
-		else {
-			break;
-		}
+
+		auto rhs = ctx.match_make(parsid::identifier, lexid::identifier);
+		if (!rhs)
+			return false;
+
+		xpi::insert_into(adds,
+			xpi::insert(op) [
+				xpi::insert(lhs),
+				xpi::insert(rhs)
+			]);
+
+		lhs = adds.back();
 	}
 
 	return true;

@@ -42,7 +42,7 @@ namespace
 
 
 stream_t::stream_t(char const* begin, char const* end)
-	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1)
+	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1), consumed_newline_()
 {
 }
 
@@ -76,17 +76,17 @@ auto stream_t::increment() -> void {
 	++position_.column;
 	++current_;
 
-	#if 0
-	if (current_ != end_ && (*current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
-		++current_;
+	bool is_newline = *current_ == '\n' || *current_ == '\r';
+
+	// skip past nestled newline characters so we don't erroneously continue
+	// changing our logical file position
+	if (!consumed_newline_ && is_newline) {
+		consumed_newline_ = true;
 		++position_.row;
 		position_.column = 1;
 	}
-	else 
-	#endif
-	if (current_ != end_ && (*current_ == '\n' || *current_ == '\r' && current_ + 1 != end_ && current_[1] == '\n')) {
-		++position_.row;
-		position_.column = 1;
+	else {
+		consumed_newline_ = false;
 	}
 }
 
