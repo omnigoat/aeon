@@ -87,7 +87,7 @@ auto aeon::generation::function(abstract_output_stream_t& stream, parsing::parse
 
 		auto type_definition = resolve::typename_to_definition(marshall::parameter::type_name(*i));
 		
-		stream << generation::type_structure(type_definition) << " " << marshall::parameter::identifier(*i)->text();
+		stream << generation::type_structure(type_definition) << " %" << marshall::parameter::identifier(*i)->text();
 	}
 
 	stream << ")\n";
@@ -129,13 +129,38 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsin
 	auto type = resolve::type_of(expr);
 	auto typen = type_name_mangle(type);
 	
-	stream << "\tret " << typen << " " << "4" << "\n";
+	stream << "ret " << typen << " " << "4" << "\n";
 }
 
 auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
 {
 	//ATMA_ASSERT(expr->id() == parsing::ID::expr);
-	
-	
+	using parsing::ID;
+
+	switch (expr->id())
+	{
+		case ID::addition_expr:
+		{
+			auto lhs = marshall::binary_expr::lhs(expr);
+			auto rhs = marshall::binary_expr::rhs(expr);
+
+			auto type = resolve::type_of(expr);
+			
+			stream << "add " << llvm_typename(type) << " %lhs, %rhs\n";
+		}
+	}
+}
+
+auto aeon::generation::llvm_typename(parsing::parseme_ptr x) -> parsing::parseme_t::text_t
+{
+	using parsing::ID;
+
+	if (x->id() != ID::type_name)
+		x = marshall::type_definition::name(resolve::type_of(x));
+
+	if (x->text() == "@int32")
+		return "i32";
+
+	return "<type-unknown>";
 }
 

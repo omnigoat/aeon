@@ -12,6 +12,7 @@
 namespace aeon {
 namespace generation {
 //=====================================================================
+
 	struct abstract_output_stream_t
 	{
 		abstract_output_stream_t() : tabs() {}
@@ -86,8 +87,13 @@ namespace generation {
 
 		auto put(atma::string const& str) -> void override
 		{
+			static char tabbuf[] = "\t\t\t\t\t\t\t\t";
+
 			if (str.empty())
 				return;
+
+			ATMA_ASSERT(tabs <= 8);
+			fwrite(tabbuf, 1, tabs, file_);
 			fwrite(str.bytes_begin(), 1, str.bytes(), file_);
 		}
 
@@ -111,6 +117,10 @@ namespace generation {
 	auto statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
 	auto return_statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
 	auto expression(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
+
+
+	auto llvm_typename(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
+
 
 //=====================================================================
 } // namespace generation

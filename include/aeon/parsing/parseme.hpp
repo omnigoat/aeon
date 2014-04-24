@@ -28,6 +28,7 @@ namespace parsing {
 	struct parseme_t : std::enable_shared_from_this<parseme_t>
 	{
 		typedef children_t children_t;
+		typedef lexing::lexeme_t::text_t text_t;
 		enum class id_t;
 
 		parseme_t(id_t);

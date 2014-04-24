@@ -9,6 +9,7 @@ namespace parsing = aeon::parsing;
 
 typedef parsing::parseme_t::id_t id;
 
+// return type-definition
 parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x)
 {
 	ATMA_ASSERT(x);
