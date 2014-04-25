@@ -106,7 +106,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 			xpi::make(ID::identifier, lexing::ID::identifier, type_name->text()),
 			xpi::make(ID::intrinsic_type_int),
 			xpi::make(ID::intrinsic_bitsize, lexing::make_synthetic_lexeme(
-				lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end(), lexing::position_t::zero, lexing::basic))
+				lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))
 		],
 
 
@@ -132,7 +132,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 
 			xpi::make(ID::block) [
 				xpi::make(ID::return_statement)[
-					xpi::make(ID::intrinsic_int_add)[
+					xpi::make(ID::intrinsic_int_add, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end())) [
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]

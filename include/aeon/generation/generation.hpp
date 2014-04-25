@@ -8,6 +8,7 @@
 //=====================================================================
 #include <aeon/parsing/parseme.hpp>
 #include <atma/string.hpp>
+#include <map>
 //=====================================================================
 namespace aeon {
 namespace generation {
@@ -107,6 +108,18 @@ namespace generation {
 	};
 
 	
+	struct analysis_t
+	{
+		auto variable_name_of(parsing::parseme_ptr const&) -> atma::string;
+
+	private:
+		// intermedia expressions require known unique names
+		std::map<parsing::parseme_ptr, uint> tmp_;
+		uint tmpcount_;
+	};
+
+	
+
 	auto function_name_mangle(parsing::parseme_ptr const&) -> atma::string;
 	auto type_name_mangle(parsing::parseme_ptr const&) -> atma::string;
 	auto type_structure(parsing::parseme_ptr const&) -> atma::string;
@@ -120,7 +133,7 @@ namespace generation {
 
 
 	auto llvm_typename(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
-
+	auto llvm_variable_name(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
 
 //=====================================================================
 } // namespace generation

@@ -139,6 +139,12 @@ namespace lexing {
 		return (lexeme_t const*)(((intptr_t)L) | 1);
 	}
 	
+	inline lexeme_t const* make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end)
+	{
+		// return a pointer with the lowest bit set, to show that we should delete it
+		auto L = new lexeme_t(id, begin, end, position_t(), multichannel_t());
+		return (lexeme_t const*)(((intptr_t)L) | 1);
+	}
 	
 //=====================================================================
 } // namespace lexing

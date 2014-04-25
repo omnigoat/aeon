@@ -80,7 +80,8 @@ namespace parsing {
 		type_definition,
 		intrinsic_type_int,
 		intrinsic_bitsize,
-		intrinsic_int_add
+		intrinsic_int_add,
+		argument_list,
 	};
 
 	typedef parseme_t::id_t ID;

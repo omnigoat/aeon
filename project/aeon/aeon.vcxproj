@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\aeon\generation\generation.hpp" />
+    <ClInclude Include="..\..\include\aeon\generation\genesis.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\id.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lex.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lexeme.hpp" />
@@ -102,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\generation\generation.cpp" />
+    <ClCompile Include="..\..\src\generation\genesis.cpp" />
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
     <ClCompile Include="..\..\src\lexing\lexeme.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />

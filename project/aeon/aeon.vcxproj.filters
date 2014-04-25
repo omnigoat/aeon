@@ -95,6 +95,9 @@
     <ClInclude Include="..\..\include\aeon\parsing\xpi.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\generation\genesis.hpp">
+      <Filter>include\generation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -130,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\parsing\mixfix.cpp">
       <Filter>source\parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\generation\genesis.cpp">
+      <Filter>source\generation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

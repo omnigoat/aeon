@@ -78,11 +78,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 		std::cout << parsemes << std::endl;
 	}
 
-	// second-phase parsing for mixfix
-	{
-		aeon::parsing::mixfix_resolution(parsemes);
-	}
-
 	ATMA_ASSERT(!parsemes.empty());
 	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
 
@@ -98,6 +93,17 @@ auto main(uint32_t arg_count, char const** args) -> int
 	auto root = root_list.back();
 	ATMA_ASSERT(root);
 
+	// intrinsic functions
+	{
+		parsing::parsemes_t functions;
+		std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(functions), [](parsing::parseme_ptr const& x) {
+			return x->id() == parsing::parseme_t::id_t::function;
+		});
+		for (auto const& x : functions)
+			generation::function(*stream, x);
+	}
+
+	*stream << "\n";
 
 	// collect the modules
 	parsing::parsemes_t modules;

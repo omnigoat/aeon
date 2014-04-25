@@ -6,6 +6,9 @@
 
 using namespace aeon;
 
+using parsing::ID;
+
+
 auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> atma::string
 {
 	atma::string result;
@@ -64,11 +67,11 @@ auto aeon::generation::type_structure(parsing::parseme_ptr const& type) -> atma:
 
 auto aeon::generation::module(abstract_output_stream_t& stream, parsing::parseme_ptr const& module) -> void
 {
-	for (auto const& fn : module->children()) {
+	for (auto const& fn : module->children())
+	{
 		if (fn->id() == aeon::parsing::parseme_t::id_t::function)
 		{
 			generation::function(stream, fn);
-			//std::cout << "fn: " << function_name_mangle(fn) << std::endl;
 		}
 	}
 }
@@ -132,35 +135,39 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsin
 	stream << "ret " << typen << " " << "4" << "\n";
 }
 
+
+
 auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
 {
-	//ATMA_ASSERT(expr->id() == parsing::ID::expr);
-	using parsing::ID;
-
 	switch (expr->id())
 	{
-		case ID::addition_expr:
+		case ID::intrinsic_int_add:
 		{
 			auto lhs = marshall::binary_expr::lhs(expr);
 			auto rhs = marshall::binary_expr::rhs(expr);
 
-			auto type = resolve::type_of(expr);
-			
-			stream << "add " << llvm_typename(type) << " %lhs, %rhs\n";
+			stream << "add @i" << expr->text() << " %lhs, %rhs\n";
+			break;
 		}
 	}
 }
 
 auto aeon::generation::llvm_typename(parsing::parseme_ptr x) -> parsing::parseme_t::text_t
 {
-	using parsing::ID;
+	auto type_definition = resolve::type_of(x);
 
-	if (x->id() != ID::type_name)
-		x = marshall::type_definition::name(resolve::type_of(x));
-
-	if (x->text() == "@int32")
+	if (marshall::type_definition::definition(type_definition)->id() == ID::intrinsic_type_int)
+		return "i32";
+	
+	if (marshall::type_definition::name(type_definition)->text() == "@int32")
 		return "i32";
 
 	return "<type-unknown>";
 }
 
+auto aeon::generation::llvm_variable_name(parsing::parseme_ptr x) -> parsing::parseme_t::text_t
+{
+	ATMA_ASSERT(x->id() == ID::identifier);
+
+	return "lulz";
+}

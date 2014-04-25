@@ -55,6 +55,13 @@ namespace marshall {
 		inline parseme_ptr const& expression(parseme_ptr const& x) { return x->children()[0]; }
 	}
 
+	namespace function_call {
+		using parsing::parseme_ptr;
+
+		inline parseme_ptr const& pattern(parseme_ptr const& x) { return x->children()[0]; }
+		inline parseme_ptr const& argument_list(parseme_ptr const& x) { return x->children()[1]; }
+	}
+
 //=====================================================================
 } // namespace marshall
 } // namespace aeon

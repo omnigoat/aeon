@@ -32,8 +32,8 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 			return typename_to_definition(x);
 
 		case id::function_call: {
-			//auto f = resolve::fu
-			//return type_of(marshall::)
+			auto f = resolve::function_from_function_call(x);
+			return type_of(marshall::function::return_type(f));
 		}
 	}
 
@@ -111,7 +111,7 @@ parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parse
 
 				xpi::make(parsid::block) [
 					xpi::make(parsid::return_statement)[
-						xpi::make(parsid::intrinsic_int_add)[
+						xpi::make(parsid::intrinsic_int_add, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, x->text().begin() + 4, x->text().end(), lexing::position_t())) [
 							xpi::make(parsid::identifier, "lhs"),
 							xpi::make(parsid::identifier, "rhs")
 						]

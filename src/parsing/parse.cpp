@@ -292,10 +292,20 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 		if (!rhs)
 			return false;
 
+
+		// addition is just a function-call
 		xpi::insert_into(adds,
-			xpi::insert(op) [
-				xpi::insert(lhs),
-				xpi::insert(rhs)
+			xpi::make(parsid::function_call, op->lexeme()) [
+				xpi::make(parsid::function_pattern) [
+					xpi::make(parsid::placeholder, lhs->lexeme()),
+					xpi::make(parsid::identifier, op->lexeme()),
+					xpi::make(parsid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(parsid::argument_list) [
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
 			]);
 
 		lhs = adds.back();
