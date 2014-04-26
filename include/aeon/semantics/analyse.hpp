@@ -1,20 +1,13 @@
-//=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_SEMANTICS_ANALYSE_HPP
-#define AEON_SEMANTICS_ANALYSE_HPP
-//=====================================================================
-#include <cstdint>
-#include <ostream>
+#pragma once
 //=====================================================================
 #include <aeon/parsing/children.hpp>
+
+#include <cstdint>
+#include <ostream>
+#include <map>
 //=====================================================================
-namespace aeon {
-namespace semantics {
-//=====================================================================
-	
+namespace aeon { namespace semantics {
+
 	struct error_t
 	{
 		error_t(std::string const& text) : text(text) {}
@@ -24,7 +17,6 @@ namespace semantics {
 	struct analysis_t
 	{
 		typedef std::vector<error_t> errors_t;
-
 		errors_t errors;
 	};
 
@@ -37,10 +29,4 @@ namespace semantics {
 		auto function(parseme_ptr const&) -> analysis_t;
 	}
 
-//=====================================================================
-} // namespace semantics
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
-
+} }

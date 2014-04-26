@@ -35,6 +35,21 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 			auto f = resolve::function_from_function_call(x);
 			return type_of(marshall::function::return_type(f));
 		}
+
+		case id::intrinsic_int_add:
+		{
+			// get to the root
+			auto root = parsing::find_root(x);
+			
+			// find type-definition
+			for (auto const& i : root->children())
+				if (i->id() == parsing::ID::type_definition)
+					if (marshall::type_definition::definition(i)->id() == parsing::ID::intrinsic_type_int)
+						if (marshall::type_definition::intrinsic_info(i)->text() == x->text())
+							return i;
+
+			return parsing::null_parseme_ptr;
+		}
 	}
 
 	return x;
@@ -66,63 +81,6 @@ parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parse
 			}
 		}
 	}
-	ATMA_ASSERT(root);
 
-
-	// intrinsic integers are constructed on the fly, as all are acceptable
-	
-	if ( aeon::parsing::is_intrinsic_int_typename(x) )
-	{
-		// SERIOUSLY, do we ever need to provide an upper bound to atoi?
-		auto bitsize = std::atoi(x->text().begin() + 4);
-
-		namespace xpi = aeon::parsing::xpi;
-		typedef parsing::parseme_t::id_t parsid;
-
-		// if this is the first time an integer of this width is encountered, insert it into the prelude
-		xpi::insert_into(root->children(), root->children().begin(),
-			xpi::make(parsid::type_definition) [
-				xpi::make(parsid::identifier, lexing::ID::identifier, x->text()),
-				xpi::make(parsid::intrinsic_type_int),
-				xpi::make(parsid::intrinsic_bitsize, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, x->text().begin() + 4, x->text().end(), x->position(), lexing::basic))
-			]
-		);
-
-		xpi::insert_into(root->children(), root->children().begin(),
-			xpi::make(parsid::function) [
-				xpi::make(parsid::function_pattern) [
-					xpi::make(parsid::placeholder),
-					xpi::make(parsid::identifier, "+"),
-					xpi::make(parsid::placeholder)
-				],
-
-				xpi::make(parsid::parameter_list)[
-					xpi::make(parsid::parameter)[
-						xpi::make(parsid::identifier, "lhs"),
-						xpi::make(parsid::type_name, x->text())
-					],
-					xpi::make(parsid::parameter)[
-						xpi::make(parsid::identifier, "rhs"),
-						xpi::make(parsid::type_name, x->text())
-					]
-				],
-
-				xpi::make(parsid::type_name, x->text()),
-
-				xpi::make(parsid::block) [
-					xpi::make(parsid::return_statement)[
-						xpi::make(parsid::intrinsic_int_add, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, x->text().begin() + 4, x->text().end(), lexing::position_t())) [
-							xpi::make(parsid::identifier, "lhs"),
-							xpi::make(parsid::identifier, "rhs")
-						]
-					]
-				]
-			]
-		);
-
-		// this should now succeed, and certainly not recurse!
-		return typename_to_definition(x);
-	}
-
-	return x;
+	return parsing::null_parseme_ptr;
 }

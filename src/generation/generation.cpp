@@ -1,13 +1,15 @@
 #include <aeon/generation/generation.hpp>
 
+#include <aeon/generation/genesis.hpp>
 #include <aeon/resolve.hpp>
 #include <aeon/marshall.hpp>
 #include <aeon/parsing/algorithm.hpp>
 
 using namespace aeon;
+using namespace generation;
 
 using parsing::ID;
-
+using parsing::parseme_ptr;
 
 auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> atma::string
 {
@@ -67,16 +69,20 @@ auto aeon::generation::type_structure(parsing::parseme_ptr const& type) -> atma:
 
 auto aeon::generation::module(abstract_output_stream_t& stream, parsing::parseme_ptr const& module) -> void
 {
+	genesis_t genesis;
+
+	analyse::module(genesis, module);
+
 	for (auto const& fn : module->children())
 	{
 		if (fn->id() == aeon::parsing::parseme_t::id_t::function)
 		{
-			generation::function(stream, fn);
+			generation::function(stream, genesis, fn);
 		}
 	}
 }
 
-auto aeon::generation::function(abstract_output_stream_t& stream, parsing::parseme_ptr const& fn) -> void
+auto aeon::generation::function(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& fn) -> void
 {
 	auto const& return_type = marshall::function::return_type(fn);
 	auto const& return_type_definition = resolve::typename_to_definition(return_type);
@@ -94,10 +100,10 @@ auto aeon::generation::function(abstract_output_stream_t& stream, parsing::parse
 	}
 
 	stream << ")\n";
-	function_body(stream, marshall::function::body(fn));
+	function_body(stream, genesis, marshall::function::body(fn));
 }
 
-auto aeon::generation::function_body(abstract_output_stream_t& stream, parsing::parseme_ptr const& body) -> void
+auto aeon::generation::function_body(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& body) -> void
 {
 	stream << "{\n";
 	{
@@ -105,39 +111,52 @@ auto aeon::generation::function_body(abstract_output_stream_t& stream, parsing::
 
 		for (auto const& x : body->children())
 		{
-			statement(stream, x);
+			statement(stream, genesis, x);
 		}
 
 	}
 	stream << "}\n";
 }
 
-auto aeon::generation::statement(abstract_output_stream_t& stream, parsing::parseme_ptr const& statement) -> void
+auto aeon::generation::statement(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& statement) -> void
 {
 	switch (statement->id())
 	{
 		case parsing::parseme_t::id_t::return_statement:
-			return_statement(stream, statement);
+			return_statement(stream, genesis, statement);
 			break;
 	}
 }
 
-auto aeon::generation::return_statement(abstract_output_stream_t& stream, parsing::parseme_ptr const& statement) -> void
+namespace
+{
+	auto llvm_expr_result(genesis_t& genesis, parseme_ptr const& expr) -> atma::string
+	{
+		return atma::string("%") + std::to_string(genesis.expr_id(expr));
+	}
+
+	auto llvm_identifier(parseme_ptr const& x) -> atma::string
+	{
+		return atma::string("%") + x->text();
+	}
+}
+
+auto aeon::generation::return_statement(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& statement) -> void
 {
 	ATMA_ASSERT(statement->id() == parsing::ID::return_statement);
 
 	auto expr = marshall::return_statement::expression(statement);
-	expression(stream, expr);
+	expression(stream, genesis, expr);
 
 	auto type = resolve::type_of(expr);
-	auto typen = type_name_mangle(type);
+	auto typen = llvm_typename(type);
 	
-	stream << "ret " << typen << " " << "4" << "\n";
+	line_begin(stream) << "ret " << typen << " " << llvm_expr_result(genesis, expr) << "\n";
 }
 
 
 
-auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::parseme_ptr const& expr) -> void
+auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& expr) -> void
 {
 	switch (expr->id())
 	{
@@ -146,7 +165,7 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, parsing::par
 			auto lhs = marshall::binary_expr::lhs(expr);
 			auto rhs = marshall::binary_expr::rhs(expr);
 
-			stream << "add @i" << expr->text() << " %lhs, %rhs\n";
+			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = add i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 	}

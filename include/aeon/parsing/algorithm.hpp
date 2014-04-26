@@ -53,7 +53,19 @@ namespace parsing {
 		}
 	}
 
-	
+	inline auto find_root(parseme_ptr const& x) -> parseme_ptr
+	{
+		ATMA_ASSERT(x);
+
+		auto p = x->parent();
+		if (!p)
+			return x;
+
+		while (p->parent())
+			p = p->parent();
+
+		return p;
+	}
 
 	template <typename FN>
 	inline void ex_test_for_each_mutate(children_t& xs, FN fn) {

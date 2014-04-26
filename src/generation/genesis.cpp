@@ -7,37 +7,68 @@ using namespace generation;
 using aeon::generation::genesis_t;
 using parsing::ID;
 
-auto genesis_t::module(parsing::parseme_ptr const& x) -> void
+genesis_t::genesis_t()
+{
+}
+
+auto genesis_t::expr_id(parsing::parseme_ptr const& x) const -> uint
+{
+	auto i = tmp_.find(x);
+	if (i == tmp_.end())
+		return 0;
+
+	return i->second;
+}
+
+auto genesis_t::push_function(parsing::parseme_ptr const& x) -> void
+{
+	fn_ = x;
+}
+
+auto genesis_t::pop_function() -> void
+{
+	// lol!
+}
+
+auto genesis_t::mark_expr(parsing::parseme_ptr const& x) -> void
+{
+	tmp_.insert({x, ++tmpcount_[fn_]});
+}
+
+auto aeon::generation::analyse::module(genesis_t& genesis, parsing::parseme_ptr const& x) -> void
 {
 	for (auto const& f : x->children()) {
 		if (f->id() == ID::function)
-			function(f);
+			function(genesis, f);
 	}
 }
 
-auto genesis_t::function(parsing::parseme_ptr const& x) -> void
+auto aeon::generation::analyse::function(genesis_t& genesis, parsing::parseme_ptr const& x) -> void
 {
 	auto const& body = marshall::function::body(x);
 
+	genesis.push_function(x);
 	for (auto const& s : body->children())
-		statement(s);
+		statement(genesis, s);
+	genesis.pop_function();
 }
 
-auto genesis_t::statement(parsing::parseme_ptr const& x) -> void
+auto aeon::generation::analyse::statement(genesis_t& genesis, parsing::parseme_ptr const& x) -> void
 {
 	switch (x->id())
 	{
 		case ID::return_statement:
-			expression(marshall::unary_expr::child(x));
+			expression(genesis, marshall::unary_expr::child(x));
 			break;
 	}
 }
 
-auto genesis_t::expression(parsing::parseme_ptr const& x) -> void
+auto aeon::generation::analyse::expression(genesis_t& genesis, parsing::parseme_ptr const& x) -> void
 {
 	switch (x->id())
 	{
-		case ID::addition_expr:
+		case ID::function_call:
+			genesis.mark_expr(x);
 			break;
 	}
 }

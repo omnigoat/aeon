@@ -99,8 +99,12 @@ auto main(uint32_t arg_count, char const** args) -> int
 		std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(functions), [](parsing::parseme_ptr const& x) {
 			return x->id() == parsing::parseme_t::id_t::function;
 		});
-		for (auto const& x : functions)
-			generation::function(*stream, x);
+		for (auto const& x : functions) {
+			generation::genesis_t g;
+			generation::analyse::function(g, x);
+			generation::function(*stream, g, x);
+		}
+			
 	}
 
 	*stream << "\n";

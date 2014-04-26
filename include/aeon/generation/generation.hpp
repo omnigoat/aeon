@@ -1,12 +1,7 @@
-//=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_GENERATION_HPP
-#define AEON_GENERATION_HPP
+#pragma once
 //=====================================================================
 #include <aeon/parsing/parseme.hpp>
+#include <aeon/generation/genesis.hpp>
 #include <atma/string.hpp>
 #include <map>
 //=====================================================================
@@ -33,8 +28,22 @@ namespace generation {
 
 	inline auto operator << (abstract_output_stream_t& lhs, atma::string const& rhs) -> abstract_output_stream_t&
 	{
-		lhs.put(rhs);
+		for (auto c : rhs)
+			for (auto ci = c.begin; ci != c.end; ++ci)
+				lhs.putc(*ci);
 		return lhs;
+	}
+
+	inline auto operator << (abstract_output_stream_t& lhs, std::string const& rhs) -> abstract_output_stream_t&
+	{
+		for (auto c : rhs)
+			lhs.putc(c);
+		return lhs;
+	}
+
+	inline auto operator << (abstract_output_stream_t& lhs, uint rhs) -> abstract_output_stream_t&
+	{
+		return lhs << std::to_string(rhs);
 	}
 
 	inline auto operator << (abstract_output_stream_t& lhs, atma::utf8_string_range_t const& rhs) -> abstract_output_stream_t&
@@ -108,28 +117,17 @@ namespace generation {
 	};
 
 	
-	struct analysis_t
-	{
-		auto variable_name_of(parsing::parseme_ptr const&) -> atma::string;
-
-	private:
-		// intermedia expressions require known unique names
-		std::map<parsing::parseme_ptr, uint> tmp_;
-		uint tmpcount_;
-	};
-
-	
 
 	auto function_name_mangle(parsing::parseme_ptr const&) -> atma::string;
 	auto type_name_mangle(parsing::parseme_ptr const&) -> atma::string;
 	auto type_structure(parsing::parseme_ptr const&) -> atma::string;
 
 	auto module(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	auto function(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	auto function_body(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	auto statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	auto return_statement(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
-	auto expression(abstract_output_stream_t&, parsing::parseme_ptr const&) -> void;
+	auto function(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
+	auto function_body(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
+	auto statement(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
+	auto return_statement(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
+	auto expression(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
 
 
 	auto llvm_typename(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
@@ -139,6 +137,3 @@ namespace generation {
 } // namespace generation
 } // namespace aeon
 //=====================================================================
-#endif
-//=====================================================================
-

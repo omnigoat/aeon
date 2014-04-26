@@ -90,11 +90,6 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 {
 	ATMA_ASSERT(type_name->id() == ID::type_name);
 
-	/*if (typename_strings.find(bitsize) == typename_strings.end()) {
-		typename_strings[bitsize] = atma::string("@int") + atma::to_string(bitsize);
-	}
-	atma::string const& typename_string = typename_strings[bitsize];
-*/
 	uint32_t size = std::atoi(type_name->text().begin() + 4);
 	if (intrinsic_integers_.find(size) != intrinsic_integers_.end())
 		return;
