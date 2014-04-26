@@ -168,6 +168,18 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = add i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
+
+		case ID::function_call:
+		{
+			// all parameters
+			auto argument_list = marshall::function_call::argument_list(expr);
+			auto fn = resolve::function_from_function_call(expr);
+
+			for (auto const& arg : argument_list->children())
+				expression(stream, genesis, arg);
+
+			stream << line_begin << "%" << genesis.expr_id(expr) << " = call " << function_name_mangle(fn) << "\n";
+		}
 	}
 }
 

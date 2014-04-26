@@ -51,7 +51,7 @@ parsing::parseme_ptr aeon::resolve::function_from_function_call(parsing::parseme
 
 	// find
 	for (auto const& f : functions)
-		if (is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(f)))
+		if (is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(x)))
 			return f;
 
 	return parsing::null_parseme_ptr;
