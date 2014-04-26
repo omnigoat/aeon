@@ -78,10 +78,15 @@ namespace parsing {
 		expr,
 		addition_expr,
 		type_definition,
+		argument_list,
+
+		// intrinsics
 		intrinsic_type_int,
 		intrinsic_bitsize,
 		intrinsic_int_add,
-		argument_list,
+		intrinsic_int_sub,
+		intrinsic_int_mul,
+		intrinsic_int_div,
 	};
 
 	typedef parseme_t::id_t ID;

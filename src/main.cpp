@@ -113,8 +113,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 			
 	}
 
-	*stream << "\n";
-
 	// collect the modules
 	parsing::parsemes_t modules;
 	std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(modules), [](parsing::parseme_ptr const& x) {

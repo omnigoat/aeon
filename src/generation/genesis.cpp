@@ -75,7 +75,9 @@ auto aeon::generation::analyse::expression(genesis_t& genesis, parsing::parseme_
 			break;
 
 		case ID::intrinsic_int_add:
+		case ID::intrinsic_int_sub:
 			genesis.mark_expr(x);
+			break;
 	}
 }
 

@@ -152,8 +152,6 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		auto r = parameter_list_node->children().back();
 		parameter_list_node->children().pop_back();
 		fn_node->children().push_back(parseme_t::make(parsing::ID::type_name, r->children()[0]->lexeme()));
-
-		
 	}
 
 	// return type
@@ -297,6 +295,9 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 	{
 		auto op = ctx.match_make(parsid::addition_expr, lexid::punctuation, "+");
 		if (!op)
+			op = ctx.match_make(parsid::function_call, lexid::punctuation, "-");
+
+		if (!op)
 			return true;
 
 		if (!function_call_expression(parsemes, ctx)) {
@@ -310,7 +311,7 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 		auto lhs = parsemes.back();
 		parsemes.pop_back();
 
-		// addition is just a function-call
+		// just a function-call
 		xpi::insert_into(parsemes,
 			xpi::make(parsid::function_call, op->lexeme()) [
 				xpi::make(parsid::function_pattern) [

@@ -26,7 +26,9 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 		if (x->id() == parsing::ID::placeholder)
 			result += "$";
 		else if (x->text() == "+")
-			result += "$plus";
+			result += "$add";
+		else if (x->text() == "-")
+			result += "$sub";
 		else
 			result += atma::to_string(x->text().bytes()) + x->text();
 
@@ -90,7 +92,7 @@ auto aeon::generation::function(abstract_output_stream_t& stream, genesis_t& gen
 	auto const& return_type_definition = resolve::typename_to_definition(return_type);
 	auto const& parameters = marshall::function::parameter_list(fn)->children();
 	
-	stream << "define " << type_structure(return_type_definition) << " @" << function_name_mangle(fn) << "(";
+	line_begin(stream) << "define " << type_structure(return_type_definition) << " @" << function_name_mangle(fn) << "(";
 	for (auto i = parameters.begin(); i != parameters.end(); ++i)
 	{
 		if (i != parameters.begin())
@@ -107,7 +109,7 @@ auto aeon::generation::function(abstract_output_stream_t& stream, genesis_t& gen
 
 auto aeon::generation::function_body(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& body) -> void
 {
-	stream << "{\n";
+	line_begin(stream) << "{\n";
 	{
 		scoped_stream_tabify_t sst(stream);
 
@@ -115,9 +117,8 @@ auto aeon::generation::function_body(abstract_output_stream_t& stream, genesis_t
 		{
 			statement(stream, genesis, x);
 		}
-
 	}
-	stream << "}\n";
+	line_begin(stream) << "}\n\n";
 }
 
 auto aeon::generation::statement(abstract_output_stream_t& stream, genesis_t& genesis, parsing::parseme_ptr const& statement) -> void
@@ -168,6 +169,15 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 
 			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = add i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			break;
+		}
+
+		case ID::intrinsic_int_sub:
+		{
+			auto lhs = marshall::binary_expr::lhs(expr);
+			auto rhs = marshall::binary_expr::rhs(expr);
+
+			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = sub i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 

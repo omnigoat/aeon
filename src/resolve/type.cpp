@@ -49,6 +49,7 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 		}
 
 		case id::intrinsic_int_add:
+		case id::intrinsic_int_sub:
 		{
 			// get to the root
 			auto root = parsing::find_root(x);

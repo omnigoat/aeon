@@ -119,7 +119,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 				lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))
 		],
 
-
+		// addition
 		xpi::make(ID::function) [
 			xpi::make(ID::function_pattern) [
 				xpi::make(ID::placeholder),
@@ -143,6 +143,37 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 			xpi::make(ID::block) [
 				xpi::make(ID::return_statement)[
 					xpi::make(ID::intrinsic_int_add, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end())) [
+						xpi::make(ID::identifier, "lhs"),
+						xpi::make(ID::identifier, "rhs")
+					]
+				]
+			]
+		],
+
+		// subtraction
+		xpi::make(ID::function)[
+			xpi::make(ID::function_pattern)[
+				xpi::make(ID::placeholder),
+				xpi::make(ID::identifier, "-"),
+				xpi::make(ID::placeholder)
+			],
+
+			xpi::make(ID::parameter_list)[
+				xpi::make(ID::parameter)[
+					xpi::make(ID::identifier, "lhs"),
+					xpi::make(ID::type_name, type_name->text())
+				],
+				xpi::make(ID::parameter)[
+					xpi::make(ID::identifier, "rhs"),
+					xpi::make(ID::type_name, type_name->text())
+				]
+			],
+
+			xpi::make(ID::type_name, type_name->text()),
+
+			xpi::make(ID::block)[
+				xpi::make(ID::return_statement)[
+					xpi::make(ID::intrinsic_int_sub, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))[
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]
