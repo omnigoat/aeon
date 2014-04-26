@@ -25,6 +25,8 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	{
 		if (x->id() == parsing::ID::placeholder)
 			result += "$";
+		else if (x->text() == "+")
+			result += "$plus";
 		else
 			result += atma::to_string(x->text().bytes()) + x->text();
 
@@ -60,7 +62,7 @@ auto aeon::generation::type_structure(parsing::parseme_ptr const& type) -> atma:
 
 	if (marshall::type_definition::definition(type)->id() == parsid::intrinsic_type_int)
 	{
-		return atma::string("@i") + marshall::type_definition::intrinsic_info(type)->text();
+		return atma::string("i") + marshall::type_definition::intrinsic_info(type)->text();
 	}
 
 	return atma::string();
@@ -149,7 +151,7 @@ auto aeon::generation::return_statement(abstract_output_stream_t& stream, genesi
 	expression(stream, genesis, expr);
 
 	auto type = resolve::type_of(expr);
-	auto typen = llvm_typename(type);
+	auto typen = llvm::storage_typename(genesis, type);
 	
 	line_begin(stream) << "ret " << typen << " " << llvm_expr_result(genesis, expr) << "\n";
 }
@@ -178,14 +180,27 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			for (auto const& arg : argument_list->children())
 				expression(stream, genesis, arg);
 
-			stream << line_begin << "%" << genesis.expr_id(expr) << " = call " << function_name_mangle(fn) << "\n";
+			line_begin(stream) << "%" << genesis.expr_id(expr) << " = call @" << function_name_mangle(fn) << "(";
+
+			for (auto i = argument_list->children().begin(); i != argument_list->children().end(); ++i)
+			{
+				if (i != argument_list->children().begin())
+					stream << ", ";
+
+				stream << llvm::storage_typename(genesis, *i) << " " << llvm::lvalue_name(genesis, *i);
+			}
+
+			stream << ")\n";
+
+			break;
 		}
 	}
 }
 
-auto aeon::generation::llvm_typename(parsing::parseme_ptr x) -> parsing::parseme_t::text_t
+auto aeon::generation::llvm::storage_typename(genesis_t& genesis, parsing::parseme_ptr const& x) -> parsing::parseme_t::text_t
 {
 	auto type_definition = resolve::type_of(x);
+	ATMA_ASSERT(type_definition->id() == ID::type_definition);
 
 	if (marshall::type_definition::definition(type_definition)->id() == ID::intrinsic_type_int)
 		return "i32";
@@ -196,9 +211,21 @@ auto aeon::generation::llvm_typename(parsing::parseme_ptr x) -> parsing::parseme
 	return "<type-unknown>";
 }
 
-auto aeon::generation::llvm_variable_name(parsing::parseme_ptr x) -> parsing::parseme_t::text_t
+auto aeon::generation::llvm::lvalue_name(genesis_t& genesis, parsing::parseme_ptr const& x) -> atma::string
 {
-	ATMA_ASSERT(x->id() == ID::identifier);
+	using parsing::ID;
 
-	return "lulz";
+	switch (x->id())
+	{
+		case ID::integer_literal:
+			return atma::string(x->text());
+
+		case ID::identifier:
+			return atma::string("%") + x->text();
+		
+		case ID::function_call:
+			return atma::string("%") + std::to_string(genesis.expr_id(x));
+	}
+
+	return "zomg";
 }

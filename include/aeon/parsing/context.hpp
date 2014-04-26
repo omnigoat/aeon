@@ -11,7 +11,7 @@ namespace aeon { namespace parsing { namespace detail {
 
 	struct context_t
 	{
-		context_t(parseme_ptr const& root, lexing::lexemes_t::const_iterator const&);
+		context_t(parseme_ptr const& root, lexing::lexemes_t::const_iterator const&, lexing::lexemes_t::const_iterator const&);
 
 		auto id() const -> lexing::ID;
 			
@@ -30,7 +30,7 @@ namespace aeon { namespace parsing { namespace detail {
 
 	private:
 		parseme_ptr root_;
-		lexing::lexemes_t::const_iterator begin_;
+		lexing::lexemes_t::const_iterator begin_, end_;
 		std::set<uint32_t> intrinsic_integers_;
 	};
 

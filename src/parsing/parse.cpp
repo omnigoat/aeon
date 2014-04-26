@@ -47,7 +47,7 @@ auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes
 {
 	parseme_ptr root_node(new parseme_t(parsid::root));
 
-	detail::context_t context(root_node, lexemes.begin(lexing::basic));
+	detail::context_t context(root_node, lexemes.begin(lexing::basic), lexemes.end(lexing::basic));
 
 
 	add_prelude(root_node->children());
@@ -177,6 +177,8 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 			goto fail;
 	}
 
+	context.skip(lexid::block_end);
+	context.skip(lexid::end_keyword);
 
 	// done!
 	parsemes.push_back(fn_node);
@@ -188,6 +190,8 @@ fail:
 
 auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
+	uint parameters = 0;
+
 	for (;;)
 	{
 		parseme_ptr parameter_node(new parseme_t(parsid::parameter));
@@ -203,24 +207,36 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 				parameter_node->children().push_back(id_node);
 			}
 
-			if (!type_name(parameter_node->children(), lexemes, context))
+			if (!type_name(parameter_node->children(), lexemes, context)) {
 				goto fail;
+			}
+			
 		}
 
 		parsemes.push_back(parameter_node);
+		++parameters;
 
 		if ( !context.skip(lexid::punctuation, "->") )
 		{
 			//context = old_context;
 			break;
 		}
-
-		
 	}
 
 	return true;
 
 fail:
+	// we may have failed because there were no parameters. try
+	// skipping the '->' and doing one more
+	if (context.skip(lexid::punctuation, "->"))
+	{
+		auto p = parseme_t::make(parsid::parameter);
+		if (type_name(p->children(), lexemes, context)) {
+			parsemes.push_back(p);
+			return true;
+		}
+	}
+	
 	return false;
 }
 
@@ -272,29 +288,30 @@ auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t c
 // additive_expr: Term (+ Term)*
 auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t& ctx) -> bool
 {
-	parsemes_t adds;
-
 	// additive first
-	auto lhs = ctx.match_make(parsid::identifier, lexid::identifier);
-	if (!lhs)
+	if (!function_call_expression(parsemes, ctx))
 		return false;
 
 	// this is fine
 	for (;;)
 	{
 		auto op = ctx.match_make(parsid::addition_expr, lexid::punctuation, "+");
-		if (!op) {
-			parsemes.push_back(lhs);
+		if (!op)
 			return true;
+
+		if (!function_call_expression(parsemes, ctx)) {
+			// remove lhs
+			parsemes.pop_back();
+			return false;
 		}
 
-		auto rhs = ctx.match_make(parsid::identifier, lexid::identifier);
-		if (!rhs)
-			return false;
-
+		auto rhs = parsemes.back();
+		parsemes.pop_back();
+		auto lhs = parsemes.back();
+		parsemes.pop_back();
 
 		// addition is just a function-call
-		xpi::insert_into(adds,
+		xpi::insert_into(parsemes,
 			xpi::make(parsid::function_call, op->lexeme()) [
 				xpi::make(parsid::function_pattern) [
 					xpi::make(parsid::placeholder, lhs->lexeme()),
@@ -307,8 +324,51 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 					xpi::insert(rhs)
 				]
 			]);
+	}
 
-		lhs = adds.back();
+	return true;
+}
+
+auto aeon::parsing::detail::function_call_expression(children_t& parsemes, context_t& ctx) -> bool
+{
+	auto iden = ctx.match_make(parsid::identifier, lexid::identifier);
+	if (!iden) {
+		if (auto intlit = ctx.match_make(parsid::integer_literal, lexid::integer_literal)) {
+			parsemes.push_back(intlit);
+			return true;
+		}
+
+		return false;
+	}
+
+	// bam, function call
+	if (ctx.skip(lexid::punctuation, "("))
+	{
+		parsing::children_t args;
+
+		for (;;)
+		{
+			if (!additive_expression(args, ctx))
+				break;
+			ctx.skip(lexid::punctuation, ",");
+		}
+
+		ctx.skip(lexid::punctuation, ")");
+
+		xpi::insert_into(parsemes,
+			xpi::make(parsid::function_call, iden->lexeme()) [
+				xpi::make(parsid::function_pattern) [
+					xpi::insert(iden)
+				],
+
+				xpi::make(parsid::argument_list) [
+					xpi::insert(args.begin(), args.end())
+				]
+			]);
+	}
+	else
+	{
+		parsemes.push_back(iden);
 	}
 
 	return true;

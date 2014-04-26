@@ -1,21 +1,12 @@
+#pragma once
 //=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_LEXING_LEXEME_HPP
-#define AEON_LEXING_LEXEME_HPP
-//=====================================================================
+#include <atma/utf/utf8_string_range.hpp>
+
 #include <cstdint>
 #include <ostream>
 #include <string>
-#include <atma/utf/utf8_string_range.hpp>
 //=====================================================================
-
-//=====================================================================
-namespace aeon {
-namespace lexing {
-//=====================================================================
+namespace aeon { namespace lexing {
 	
 	//=====================================================================
 	// forward declares
@@ -145,11 +136,12 @@ namespace lexing {
 		auto L = new lexeme_t(id, begin, end, position_t(), multichannel_t());
 		return (lexeme_t const*)(((intptr_t)L) | 1);
 	}
-	
-//=====================================================================
-} // namespace lexing
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
 
+	inline lexeme_t const* make_synthetic_lexeme(lexeme_t::id_t id, char const* str)
+	{
+		// return a pointer with the lowest bit set, to show that we should delete it
+		auto L = new lexeme_t(id, str, str + strlen(str), position_t(), multichannel_t());
+		return (lexeme_t const*)(((intptr_t)L) | 1);
+	}
+
+} }

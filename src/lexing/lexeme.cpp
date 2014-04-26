@@ -37,7 +37,7 @@ auto lexeme_t::text() const -> text_t const&
 auto lexeme_t::streq(char const* begin) const -> bool
 {
 	char const* x = text_.begin(), *y = begin;
-	while (x != text_.end() && *y)
+	while (x != text_.end() && *y && *x == *y)
 		++x, ++y;
 	return x == text_.end() && !*y;
 }

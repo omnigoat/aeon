@@ -16,6 +16,18 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 
 	switch (x->id())
 	{
+		case id::integer_literal:
+		{
+			// get to the root
+			auto root = parsing::find_root(x);
+
+			// find type-definition
+			for (auto const& i : root->children())
+				if (i->id() == parsing::ID::type_definition)
+					if (marshall::type_definition::definition(i)->id() == parsing::ID::intrinsic_type_int)
+						return i;
+		}
+
 		case id::return_statement:
 			return type_of(marshall::unary_expr::child(x));
 

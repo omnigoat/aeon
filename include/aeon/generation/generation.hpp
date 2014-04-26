@@ -129,9 +129,12 @@ namespace generation {
 	auto return_statement(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
 	auto expression(abstract_output_stream_t&, genesis_t&, parsing::parseme_ptr const&) -> void;
 
-
-	auto llvm_typename(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
-	auto llvm_variable_name(parsing::parseme_ptr) -> parsing::parseme_t::text_t;
+	namespace llvm
+	{
+		auto storage_typename(genesis_t&, parsing::parseme_ptr const&) -> parsing::parseme_t::text_t;
+		auto lvalue_name(genesis_t&, parsing::parseme_ptr const&) -> atma::string;
+	}
+	
 
 //=====================================================================
 } // namespace generation

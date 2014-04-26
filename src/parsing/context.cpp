@@ -19,8 +19,8 @@ namespace
 }
 
 
-context_t::context_t(parseme_ptr const& root, aeon::lexing::lexemes_t::const_iterator const& begin)
-	: root_(root), begin_(begin)
+context_t::context_t(parseme_ptr const& root, aeon::lexing::lexemes_t::const_iterator const& begin, aeon::lexing::lexemes_t::const_iterator const& end)
+	: root_(root), begin_(begin), end_(end)
 {
 }
 
@@ -38,6 +38,9 @@ auto context_t::match_make(parsid pid, lexid lid) -> parseme_ptr
 {
 	parseme_ptr result;
 	
+	if (begin_ == end_)
+		return parsing::null_parseme_ptr;
+
 	if (begin_->id() == lid) {
 		result.reset(new parseme_t(pid, &*begin_));
 		++begin_;
@@ -50,6 +53,9 @@ auto context_t::match_make(parsid pid, lexid lid, char const* str) -> parseme_pt
 {
 	parseme_ptr result;
 	
+	if (begin_ == end_)
+		return parsing::null_parseme_ptr;
+
 	if (begin_->id() == lid && begin_->streq(str)) {
 		result.reset(new parseme_t(pid, &*begin_));
 		++begin_;
@@ -60,12 +66,18 @@ auto context_t::match_make(parsid pid, lexid lid, char const* str) -> parseme_pt
 
 auto context_t::match_make(parsid pid, lexid lid, aeon::lexing::multichannel_t const& ch) -> parseme_ptr
 {
+	if (begin_ == end_)
+		return parsing::null_parseme_ptr;
+
 	begin_.set_channel(ch);
 	return match_make(pid, lid);
 }
 
 auto context_t::skip(lexid lid) -> bool
 {
+	if (begin_ == end_)
+		return false;
+
 	if (begin_->id() != lid)
 		return false;
 	++begin_;
@@ -74,6 +86,9 @@ auto context_t::skip(lexid lid) -> bool
 
 auto context_t::skip(lexid lid, char const* str) -> bool
 {
+	if (begin_ == end_)
+		return false;
+
 	if (begin_->id() != lid || !begin_->streq(str))
 		return false;
 	++begin_;

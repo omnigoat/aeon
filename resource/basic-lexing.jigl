@@ -2,3 +2,6 @@ function plus :: lhs as @int32 -> rhs as @int32 -> @int32
 	return lhs + rhs + rhs
 end
 
+function main :: -> @int32
+	return plus(4, 5)
+end
