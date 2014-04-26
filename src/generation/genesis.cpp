@@ -68,8 +68,14 @@ auto aeon::generation::analyse::expression(genesis_t& genesis, parsing::parseme_
 	switch (x->id())
 	{
 		case ID::function_call:
+			for (auto const& arg : marshall::function_call::argument_list(x)->children())
+				expression(genesis, arg);
+
 			genesis.mark_expr(x);
 			break;
+
+		case ID::intrinsic_int_add:
+			genesis.mark_expr(x);
 	}
 }
 

@@ -33,6 +33,12 @@ struct input_file_t
 		delete data_;
 	}
 
+	auto close() -> void
+	{
+		fflush(file_);
+		fclose(file_);
+	}
+
 	auto begin() const -> char* { return data_; }
 	auto end() const -> char* { return data_ + file_size_; }
 
@@ -121,5 +127,14 @@ auto main(uint32_t arg_count, char const** args) -> int
 	}
 
 	std::cout << parsemes << std::endl;
+
+	fflush(out);
+	fclose(out);
+
+	printf("generating code...\n");
+	system("..\\bin\\llvm-as ../resource/basic-lexing.out");
+	system("..\\bin\\run_and_show_return_value.bat ..\\bin\\lli ../resource/basic-lexing.out.bc");
+	printf("\n");
+	system("pause");
 }
 

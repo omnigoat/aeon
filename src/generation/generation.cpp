@@ -13,7 +13,7 @@ using parsing::parseme_ptr;
 
 auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> atma::string
 {
-	atma::string result;
+	atma::string result = "f";
 
 	// function name
 	auto pattern = marshall::function::pattern(fn);
@@ -176,11 +176,12 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			// all parameters
 			auto argument_list = marshall::function_call::argument_list(expr);
 			auto fn = resolve::function_from_function_call(expr);
+			auto fn_return_type = resolve::type_of(marshall::function::return_type(fn));
 
 			for (auto const& arg : argument_list->children())
 				expression(stream, genesis, arg);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) << " = call @" << function_name_mangle(fn) << "(";
+			line_begin(stream) << "%" << genesis.expr_id(expr) << " = call " << llvm::storage_typename(genesis, fn_return_type) << " @" << function_name_mangle(fn) << "(";
 
 			for (auto i = argument_list->children().begin(); i != argument_list->children().end(); ++i)
 			{
