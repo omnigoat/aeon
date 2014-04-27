@@ -1,7 +1,7 @@
 function maths :: lhs as @int32 -> rhs as @int32 -> @int32
-	return lhs + lhs - rhs
+	return lhs * lhs - rhs * rhs
 end
 
 function main :: -> @int32
-	return maths(4, 5)
+	return maths(5, 4)
 end

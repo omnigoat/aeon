@@ -283,11 +283,57 @@ auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t c
 }
 
 
-// additive_expr: Term (+ Term)*
+// multiplicative_expr: Term (*|/ Term)*
+auto aeon::parsing::detail::multiplicative_expression(children_t& parsemes, context_t& ctx) -> bool
+{
+	if (!function_call_expression(parsemes, ctx))
+		return false;
+
+	// this is fine
+	for (;;)
+	{
+		auto op = ctx.match_make(parsid::addition_expr, lexid::punctuation, "*");
+		if (!op)
+			op = ctx.match_make(parsid::function_call, lexid::punctuation, "/");
+
+		if (!op)
+			return true;
+
+		if (!function_call_expression(parsemes, ctx)) {
+			// remove lhs
+			parsemes.pop_back();
+			return false;
+		}
+
+		auto rhs = parsemes.back();
+		parsemes.pop_back();
+		auto lhs = parsemes.back();
+		parsemes.pop_back();
+
+		// just a function-call
+		xpi::insert_into(parsemes,
+			xpi::make(parsid::function_call, op->lexeme())[
+				xpi::make(parsid::function_pattern)[
+					xpi::make(parsid::placeholder, lhs->lexeme()),
+						xpi::make(parsid::identifier, op->lexeme()),
+						xpi::make(parsid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(parsid::argument_list)[
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
+			]);
+	}
+
+	return true;
+}
+
+// additive_expr: Term (+|- Term)*
 auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t& ctx) -> bool
 {
 	// additive first
-	if (!function_call_expression(parsemes, ctx))
+	if (!multiplicative_expression(parsemes, ctx))
 		return false;
 
 	// this is fine
@@ -300,7 +346,7 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 		if (!op)
 			return true;
 
-		if (!function_call_expression(parsemes, ctx)) {
+		if (!multiplicative_expression(parsemes, ctx)) {
 			// remove lhs
 			parsemes.pop_back();
 			return false;

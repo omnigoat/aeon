@@ -29,6 +29,10 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 			result += "$add";
 		else if (x->text() == "-")
 			result += "$sub";
+		else if (x->text() == "*")
+			result += "$mul";
+		else if (x->text() == "/")
+			result += "$div";
 		else
 			result += atma::to_string(x->text().bytes()) + x->text();
 
@@ -178,6 +182,24 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 
 			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = sub i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			break;
+		}
+
+		case ID::intrinsic_int_mul:
+		{
+			auto lhs = marshall::binary_expr::lhs(expr);
+			auto rhs = marshall::binary_expr::rhs(expr);
+
+			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = mul i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			break;
+		}
+
+		case ID::intrinsic_int_div:
+		{
+			auto lhs = marshall::binary_expr::lhs(expr);
+			auto rhs = marshall::binary_expr::rhs(expr);
+
+			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = sdiv i" << expr->text() << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 

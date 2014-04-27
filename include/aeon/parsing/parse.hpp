@@ -28,6 +28,7 @@ namespace parsing {
 		auto function_body(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto statement(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto expression(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
+		auto multiplicative_expression(children_t&, context_t&) -> bool;
 		auto additive_expression(children_t&, context_t&) -> bool;
 		auto function_call_expression(children_t&, context_t&) -> bool;
 	}
