@@ -83,3 +83,17 @@ auto parseme_t::make(id_t id, lexing::lexeme_t const* L) -> parseme_ptr
 std::ostream& aeon::parsing::operator << (std::ostream& stream, parseme_t const& x) {
 	return stream << static_cast<int>(x.id()) << ": " << "\"" << x.text() << "\"[" << x.position().row << ":" << x.position().column << "]";
 }
+
+auto aeon::parsing::clone(parseme_ptr const& x) -> parseme_ptr
+{
+	auto r = parseme_t::make(x->id(), x->lexeme());
+	for (auto const& y : x->children())
+		r->children().push_back(clone(y));
+	return r;
+}
+
+auto aeon::parsing::clone(parsemes_t& dest, parsemes_t const& src) -> void
+{
+	for (auto const& x : src)
+		dest.push_back(clone(x));
+}

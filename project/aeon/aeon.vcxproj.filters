@@ -37,6 +37,12 @@
     <Filter Include="source\resolve">
       <UniqueIdentifier>{0d721fba-290c-46b0-aaae-4f97d7797570}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\optimization">
+      <UniqueIdentifier>{cb875cdc-a498-4015-a7c3-32d1acd213f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\optimization">
+      <UniqueIdentifier>{c996796d-b5ab-43af-9d15-46bc5d2302e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resource\basic-lexing.jigl">
@@ -98,6 +104,9 @@
     <ClInclude Include="..\..\include\aeon\generation\genesis.hpp">
       <Filter>include\generation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\optimization\inlining.hpp">
+      <Filter>include\optimization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -136,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\generation\genesis.cpp">
       <Filter>source\generation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\optimization\inlining.cpp">
+      <Filter>source\optimization</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

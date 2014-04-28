@@ -44,6 +44,7 @@ namespace parsing {
 		
 		auto replace(const_iterator const&, parseme_ptr const&) -> void;
 		auto detach(const_iterator const&) -> parseme_ptr;
+		auto detach(parseme_ptr const&) -> bool;
 		auto insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator;
 
 		auto push_back(parseme_ptr const&) -> void;
@@ -60,6 +61,7 @@ namespace parsing {
 		friend parseme_t;
 	};
 
+	auto clone(children_t&, children_t const&) -> void;
 
 	namespace detail
 	{

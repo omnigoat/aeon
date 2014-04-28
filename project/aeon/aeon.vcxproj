@@ -95,6 +95,7 @@
     <ClInclude Include="..\..\include\aeon\lexing\state.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
     <ClInclude Include="..\..\include\aeon\marshall.hpp" />
+    <ClInclude Include="..\..\include\aeon\optimization\inlining.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\xpi.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />
@@ -111,6 +112,7 @@
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
     <ClCompile Include="..\..\src\lexing\lexeme.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\optimization\inlining.cpp" />
     <ClCompile Include="..\..\src\parsing\context.cpp" />
     <ClCompile Include="..\..\src\parsing\mixfix.cpp" />
     <ClCompile Include="..\..\src\parsing\parse.cpp" />

@@ -56,6 +56,10 @@ namespace parsing {
 	
 	std::ostream& operator << (std::ostream& stream, parseme_t const& x);
 
+	// recursive
+	auto clone(parseme_ptr const&) -> parseme_ptr;
+	auto clone(parsemes_t&, parsemes_t const&) -> void;
+
 	enum class parseme_t::id_t
 	{
 		root,

@@ -53,6 +53,25 @@ namespace parsing {
 		}
 	}
 
+	template <typename FN>
+	inline void for_each_depth_first(children_t& xs, FN fn) {
+		for (auto& x : xs) {
+			fn(x);
+			for_each_depth_first(x->children(), fn);
+		}
+	}
+
+	template <typename FN>
+	inline auto find_ancestor(parseme_ptr const& x, FN const& fn) -> parseme_ptr {
+		if (!x)
+			return null_parseme_ptr;
+		else if (fn(x))
+			return x;
+		else
+			return find_ancestor(x->parent(), fn);
+	}
+
+
 	inline auto find_root(parseme_ptr const& x) -> parseme_ptr
 	{
 		ATMA_ASSERT(x);

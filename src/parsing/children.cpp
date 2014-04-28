@@ -92,6 +92,17 @@ auto children_t::detach(const_iterator const& i) -> parseme_ptr
 	return p;
 }
 
+auto children_t::detach(parseme_ptr const& x) -> bool
+{
+	auto i = std::find(elements_.begin(), elements_.end(), x);
+	if (i == elements_.end())
+		return false;
+
+	(*i)->set_parent(nullptr);
+	elements_.erase(i);
+	return true;
+}
+
 auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator
 {
 	auto ni = elements_.insert(where_, begin, end);
@@ -120,3 +131,10 @@ auto aeon::parsing::detail::print_parsemes(std::ostream& stream, children_t cons
 
 	return stream;
 }
+
+auto aeon::parsing::clone(children_t& dest, children_t const& src) -> void
+{
+	for (auto const& x : src)
+		dest.push_back(clone(x));
+}
+
