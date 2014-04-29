@@ -43,6 +43,7 @@ namespace parsing {
 		auto end() const -> const_iterator;
 		
 		auto replace(const_iterator const&, parseme_ptr const&) -> void;
+		auto replace(parseme_ptr const&, parseme_ptr const&) -> void;
 		auto detach(const_iterator const&) -> parseme_ptr;
 		auto detach(parseme_ptr const&) -> bool;
 		auto insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator;

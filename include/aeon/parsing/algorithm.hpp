@@ -94,6 +94,14 @@ namespace parsing {
 		}
 	}
 
+	template <typename FN>
+	inline auto transform_depth_first(children_t& xs, FN const& fn) -> void {
+		for (auto& x : xs) {
+			transform_depth_first(x->children(), fn);
+			fn(xs, (parseme_ptr const&)x);
+		}
+	}
+
 //=====================================================================
 } // namespace parsing
 } // namespace aeon

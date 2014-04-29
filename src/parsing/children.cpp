@@ -84,6 +84,16 @@ auto children_t::replace(const_iterator const& i, parseme_ptr const& n) -> void
 	*unconst(i) = n;
 }
 
+auto children_t::replace(parseme_ptr const& p, parseme_ptr const& n) -> void
+{
+	auto i = std::find(elements_.begin(), elements_.end(), p);
+	ATMA_ASSERT(i != elements_.end());
+
+	p->set_parent(nullptr);
+	n->set_parent(owner_ ? owner_->shared_from_this() : parseme_ptr());
+	*unconst(i) = n;
+}
+
 auto children_t::detach(const_iterator const& i) -> parseme_ptr
 {
 	parseme_ptr p = *i;

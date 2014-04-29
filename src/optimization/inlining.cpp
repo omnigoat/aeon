@@ -36,6 +36,7 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 	{
 		auto fn = resolve::function_from_function_call(call);
 		ATMA_ASSERT(fn);
+
 		auto fn_parameters = marshall::function::parameter_list(fn);
 
 		auto call_parent = call->parent();
@@ -94,8 +95,8 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 
 		// build a map of parameter -> argument
 		//  - 
+		std::map<parseme_ptr, parseme_ptr> replacements;
 		{
-			std::map<parseme_ptr, parseme_ptr> replacements;
 			auto args = marshall::function_call::argument_list(call)->children();
 			int i = 0;
 			for (auto const& x : marshall::function::parameter_list(fn_clone)->children())
@@ -104,10 +105,22 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 			}
 		}
 
-#if 0
-		parsing::transform_depth_first(fn_clone_body->children(), [&refcounts](parseme_ptr const& x) {
-			
-		});
+#if 1
+		parsing::transform_depth_first(fn_clone_body->children(),
+			[&replacements](parsing::children_t& xs, parseme_ptr const& x)
+			{
+				if (x->id() != parsing::ID::identifier)
+					return;
+
+				auto def = resolve::identifier_to_definition(x);
+				if (!def)
+					return;
+
+				if (def->id() != parsing::ID::parameter)
+					return;
+
+				xs.replace(x, parsing::clone(replacements[def]));
+			});
 #endif
 
 		// replace all references to parameters with their arguments
