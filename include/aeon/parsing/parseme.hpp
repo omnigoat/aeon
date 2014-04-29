@@ -84,6 +84,8 @@ namespace parsing {
 		type_definition,
 		argument_list,
 
+		variable_declaration,
+
 		// intrinsics
 		intrinsic_type_int,
 		intrinsic_bitsize,

@@ -175,7 +175,13 @@ namespace xpi {
 		return detail::expr_t(detail::abstract_expr_ptr(new detail::insert_single_expr_t(x)));
 	}
 
-
+	inline auto reify(detail::expr_t const& x) -> parseme_ptr
+	{
+		parsemes_t p;
+		x(p);
+		ATMA_ASSERT(p.size() == 1);
+		return p.back();
+	}
 
 
 	inline void insert_into(parsemes_t& dest, detail::expr_t const& x) {

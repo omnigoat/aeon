@@ -5,7 +5,7 @@
 #include <aeon/lexing/id.hpp>
 #include <aeon/parsing/parse.hpp>
 #include <aeon/semantics/analyse.hpp>
-
+#include <aeon/optimization/inlining.hpp>
 #include <aeon/generation/generation.hpp>
 
 #define ATMA_ASSERT_RETURN(x) \
@@ -99,6 +99,8 @@ auto main(uint32_t arg_count, char const** args) -> int
 	auto root = root_list.back();
 	ATMA_ASSERT(root);
 
+	optimization::inline_all_the_things(parsemes);
+
 	// intrinsic functions
 	{
 		parsing::parsemes_t functions;
@@ -110,7 +112,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 			generation::analyse::function(g, x);
 			generation::function(*stream, g, x);
 		}
-			
 	}
 
 	// collect the modules
