@@ -22,18 +22,18 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 	parsing::copy_depth_first_if(std::back_inserter(calls), xs,
 		[](parsing::parseme_ptr const& x) { return x->id() == parsing::ID::function_call; });
 
-#if 0
-	// filter inlining
-	calls.erase(
-		
-	);
-#endif
-	
 	using parsing::parseme_ptr;
 	namespace xpi = parsing::xpi;
-
+	std::reverse(calls.begin(), calls.end());
+	int count = 0;
 	for (auto const& call : calls)
 	{
+		// only inline calls to binary functions atm
+		if (marshall::function_call::pattern(call)->children().size() != 3)
+			continue;
+
+
+
 		auto fn = resolve::function_from_function_call(call);
 		ATMA_ASSERT(fn);
 
@@ -59,6 +59,12 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 			return argnames[idx++];
 		};
 
+		bool nonvoid_function = true;
+		uint return_count = 0;
+
+
+
+
 		// clone the inlining-function's (Fi) body, and:
 		//   - find which parameters are used multiple times
 		//   - 
@@ -67,8 +73,14 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 		auto fn_clone_body = marshall::function::body(fn_clone);
 
 		std::map<parseme_ptr, int> refcounts;
-		parsing::for_each_depth_first(fn_clone_body->children(), [&refcounts](parseme_ptr const& x)
+		std::vector<parseme_ptr> return_statements;
+		parsing::for_each_depth_first(fn_clone_body->children(), [&refcounts, &return_count, &return_statements](parseme_ptr const& x)
 		{
+			if (x->id() == parsing::ID::return_statement) {
+				return_statements.push_back(x);
+				++return_count;
+			}
+
 			if (x->id() != parsing::ID::identifier)
 				return;
 
@@ -133,5 +145,12 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 		auto i = std::find(call_parent_children.begin(), call_parent_children.end(), call);
 		call_parent_children.insert(i, precaller_statements.begin(), precaller_statements.end());
 		//call_parent->children().detach(call);
+		ATMA_ASSERT(return_statements.size() == 1);
+		auto p = return_statements.front()->children().front();
+		return_statements.front()->children().pop_back();
+		call_parent->children().replace(call, p);
+		
+		if (++count == 3)
+			break;
 	}
 }

@@ -60,7 +60,7 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 			for (auto const& i : root->children())
 				if (i->id() == parsing::ID::type_definition)
 					if (marshall::type_definition::definition(i)->id() == parsing::ID::intrinsic_type_int)
-						if (marshall::type_definition::intrinsic_info(i)->text() == x->text())
+						if (marshall::type_definition::name(i)->text() == x->text())
 							return i;
 
 			return parsing::null_parseme_ptr;

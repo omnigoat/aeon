@@ -142,7 +142,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 
 			xpi::make(ID::block) [
 				xpi::make(ID::return_statement)[
-					xpi::make(ID::intrinsic_int_add, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end())) [
+					xpi::make(ID::intrinsic_int_add, type_name->lexeme())[
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]
@@ -173,7 +173,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 
 			xpi::make(ID::block)[
 				xpi::make(ID::return_statement)[
-					xpi::make(ID::intrinsic_int_sub, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))[
+					xpi::make(ID::intrinsic_int_sub, type_name->lexeme())[
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]
@@ -181,7 +181,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 			]
 		],
 
-		// subtraction
+		// multiplication
 		xpi::make(ID::function)[
 			xpi::make(ID::function_pattern)[
 				xpi::make(ID::placeholder),
@@ -204,7 +204,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 
 			xpi::make(ID::block)[
 				xpi::make(ID::return_statement)[
-					xpi::make(ID::intrinsic_int_mul, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))[
+					xpi::make(ID::intrinsic_int_mul, type_name->lexeme())[
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]
@@ -212,7 +212,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 			]
 		],
 
-		// subtraction
+		// division
 		xpi::make(ID::function)[
 			xpi::make(ID::function_pattern)[
 				xpi::make(ID::placeholder),
@@ -235,7 +235,7 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 
 			xpi::make(ID::block)[
 				xpi::make(ID::return_statement)[
-					xpi::make(ID::intrinsic_int_div, lexing::make_synthetic_lexeme(lexing::ID::integer_literal, type_name->text().begin() + 4, type_name->text().end()))[
+					xpi::make(ID::intrinsic_int_div, type_name->lexeme())[
 						xpi::make(ID::identifier, "lhs"),
 						xpi::make(ID::identifier, "rhs")
 					]
