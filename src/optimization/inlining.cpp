@@ -41,6 +41,7 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 
 		auto call_parent = call->parent();
 		ATMA_ASSERT(call_parent);
+		auto& call_parent_children = call_parent->children();
 
 		auto statement = parsing::find_ancestor(call, [](parsing::parseme_ptr const& x)
 			{ return x->id() == parsing::ID::return_statement; });
@@ -82,7 +83,8 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 		});
 
 		// generate statements for multiply-references arguments
-		std::map<parseme_ptr, parseme_ptr> precaller_statements;
+		parsing::parsemes_t precaller_statements;
+		//std::map<parseme_ptr, parseme_ptr> precaller_statements;
 		for (auto const& x : refcounts) {
 			if (x.second > 1) {
 				auto vd = xpi::reify(
@@ -90,6 +92,8 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 						xpi::make(parsing::ID::identifier, lexing::make_synthetic_lexeme(lexing::ID::identifier, generate_argiden())),
 						xpi::insert(x.first)
 					]);
+
+				precaller_statements.push_back(vd);
 			}
 		}
 
@@ -119,13 +123,15 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 				if (def->id() != parsing::ID::parameter)
 					return;
 
-				xs.replace(x, parsing::clone(replacements[def]));
+				if (replacements.find(def) != replacements.end())
+					xs.replace(x, parsing::clone(replacements[def]));
 			});
 #endif
 
 		// replace all references to parameters with their arguments
 		
-
-		call_parent->children().detach(call);
+		auto i = std::find(call_parent_children.begin(), call_parent_children.end(), call);
+		call_parent_children.insert(i, precaller_statements.begin(), precaller_statements.end());
+		//call_parent->children().detach(call);
 	}
 }

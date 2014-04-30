@@ -135,7 +135,7 @@ auto children_t::pop_back() -> void
 auto aeon::parsing::detail::print_parsemes(std::ostream& stream, children_t const& xs, uint32_t spaces) -> std::ostream&
 {
 	for (auto const& x : xs) {
-		stream << std::string(spaces, ' ') << x.get() << " " << *x << std::endl;
+		stream << std::string(spaces, ' ') << *x << std::endl;
 		print_parsemes(stream, x->children(), spaces + 2);
 	}
 
