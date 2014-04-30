@@ -94,13 +94,27 @@ namespace parsing {
 		}
 	}
 
-	template <typename FN>
-	inline auto transform_depth_first(children_t& xs, FN const& fn) -> void {
+	auto const passthrough = [](children_t&, parseme_ptr const&) {};
+
+	template <typename FN, typename FNUP = decltype(passthrough)>
+	inline auto transform_depth_first(children_t& xs, FN const& fn, FNUP const& fnup = passthrough) -> void {
 		for (auto& x : xs) {
 			transform_depth_first(x->children(), fn);
 			fn(xs, (parseme_ptr const&)x);
 		}
 	}
+
+	struct id_equals_t
+	{
+		id_equals_t(ID id)
+			: id_(id)
+		{}
+
+		bool operator (parseme_ptr const& x) const -> bool { return x->id() == id_; }
+
+	private:
+		ID id_;
+	};
 
 //=====================================================================
 } // namespace parsing
