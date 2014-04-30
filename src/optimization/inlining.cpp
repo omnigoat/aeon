@@ -14,16 +14,60 @@
 using namespace aeon;
 using namespace optimization;
 
+namespace
+{
+	using namespace parsing;
+
+	auto inline_function_call(children_t& xs, parseme_ptr const& x) -> void
+	{
+		auto fn = resolve::function_from_function_call(call);
+		ATMA_ASSERT(fn);
+		auto fn_parameters = marshall::function::parameter_list(fn);
+
+		auto call_parent = call->parent();
+		ATMA_ASSERT(call_parent);
+		auto& call_parent_children = call_parent->children();
+
+		auto statement = parsing::find_ancestor(call, parsing::id_equals_t(ID::return_statement));
+		ATMA_ASSERT(statement);
+
+		auto scope = statement->parent();
+		ATMA_ASSERT(scope);
+
+		static char const* argnames[6] ={
+			"arg0", "arg1", "arg2", "arg3", "arg4", "arg5"
+		};
+
+		auto generate_argiden = []() -> char const* {
+			static auto idx = 0;
+			return argnames[idx++];
+		};
+
+		bool nonvoid_function = true;
+		uint return_count = 0;
+
+	}
+}
+
 
 auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 {
+	using parsing::parseme_ptr;
+	namespace xpi = parsing::xpi;
+
+	parsing::transform_depth_first(xs, [](parsing::children_t& xs, parseme_ptr const& x)
+	{
+		if (x->id() == parsing::ID::function_call)
+			if (marshall::function_call::pattern(x)->children().size() == 3)
+				inline_function_call(xs, x);
+	});
+
 	// get all function-calls
 	parsing::parsemes_t calls;
 	parsing::copy_depth_first_if(std::back_inserter(calls), xs,
 		[](parsing::parseme_ptr const& x) { return x->id() == parsing::ID::function_call; });
 
-	using parsing::parseme_ptr;
-	namespace xpi = parsing::xpi;
+	
 	std::reverse(calls.begin(), calls.end());
 	int count = 0;
 	for (auto const& call : calls)
@@ -62,7 +106,7 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 		bool nonvoid_function = true;
 		uint return_count = 0;
 
-
+		
 
 
 		// clone the inlining-function's (Fi) body, and:
@@ -71,6 +115,11 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 		//   - replace all identifiers of the parameters with the arguments
 		auto fn_clone = parsing::clone(fn);
 		auto fn_clone_body = marshall::function::body(fn_clone);
+
+		if (count == 2) {
+			std::cout << "cloned fn-body " << fn_clone_body->children() << std::endl;
+			std::cout << "existing scope " << scope->children() << std::endl;
+		}
 
 		std::map<parseme_ptr, int> refcounts;
 		std::vector<parseme_ptr> return_statements;
@@ -142,8 +191,8 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 
 		// replace all references to parameters with their arguments
 		
-		auto i = std::find(call_parent_children.begin(), call_parent_children.end(), call);
-		call_parent_children.insert(i, precaller_statements.begin(), precaller_statements.end());
+		auto i = std::find(scope->children().begin(), scope->children().end(), call_parent);
+		scope->children().insert(i, precaller_statements.begin(), precaller_statements.end());
 		//call_parent->children().detach(call);
 		ATMA_ASSERT(return_statements.size() == 1);
 		auto p = return_statements.front()->children().front();
