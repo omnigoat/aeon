@@ -9,6 +9,18 @@ namespace parsing = aeon::parsing;
 
 typedef parsing::parseme_t::id_t id;
 
+auto aeon::resolve::is_atomic_expr(parsing::parseme_ptr const& x) -> bool
+{
+	switch (x->id())
+	{
+		case id::integer_literal:
+		case id::identifier:
+			return true;
+	}
+
+	return false;
+}
+
 // return type-definition
 parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x)
 {

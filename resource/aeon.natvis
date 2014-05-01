@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+
+<Type Name="aeon::lexing::lexeme_t">
+	<DisplayString Condition="begin_">{{ {id_}, {begin_,s}, {position_} }}</DisplayString>
+    <!-- <DisplayString Condition="!begin_">{{ {id_}, {position_} }}</DisplayString> -->
+</Type>
+
+<Type Name="aeon::parsing::parseme_t">
+	<Expand>
+      <Item Name="id">id_</Item>
+      <Item Condition="lexeme_" Name="text">((aeon::lexing::lexeme_t*)((intptr_t)lexeme_ &amp; ~1))->text_.begin_,
+      		[((aeon::lexing::lexeme_t*)((intptr_t)lexeme_ &amp; ~1))->text_.end_ - ((aeon::lexing::lexeme_t*)((intptr_t)lexeme_ &amp; ~1))->text_.begin_]na</Item>
+      <Item Name="children">children_</Item>
+    </Expand>
+</Type>
+
+<Type Name="aeon::parsing::children_t">
+	<DisplayString>{elements_}</DisplayString>
+	<Expand>
+    	<ExpandedItem>elements_</ExpandedItem>
+    </Expand>
+</Type>
+
+<Type Name="std::shared_ptr&lt;aeon::parsing::parseme_t&gt;">
+	<DisplayString>{*_Ptr}</DisplayString>
+	<Expand>
+    	<ExpandedItem>*_Ptr</ExpandedItem>
+    </Expand>
+</Type>
+
+</AutoVisualizer>

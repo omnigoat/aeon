@@ -12,6 +12,10 @@ namespace aeon {
 namespace resolve {
 //=====================================================================
 	
+	// returns true if we could clone this node multiple times and not
+	// generate any additional computations. i.e: identifiers, integer-literals
+	auto is_atomic_expr(parsing::parseme_ptr const&) -> bool;
+
 	parsing::parseme_ptr const& type_of(parsing::parseme_ptr const&);
 	
 	//
