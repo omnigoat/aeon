@@ -1,12 +1,8 @@
-//=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_PARSING_ALGORITHM_HPP
-#define AEON_PARSING_ALGORITHM_HPP
+#pragma once
 //=====================================================================
 #include <aeon/parsing/parseme.hpp>
+
+#include <set>
 //=====================================================================
 namespace aeon {
 namespace parsing {
@@ -62,6 +58,17 @@ namespace parsing {
 	}
 
 	template <typename FN>
+	inline void for_each_unique(children_t& xs, FN const& fn) {
+		std::set<parseme_t const*> visited;
+		for_each_depth_first(xs, [&visited, &fn](parseme_ptr const& x) {
+			if (visited.find(x.get()) != visited.end())
+				return;
+			visited.insert(x.get());
+			fn(x);
+		});
+	}
+
+	template <typename FN>
 	inline auto find_ancestor(parseme_ptr const& x, FN const& fn) -> parseme_ptr {
 		if (!x)
 			return null_parseme_ptr;
@@ -99,8 +106,9 @@ namespace parsing {
 	template <typename FN, typename FNUP = decltype(passthrough)>
 	inline auto transform_depth_first(children_t& xs, FN const& fn, FNUP const& fnup = passthrough) -> void {
 		for (auto& x : xs) {
-			transform_depth_first(x->children(), fn);
 			fn(xs, (parseme_ptr const&)x);
+			transform_depth_first(x->children(), fn, fnup);
+			fnup(xs, (parseme_ptr const&)x);
 		}
 	}
 
@@ -110,16 +118,10 @@ namespace parsing {
 			: id_(id)
 		{}
 
-		bool operator (parseme_ptr const& x) const -> bool { return x->id() == id_; }
+		auto operator ()(parseme_ptr const& x) const -> bool { return x->id() == id_; }
 
 	private:
 		ID id_;
 	};
 
-//=====================================================================
-} // namespace parsing
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
-
+} }
