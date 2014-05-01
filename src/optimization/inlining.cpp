@@ -93,11 +93,17 @@ namespace
 		parsing::parsemes_t precaller_statements;
 		std::map<parseme_ptr, parseme_ptr> arg_to_iden;
 
-		for (auto const& x : param_refcounts)
+		for (auto& x : param_refcounts)
 		{
 			if (x.second > 1) {
 				char const* iden = generate_argiden();
 				auto const& arg = arg_of_param(x.first);
+
+				// hack: don't create variable declarations for identifiers or literals
+				if (arg->id() == ID::identifier || arg->id() == ID::integer_literal) {
+					x.second = 1;
+					continue;
+				}
 
 				auto vd = xpi::reify(
 					xpi::make(parsing::ID::variable_declaration)[
