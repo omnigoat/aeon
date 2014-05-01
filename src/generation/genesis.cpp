@@ -78,6 +78,8 @@ auto aeon::generation::analyse::expression(genesis_t& genesis, parsing::parseme_
 		case ID::intrinsic_int_sub:
 		case ID::intrinsic_int_mul:
 		case ID::intrinsic_int_div:
+			expression(genesis, marshall::binary_expr::lhs(x));
+			expression(genesis, marshall::binary_expr::rhs(x));
 			genesis.mark_expr(x);
 			break;
 	}

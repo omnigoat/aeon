@@ -25,5 +25,6 @@ project/aeon/Debug/
 project/aeon/Release/
 
 
-
+; llvm
+*.out.bc
 

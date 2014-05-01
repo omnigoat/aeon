@@ -173,7 +173,9 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 			auto type = resolve::type_of(expr);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = add " << llvm::storage_typename(genesis, type) << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			expression(stream, genesis, lhs);
+			expression(stream, genesis, rhs);
+			line_begin(stream) << llvm::lvalue_name(genesis, expr) <<  " = add " << llvm::storage_typename(genesis, type) << " " << llvm::lvalue_name(genesis, lhs) << ", " << llvm::lvalue_name(genesis, rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 
@@ -183,7 +185,9 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 			auto type = resolve::type_of(expr);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = sub " << llvm::storage_typename(genesis, type) << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			expression(stream, genesis, lhs);
+			expression(stream, genesis, rhs);
+			line_begin(stream) << llvm::lvalue_name(genesis, expr) <<  " = sub " << llvm::storage_typename(genesis, type) << " " << llvm::lvalue_name(genesis, lhs) << ", " << llvm::lvalue_name(genesis, rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 
@@ -193,7 +197,9 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 			auto type = resolve::type_of(expr);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = mul " << llvm::storage_typename(genesis, type) << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			expression(stream, genesis, lhs);
+			expression(stream, genesis, rhs);
+			line_begin(stream) << llvm::lvalue_name(genesis, expr) <<  " = mul " << llvm::storage_typename(genesis, type) << " " << llvm::lvalue_name(genesis, lhs) << ", " << llvm::lvalue_name(genesis, rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 
@@ -203,7 +209,9 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			auto rhs = marshall::binary_expr::rhs(expr);
 			auto type = resolve::type_of(expr);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) <<  " = sdiv " << llvm::storage_typename(genesis, type) << " " << llvm_identifier(lhs) << ", " << llvm_identifier(rhs) << "\n"; // %lhs, %rhs\n";
+			expression(stream, genesis, lhs);
+			expression(stream, genesis, rhs);
+			line_begin(stream) << llvm::lvalue_name(genesis, expr) <<  " = sdiv " << llvm::storage_typename(genesis, type) << " " << llvm::lvalue_name(genesis, lhs) << ", " << llvm::lvalue_name(genesis, rhs) << "\n"; // %lhs, %rhs\n";
 			break;
 		}
 
@@ -217,7 +225,7 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 			for (auto const& arg : argument_list->children())
 				expression(stream, genesis, arg);
 
-			line_begin(stream) << "%" << genesis.expr_id(expr) << " = call " << llvm::storage_typename(genesis, fn_return_type) << " @" << function_name_mangle(fn) << "(";
+			line_begin(stream) << llvm::lvalue_name(genesis, expr) << " = call " << llvm::storage_typename(genesis, fn_return_type) << " @" << function_name_mangle(fn) << "(";
 
 			for (auto i = argument_list->children().begin(); i != argument_list->children().end(); ++i)
 			{
