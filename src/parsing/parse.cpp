@@ -420,3 +420,8 @@ auto aeon::parsing::detail::function_call_expression(children_t& parsemes, conte
 
 	return true;
 }
+
+auto aeon::parsing::logical_expression(children_t&, context_t&) -> bool
+{
+	
+}

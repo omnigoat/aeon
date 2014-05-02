@@ -22,6 +22,7 @@ namespace aeon { namespace parsing {
 		auto expression(children_t&, lexing::lexemes_t const&, context_t&) -> bool;
 		auto multiplicative_expression(children_t&, context_t&) -> bool;
 		auto additive_expression(children_t&, context_t&) -> bool;
+		auto logical_expression(children_t&, context_t&) -> bool;
 		auto function_call_expression(children_t&, context_t&) -> bool;
 	}
 
