@@ -1,52 +1,23 @@
-//=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_RESOLVE_HPP
-#define AEON_RESOLVE_HPP
+#pragma once
 //=====================================================================
 #include <aeon/parsing/parseme.hpp>
 //=====================================================================
-namespace aeon {
-namespace resolve {
-//=====================================================================
+namespace aeon { namespace resolve {
 	
-	// returns true if we could clone this node multiple times and not
-	// generate any additional computations. i.e: identifiers, integer-literals
+	// identifies atomic expressions
+	//  - anything duplicitous: identifiers, integer-literals, etc
 	auto is_atomic_expr(parsing::parseme_ptr const&) -> bool;
 
-	parsing::parseme_ptr const& type_of(parsing::parseme_ptr const&);
+
+	// returns a type-definition from things:
+	//  - identifiers find their definition and corresponding type
+	//  - typenames lookup the corresponding type
+	//  - expressions have their types inferred
+	auto type_of(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
 	
-	//
-	parsing::parseme_ptr const& identifier_to_definition(parsing::parseme_ptr const&);
 
-	//
-	parsing::parseme_ptr const& typename_to_definition(parsing::parseme_ptr const&);
+	auto identifier_to_definition(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
+	auto typename_to_definition(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
+	auto function_from_function_call(parsing::parseme_ptr const&) -> parsing::parseme_ptr;
 
-	//
-	parsing::parseme_ptr const& expression_to_ast(parsing::parseme_ptr const&);
-
-	parsing::parseme_ptr function_from_function_call(parsing::parseme_ptr const&);
-
-#if 0
-
-	struct resolver_t
-	{
-		auto type_definition_of(parsing::parseme_ptr const&) -> parsing::parseme_ptr;
-		auto variable_definition_of(parsing::parseme_ptr const&) -> parsing::parseme_ptr;
-
-	private:
-		// map from x to its resultant type-definition
-		std::map<parsing::parseme_ptr, parsing::parseme_ptr> type_definitions_;
-	};
-
-#endif
-
-//=====================================================================
-} // namespace resolve
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
-
+} }

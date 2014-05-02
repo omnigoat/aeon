@@ -18,7 +18,7 @@ namespace
 	}
 }
 
-parsing::parseme_ptr const& aeon::resolve::identifier_to_definition(parsing::parseme_ptr const& x)
+auto aeon::resolve::identifier_to_definition(parsing::parseme_ptr const& x) -> parsing::parseme_ptr const&
 {
 	// get all locations which may house our variable definition
 	parsing::parsemes_t locations;
@@ -39,7 +39,7 @@ parsing::parseme_ptr const& aeon::resolve::identifier_to_definition(parsing::par
 	return parsing::null_parseme_ptr;
 }
 
-parsing::parseme_ptr aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x)
+auto aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x) -> parsing::parseme_ptr
 {
 	ATMA_ASSERT(x->id() == parsing::ID::function_call);
 
