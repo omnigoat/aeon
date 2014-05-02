@@ -1,21 +1,13 @@
-//=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_PARSING_PARSE_HPP
-#define AEON_PARSING_PARSE_HPP
-//=====================================================================
-#include <cstdint>
-#include <ostream>
+#pragma once
 //=====================================================================
 #include <aeon/lexing/lexemes.hpp>
 #include <aeon/parsing/children.hpp>
 #include <aeon/parsing/context.hpp>
+
+#include <cstdint>
+#include <ostream>
 //=====================================================================
-namespace aeon {
-namespace parsing {
-//=====================================================================
+namespace aeon { namespace parsing {
 	
 	namespace detail
 	{
@@ -33,15 +25,6 @@ namespace parsing {
 		auto function_call_expression(children_t&, context_t&) -> bool;
 	}
 
-
 	auto parse(children_t&, lexing::lexemes_t const&) -> void;
 
-	auto mixfix_resolution(children_t&) -> void;
-
-//=====================================================================
-} // namespace parsing
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
-
+} }

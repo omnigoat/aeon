@@ -114,7 +114,6 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\optimization\inlining.cpp" />
     <ClCompile Include="..\..\src\parsing\context.cpp" />
-    <ClCompile Include="..\..\src\parsing\mixfix.cpp" />
     <ClCompile Include="..\..\src\parsing\parse.cpp" />
     <ClCompile Include="..\..\src\parsing\parseme.cpp" />
     <ClCompile Include="..\..\src\parsing\children.cpp" />
