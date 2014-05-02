@@ -48,3 +48,12 @@ auto aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x) -
 			&& is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(x));
 	});
 }
+
+auto aeon::resolve::is_function_forceinline(parsing::parseme_ptr const& x) -> bool
+{
+	if (auto const& attrs = marshall::function::attributes(x)) {
+		return parsing::find(attrs, parsing::id_equals_t(parsing::ID::attribute_forceinline)) != nullptr;
+	}
+
+	return false;
+}

@@ -93,6 +93,9 @@ namespace parsing {
 		intrinsic_int_sub,
 		intrinsic_int_mul,
 		intrinsic_int_div,
+
+		attributes,
+		attribute_forceinline,
 	};
 
 	typedef parseme_t::id_t ID;

@@ -181,8 +181,9 @@ auto aeon::optimization::inline_all_the_things(parsing::children_t& xs) -> void
 	parsing::transform_depth_first(xs, parsing::passthrough, [](parsing::children_t& xs, parseme_ptr const& x)
 	{
 		if (x->id() == parsing::ID::function_call)
-			//if (marshall::function_call::pattern(x)->children().size() == 3)
-				inline_function_call(xs, x);
+			if (auto const& f = resolve::function_from_function_call(x))
+				if (resolve::is_function_forceinline(f))
+					inline_function_call(xs, x);
 	});
 
 #if 0

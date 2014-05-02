@@ -100,7 +100,8 @@ namespace parsing {
 			return x;
 
 		for (auto const& xc : x->children())
-			find(xc, fn);
+			if (auto const& xcr = find(xc, fn))
+				return xcr;
 
 		return parsing::null_parseme_ptr;
 	}

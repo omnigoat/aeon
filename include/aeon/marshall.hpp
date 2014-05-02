@@ -19,6 +19,7 @@ namespace aeon { namespace marshall {
 		inline auto parameter_list(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[1]; }
 		inline auto return_type(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[2]; }
 		inline auto body(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[3]; }
+		inline auto attributes(parseme_ptr const& x) -> parseme_ptr const& { return x->children().size() > 4 ? x->children()[4] : parsing::null_parseme_ptr; }
 	}
 
 	namespace parameter {

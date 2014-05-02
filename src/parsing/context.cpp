@@ -147,6 +147,10 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 						xpi::make(ID::identifier, "rhs")
 					]
 				]
+			],
+
+			xpi::make(ID::attributes) [
+				xpi::make(ID::attribute_forceinline)
 			]
 		],
 
@@ -178,6 +182,10 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 						xpi::make(ID::identifier, "rhs")
 					]
 				]
+			],
+
+			xpi::make(ID::attributes)[
+				xpi::make(ID::attribute_forceinline)
 			]
 		],
 
@@ -209,6 +217,10 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 						xpi::make(ID::identifier, "rhs")
 					]
 				]
+			],
+
+			xpi::make(ID::attributes)[
+				xpi::make(ID::attribute_forceinline)
 			]
 		],
 
@@ -240,6 +252,10 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 						xpi::make(ID::identifier, "rhs")
 					]
 				]
+			],
+
+			xpi::make(ID::attributes)[
+				xpi::make(ID::attribute_forceinline)
 			]
 		]
 	));
