@@ -39,20 +39,12 @@ auto aeon::resolve::identifier_to_definition(parsing::parseme_ptr const& x) -> p
 	return parsing::null_parseme_ptr;
 }
 
-auto aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x) -> parsing::parseme_ptr
+auto aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x) -> parsing::parseme_ptr const&
 {
 	ATMA_ASSERT(x->id() == parsing::ID::function_call);
 
-	// get all functions in enclosing scopes
-	parsing::parsemes_t functions;
-	parsing::copy_breadth_first_upwards_if(
-		std::back_inserter(functions), x,
-		[](parsing::parseme_ptr const& y) { return y->id() == id::function; });
-
-	// find
-	for (auto const& f : functions)
-		if (is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(x)))
-			return f;
-
-	return parsing::null_parseme_ptr;
+	return parsing::upwards_enclosing_find(x, [&x](parsing::parseme_ptr const& f) {
+		return f->id() == id::function
+			&& is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(x));
+	});
 }

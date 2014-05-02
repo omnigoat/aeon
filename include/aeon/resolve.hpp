@@ -18,6 +18,6 @@ namespace aeon { namespace resolve {
 
 	auto identifier_to_definition(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
 	auto typename_to_definition(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
-	auto function_from_function_call(parsing::parseme_ptr const&) -> parsing::parseme_ptr;
+	auto function_from_function_call(parsing::parseme_ptr const&) -> parsing::parseme_ptr const&;
 
 } }

@@ -94,6 +94,66 @@ namespace parsing {
 	}
 
 	template <typename FN>
+	inline auto find(parseme_ptr const& x, FN const& fn) -> parseme_ptr const&
+	{
+		if (fn(x))
+			return x;
+
+		for (auto const& xc : x->children())
+			find(xc, fn);
+
+		return parsing::null_parseme_ptr;
+	}
+
+	namespace detail
+	{
+		template <typename F>
+		inline auto upwards_enclosing(children_t const& xs, F const& f) -> void
+		{
+			for (auto const& x : xs)
+				if (f(xs, x))
+					return;
+
+			if (auto const* o = xs.owner())
+				if (auto p = o->parent())
+					upwards_enclosing(p->children(), f);
+		}
+
+		template <typename F>
+		inline auto upwards_enclosing(parseme_ptr const& x, F const& f) -> void
+		{
+			if (auto p = x->parent())
+				upwards_enclosing(p->children(), f);
+		}
+	}
+	
+	template <typename F>
+	inline auto upwards_enclosing_find(parseme_ptr const& x, F const& fn) -> parseme_ptr const&
+	{
+		parseme_ptr const* result = &null_parseme_ptr;
+
+		detail::upwards_enclosing(x, [&result, &fn](children_t const& xs, parseme_ptr const& x){
+			if (fn(x)) {
+				result = &x;
+				return true;
+			}
+
+			return false;
+		});
+
+		return *result;
+	}
+
+	template <typename F>
+	inline auto upwards_enclosing_for_each(parseme_ptr const& x, F const& f) -> void
+	{
+		detail::upwards_enclosing(x, [](children_t const&, parseme_ptr const& x) {
+			f(x);
+			return false;
+		});
+	}
+
+	template <typename FN>
 	inline void ex_test_for_each_mutate(children_t& xs, FN fn) {
 		for (auto& x : xs) {
 			fn(xs, x);
