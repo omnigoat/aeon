@@ -1,5 +1,7 @@
 #pragma once
 //=====================================================================
+#include <atma/string.hpp>
+//=====================================================================
 namespace aeon { namespace lexing {
 
 	struct channel_t;
@@ -37,5 +39,7 @@ namespace aeon { namespace lexing {
 		AEON_LEXING_IDS()
 	};
 	#undef X
+
+	auto to_string(ID id) -> atma::string;
 
 } }

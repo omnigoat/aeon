@@ -39,7 +39,10 @@ namespace
 	uint32_t const keywords_end = static_cast<uint32_t>(aeon::lexing::ID::keyword_upper_bound);
 }
 
-
+auto aeon::lexing::to_string(aeon::lexing::ID id) -> atma::string
+{
+	return keywords[(int)id];
+}
 
 stream_t::stream_t(char const* begin, char const* end)
 	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1), consumed_newline_()

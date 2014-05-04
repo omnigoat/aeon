@@ -94,6 +94,10 @@ namespace parsing {
 		intrinsic_int_mul,
 		intrinsic_int_div,
 
+		// for error recovery
+		error_term,
+		error_type,
+
 		attributes,
 		attribute_forceinline,
 	};

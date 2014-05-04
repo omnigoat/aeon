@@ -40,10 +40,32 @@ auto add_prelude(parsing::children_t& parsemes) -> void
 }
 
 
+#if 0
+auto aeon::parsing::errors_t::unexpected(atma::string const& msg, parseme_t const& p) -> void
+{
+	errs_.push_back({filename_, p.position(), msg});
+}
+#endif
 
 
+auto aeon::parsing::errors_t::unexpected(lexing::lexeme_t const* L) -> void
+{
+	auto id = L->id();
+	if (lexing::ID::keyword_lower_bound < id && id < lexing::ID::keyword_upper_bound)
+		errs_.push_back({filename_, L->position(), atma::string("unexpected keyword ") + lexing::to_string(id)});
+	else
+		errs_.push_back({filename_, L->position(), "unexpected!"});
+}
 
-auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
+auto aeon::parsing::operator << (std::ostream& stream, errors_t const& rhs) -> std::ostream&
+{
+	for (auto const& x : rhs.errs_)
+		stream << x.file << "(" << x.position.row << "): " << x.message << std::endl;
+	return stream;
+}
+
+
+auto aeon::parsing::parse(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
 	parseme_ptr root_node(new parseme_t(parsid::root));
 
@@ -52,60 +74,23 @@ auto aeon::parsing::parse(children_t& parsemes, lexing::lexemes_t const& lexemes
 
 	add_prelude(root_node->children());
 
-	detail::module(root_node->children(), lexemes, context);
+	detail::module(errors, root_node->children(), lexemes, context);
 	parsemes.push_back(root_node);
 }
 
-auto aeon::parsing::detail::module(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::module(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	parseme_ptr module_node(new parseme_t(parsid::module));
 
 	parsemes.push_back(module_node);
 
-	while (function(module_node->children(), lexemes, context))
+	while (function(errors, module_node->children(), lexemes, context))
 		;
 
 	return true;
 }
 
-struct match_t
-{
-	match_t(aeon::lexing::lexemes_t::const_iterator& i, aeon::lexing::multichannel_t const& ch)
-		: orig_(i), i_(i), ch_(ch), good_(true)
-	{
-		i_.set_channel(ch);
-	}
-
-	match_t& operator ()(lexid id, char const* token = nullptr)
-	{
-		if (good_ == false)
-			return *this;
-
-		if ((ch_ & i_->channel()) && (i_->id() != id || (id == lexid::punctuation && !i_->streq(token)))) {
-			i_ = orig_;
-			good_ = false;
-		}
-		else
-			++i_;
-
-		return *this;
-	}
-
-	operator bool() const { return good_; }
-
-private:
-	aeon::lexing::lexemes_t::const_iterator orig_;
-	aeon::lexing::lexemes_t::const_iterator& i_;
-	aeon::lexing::multichannel_t ch_;
-
-	bool good_;
-};
-
-match_t match(aeon::lexing::lexemes_t::const_iterator& i, aeon::lexing::multichannel_t const& ch) {
-	return match_t(i, ch);
-}
-
-auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::function(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	parseme_ptr fn_node, id_node, parameter_list_node, function_body_node;
 
@@ -144,7 +129,7 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		if (!parameter_list_node)
 			goto fail;
 		
-		if (!parameters(parameter_list_node->children(), lexemes, context))
+		if (!parameters(errors, parameter_list_node->children(), lexemes, context))
 			goto fail;
 
 		fn_node->children().push_back(parameter_list_node);
@@ -159,7 +144,7 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		if (!context.skip(lexid::punctuation, "->"))
 			goto fail;
 
-		if (!type_name(fn_node->children(), lexemes, context))
+		if (!type_name(errors, fn_node->children(), lexemes, context))
 			goto fail;
 	}
 
@@ -168,7 +153,7 @@ auto aeon::parsing::detail::function(children_t& parsemes, lexing::lexemes_t con
 		parseme_ptr function_body_node = context.match_make(parsid::block, lexid::block_begin, lexing::all);
 		if (function_body_node) {
 			context.align(lexing::basic);
-			function_body(function_body_node->children(), lexemes, context);
+			function_body(errors, function_body_node->children(), lexemes, context);
 			fn_node->children().push_back(function_body_node);
 		}
 		else
@@ -186,7 +171,7 @@ fail:
 	return false;
 }
 
-auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::parameters(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	uint parameters = 0;
 
@@ -205,7 +190,7 @@ auto aeon::parsing::detail::parameters(children_t& parsemes, lexing::lexemes_t c
 				parameter_node->children().push_back(id_node);
 			}
 
-			if (!type_name(parameter_node->children(), lexemes, context)) {
+			if (!type_name(errors, parameter_node->children(), lexemes, context)) {
 				goto fail;
 			}
 			
@@ -229,7 +214,7 @@ fail:
 	if (context.skip(lexid::punctuation, "->"))
 	{
 		auto p = parseme_t::make(parsid::parameter);
-		if (type_name(p->children(), lexemes, context)) {
+		if (type_name(errors, p->children(), lexemes, context)) {
 			parsemes.push_back(p);
 			return true;
 		}
@@ -238,7 +223,7 @@ fail:
 	return false;
 }
 
-auto aeon::parsing::detail::type_name(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::type_name(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	if (parseme_ptr type_name = context.match_make(parsid::type_name, lexid::type))
 	{
@@ -255,19 +240,19 @@ auto aeon::parsing::detail::type_name(children_t& parsemes, lexing::lexemes_t co
 }
 
 
-auto aeon::parsing::detail::function_body(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::function_body(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	while (statement(parsemes, lexemes, context))
+	while (statement(errors, parsemes, lexemes, context))
 		;
 
 	return true;
 }
 
 
-auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::statement(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
 	if (parseme_ptr return_statement_node = context.match_make(parsid::return_statement, lexid::return_keyword)) {
-		expression(return_statement_node->children(), lexemes, context);
+		expression(errors, return_statement_node->children(), lexemes, context);
 		parsemes.push_back(return_statement_node);
 		return true;
 	}
@@ -275,18 +260,18 @@ auto aeon::parsing::detail::statement(children_t& parsemes, lexing::lexemes_t co
 	return false;
 }
 
-auto aeon::parsing::detail::expression(children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
+auto aeon::parsing::detail::expression(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	additive_expression(parsemes, context);
+	logical_expression(errors, parsemes, context);
 
 	return true;
 }
 
 
 // multiplicative_expr: Term (*|/ Term)*
-auto aeon::parsing::detail::multiplicative_expression(children_t& parsemes, context_t& ctx) -> bool
+auto aeon::parsing::detail::multiplicative_expression(errors_t& errors, children_t& parsemes, context_t& ctx) -> bool
 {
-	if (!function_call_expression(parsemes, ctx))
+	if (!function_call_expression(errors, parsemes, ctx))
 		return false;
 
 	// this is fine
@@ -299,7 +284,7 @@ auto aeon::parsing::detail::multiplicative_expression(children_t& parsemes, cont
 		if (!op)
 			return true;
 
-		if (!function_call_expression(parsemes, ctx)) {
+		if (!function_call_expression(errors, parsemes, ctx)) {
 			// remove lhs
 			parsemes.pop_back();
 			return false;
@@ -329,11 +314,54 @@ auto aeon::parsing::detail::multiplicative_expression(children_t& parsemes, cont
 	return true;
 }
 
-// additive_expr: Term (+|- Term)*
-auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t& ctx) -> bool
+auto aeon::parsing::detail::logical_expression(errors_t& errors, children_t& xs, context_t& ctx) -> bool
 {
-	// additive first
-	if (!multiplicative_expression(parsemes, ctx))
+	if (!additive_expression(errors, xs, ctx))
+		return false;
+
+	for (;;)
+	{
+		auto op_fn = ctx.match_make(parsid::function_call, lexid::punctuation, "==");
+		if (!op_fn)
+			op_fn = ctx.match_make(parsid::function_call, lexid::punctuation, "!=");
+
+		if (!op_fn)
+			return true;
+
+		if (!additive_expression(errors, xs, ctx)) {
+			// remove lhs
+			xs.pop_back();
+			return false;
+		}
+
+		auto rhs = xs.back();
+		xs.pop_back();
+		auto lhs = xs.back();
+		xs.pop_back();
+
+		// just a function-call
+		xpi::insert_into(xs,
+			xpi::insert(op_fn) [
+				xpi::make(parsid::function_pattern) [
+					xpi::make(parsid::placeholder, lhs->lexeme()),
+					xpi::make(parsid::identifier, op_fn->lexeme()),
+					xpi::make(parsid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(parsid::argument_list)[
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
+			]);
+	}
+
+	return true;
+}
+
+// additive_expr: Term (+|- Term)*
+auto aeon::parsing::detail::additive_expression(errors_t& errors, children_t& parsemes, context_t& ctx) -> bool
+{
+	if (!multiplicative_expression(errors, parsemes, ctx))
 		return false;
 
 	// this is fine
@@ -346,10 +374,12 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 		if (!op)
 			return true;
 
-		if (!multiplicative_expression(parsemes, ctx)) {
+		if (!multiplicative_expression(errors, parsemes, ctx)) {
 			// remove lhs
-			parsemes.pop_back();
-			return false;
+			//parsemes.pop_back();
+			//errors.unexpected();
+			errors.unexpected(ctx.current_lexeme());
+			parsemes.push_back(parseme_t::make(ID::error_term));
 		}
 
 		auto rhs = parsemes.back();
@@ -376,7 +406,7 @@ auto aeon::parsing::detail::additive_expression(children_t& parsemes, context_t&
 	return true;
 }
 
-auto aeon::parsing::detail::function_call_expression(children_t& parsemes, context_t& ctx) -> bool
+auto aeon::parsing::detail::function_call_expression(errors_t& errors, children_t& parsemes, context_t& ctx) -> bool
 {
 	auto iden = ctx.match_make(parsid::identifier, lexid::identifier);
 	if (!iden) {
@@ -395,7 +425,7 @@ auto aeon::parsing::detail::function_call_expression(children_t& parsemes, conte
 
 		for (;;)
 		{
-			if (!additive_expression(args, ctx))
+			if (!additive_expression(errors, args, ctx))
 				break;
 			ctx.skip(lexid::punctuation, ",");
 		}
@@ -419,9 +449,4 @@ auto aeon::parsing::detail::function_call_expression(children_t& parsemes, conte
 	}
 
 	return true;
-}
-
-auto aeon::parsing::logical_expression(children_t&, context_t&) -> bool
-{
-	
 }

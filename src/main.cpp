@@ -70,8 +70,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 		lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
 		auto B = state.lexemes().begin(aeon::lexing::multichannel_t(0xffff));
 		lexemes_t::const_iterator ci = aeon::lexing::lexemes_t::iterator();
-
-		std::cout << lexemes << std::endl;
 	}
 	
 	// syntactic analysis
@@ -79,9 +77,13 @@ auto main(uint32_t arg_count, char const** args) -> int
 	{
 		using namespace aeon::parsing;
 
-		parse(parsemes, lexemes);
+		auto errors = parsing::errors_t(args[1]);
+		parse(errors, parsemes, lexemes);
 
-		std::cout << parsemes << std::endl;
+		if (errors.size() > 0) {
+			std::cout << errors << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 
 	ATMA_ASSERT(!parsemes.empty());
@@ -130,7 +132,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	fflush(out);
 	fclose(out);
 
-	system("pwd");
+	system("cd");
 	printf("generating code...\n");
 	system("..\\..\\bin\\llvm-as ../../resource/basic-lexing.out");
 	system("..\\..\\bin\\run_and_show_return_value.bat ..\\..\\bin\\lli ../../resource/basic-lexing.out.bc");
