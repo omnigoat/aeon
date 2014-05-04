@@ -107,6 +107,12 @@
     <ClInclude Include="..\..\include\aeon\optimization\inlining.hpp">
       <Filter>include\optimization</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\position.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\aeon\lexing\channel.hpp">
+      <Filter>include\lexing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
