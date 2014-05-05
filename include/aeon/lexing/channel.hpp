@@ -15,6 +15,7 @@ namespace aeon { namespace lexing {
 		channel_t(multichannel_t const&);
 
 		auto as_int() const -> uint { return bits_; }
+		operator bool() const { return bits_ != 0; }
 
 	private:
 		uint bits_;
@@ -34,6 +35,7 @@ namespace aeon { namespace lexing {
 		multichannel_t(channel_t const& ch);
 
 		auto as_int() const -> uint { return bits_; }
+		operator bool() const { return bits_ != 0; }
 
 	private:
 		uint bits_;
@@ -91,6 +93,10 @@ namespace aeon { namespace lexing {
 	
 	inline auto operator & (multichannel_t const& lhs, channel_t const& rhs) -> multichannel_t {
 		return multichannel_t(lhs.as_int() & rhs.as_int());
+	}
+
+	inline auto operator == (multichannel_t const& lhs, multichannel_t const& rhs) -> bool {
+		return lhs.as_int() == rhs.as_int();
 	}
 
 } }

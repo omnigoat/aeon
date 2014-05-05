@@ -26,8 +26,8 @@ namespace aeon { namespace parsing {
 	
 	struct errors_t
 	{
-		errors_t(atma::string const& filename)
-			: filename_(filename)
+		errors_t(atma::string const& filename, char const* text)
+			: filename_(filename), text_(text)
 		{}
 
 		auto size() const -> size_t { return errs_.size(); }
@@ -37,6 +37,7 @@ namespace aeon { namespace parsing {
 
 	private:
 		atma::string filename_;
+		char const* text_;
 		std::vector<error_t> errs_;
 
 		friend auto operator << (std::ostream&, errors_t const&) -> std::ostream&;

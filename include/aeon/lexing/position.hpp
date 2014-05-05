@@ -13,15 +13,15 @@ namespace aeon { namespace lexing {
 		static position_t const zero;
 
 		position_t()
-			: row(), column()
+			: row(), column(), total()
 		{}
 
-		position_t(uint row, uint column)
-			: row(row), column(column)
+		position_t(uint row, uint column, uint total)
+			: row(row), column(column), total(total)
 		{
 		}
 
-		uint row, column;
+		uint row, column, total;
 	};
 
 } }

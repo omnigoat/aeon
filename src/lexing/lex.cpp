@@ -10,7 +10,7 @@ using aeon::lexing::ID;
 using aeon::lexing::position_t;
 using aeon::lexing::multichannel_t;
 
-aeon::lexing::multichannel_t aeon::lexing::multichannel_t::all(0xffffffff);
+aeon::lexing::multichannel_t const aeon::lexing::multichannel_t::all(0xffffffff);
 
 namespace
 {
@@ -45,7 +45,7 @@ auto aeon::lexing::to_string(aeon::lexing::ID id) -> atma::string
 }
 
 stream_t::stream_t(char const* begin, char const* end)
-	: begin_(begin), end_(end), current_(begin), position_(1, 1), marked_position_(1, 1), consumed_newline_()
+	: begin_(begin), end_(end), current_(begin), position_(1, 1, 0), marked_position_(1, 1, 0), consumed_newline_()
 {
 }
 
@@ -77,6 +77,7 @@ auto stream_t::increment() -> void {
 	ATMA_ASSERT(current_ != end_);
 
 	++position_.column;
+	++position_.total;
 	++current_;
 
 	bool is_newline = *current_ == '\n' || *current_ == '\r';

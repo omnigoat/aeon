@@ -68,8 +68,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 		state_t state(lexemes);
 		lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
-		auto B = state.lexemes().begin(aeon::lexing::multichannel_t(0xffff));
-		lexemes_t::const_iterator ci = aeon::lexing::lexemes_t::iterator();
 	}
 	
 	// syntactic analysis
@@ -77,7 +75,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 	{
 		using namespace aeon::parsing;
 
-		auto errors = parsing::errors_t(args[1]);
+		auto errors = parsing::errors_t(args[1], file.begin());
 		parse(errors, parsemes, lexemes);
 
 		if (errors.size() > 0) {

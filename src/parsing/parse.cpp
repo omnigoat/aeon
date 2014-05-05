@@ -14,45 +14,16 @@ typedef aeon::parsing::parseme_t::id_t parsid;
 
 char const* intrinsic_text = "@int16@int32";
 
-aeon::lexing::position_t intrinsic_position(0, 0);
-
-auto add_prelude(parsing::children_t& parsemes) -> void
-{
-	typedef parsing::parseme_t::id_t id;
-
-	parsing::children_t xs;
-
-	#if 0
-	xpi::insert_into(xs, (
-		xpi::make(id::type_definition) [
-			xpi::make(id::identifier, int16_lexeme),
-			xpi::make(id::intrinsic_type_int16)
-		],
-
-		xpi::make(id::type_definition) [
-			xpi::make(id::identifier, int32_lexeme),
-			xpi::make(id::intrinsic_type_int32)
-		]
-	));
-
-	parsemes.insert(parsemes.begin(), xs.begin(), xs.end());
-	#endif
-}
-
-
-#if 0
-auto aeon::parsing::errors_t::unexpected(atma::string const& msg, parseme_t const& p) -> void
-{
-	errs_.push_back({filename_, p.position(), msg});
-}
-#endif
+aeon::lexing::position_t intrinsic_position(0, 0, 0);
 
 
 auto aeon::parsing::errors_t::unexpected(lexing::lexeme_t const* L) -> void
 {
 	auto id = L->id();
-	if (lexing::ID::keyword_lower_bound < id && id < lexing::ID::keyword_upper_bound)
+	if (lexing::ID::keyword_lower_bound < id && id < lexing::ID::keyword_upper_bound) {
 		errs_.push_back({filename_, L->position(), atma::string("unexpected keyword ") + lexing::to_string(id)});
+		errs_.push_back({filename_, L->position(), text_ + L->position().total, text_ + L->pos})
+	}
 	else
 		errs_.push_back({filename_, L->position(), "unexpected!"});
 }
@@ -72,7 +43,7 @@ auto aeon::parsing::parse(errors_t& errors, children_t& parsemes, lexing::lexeme
 	detail::context_t context(root_node, lexemes.begin(lexing::basic), lexemes.end(lexing::basic));
 
 
-	add_prelude(root_node->children());
+	//add_prelude(root_node->children());
 
 	detail::module(errors, root_node->children(), lexemes, context);
 	parsemes.push_back(root_node);
@@ -285,9 +256,8 @@ auto aeon::parsing::detail::multiplicative_expression(errors_t& errors, children
 			return true;
 
 		if (!function_call_expression(errors, parsemes, ctx)) {
-			// remove lhs
-			parsemes.pop_back();
-			return false;
+			errors.unexpected(ctx.current_lexeme());
+			parsemes.push_back(parseme_t::make(ID::error_term));
 		}
 
 		auto rhs = parsemes.back();
@@ -329,9 +299,8 @@ auto aeon::parsing::detail::logical_expression(errors_t& errors, children_t& xs,
 			return true;
 
 		if (!additive_expression(errors, xs, ctx)) {
-			// remove lhs
-			xs.pop_back();
-			return false;
+			errors.unexpected(ctx.current_lexeme());
+			xs.push_back(parseme_t::make(ID::error_term));
 		}
 
 		auto rhs = xs.back();
@@ -375,9 +344,6 @@ auto aeon::parsing::detail::additive_expression(errors_t& errors, children_t& pa
 			return true;
 
 		if (!multiplicative_expression(errors, parsemes, ctx)) {
-			// remove lhs
-			//parsemes.pop_back();
-			//errors.unexpected();
 			errors.unexpected(ctx.current_lexeme());
 			parsemes.push_back(parseme_t::make(ID::error_term));
 		}
