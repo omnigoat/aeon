@@ -93,6 +93,7 @@
     <ClInclude Include="..\..\include\aeon\lexing\lex.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lexeme.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\lexemes.hpp" />
+    <ClInclude Include="..\..\include\aeon\lexing\lexical_analysis.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\position.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\state.hpp" />
     <ClInclude Include="..\..\include\aeon\lexing\stream.hpp" />
@@ -113,6 +114,7 @@
     <ClCompile Include="..\..\src\generation\genesis.cpp" />
     <ClCompile Include="..\..\src\lexing\lex.cpp" />
     <ClCompile Include="..\..\src\lexing\lexeme.cpp" />
+    <ClCompile Include="..\..\src\lexing\lexical_analysis.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\optimization\inlining.cpp" />
     <ClCompile Include="..\..\src\parsing\context.cpp" />

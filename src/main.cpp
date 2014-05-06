@@ -62,12 +62,13 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 
 	// lexical analysis
-	lexing::lexemes_t lexemes;
+	//auto lexemes = lexing::lexemes_t lexemes;
+	auto lexical_analysis = aeon::lexing::lexical_analysis_t(file.begin(), file.end());
 	{
-		using namespace aeon::lexing;
+		//using namespace aeon::lexing;
 
-		state_t state(lexemes);
-		lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
+		//state_t state(lexemes);
+		//lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
 	}
 	
 	// syntactic analysis

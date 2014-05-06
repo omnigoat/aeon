@@ -21,7 +21,7 @@ auto aeon::parsing::errors_t::unexpected(lexing::lexeme_t const* L) -> void
 {
 	auto id = L->id();
 	if (lexing::ID::keyword_lower_bound < id && id < lexing::ID::keyword_upper_bound) {
-		errs_.push_back({filename_, L->position(), atma::string("unexpected keyword ") + lexing::to_string(id)});
+		errs_.push_back({filename_, L->position(), atma::string("unexpected keyword ") + L->text()});
 		errs_.push_back({filename_, L->position(), text_ + L->position().total, text_ + L->pos})
 	}
 	else
