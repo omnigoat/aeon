@@ -20,6 +20,50 @@ auto lexical_analysis_t::stream_valid() const -> bool
 	return current_ != end_;
 }
 
+auto lexical_analysis_t::stream_increment() const -> bool
+{
+	ATMA_ASSERT(current_ != end_);
+
+	++position_.column;
+	++position_.total;
+	++current_;
+
+	bool is_newline = *current_ == '\n' || *current_ == '\r';
+
+	// skip past nestled newline characters so we don't erroneously continue
+	// changing our logical file position
+	if (!consumed_newline_ && is_newline) {
+		consumed_newline_ = true;
+		++position_.row;
+		position_.column = 1;
+	}
+	else {
+		consumed_newline_ = false;
+	}
+}
+
+auto lexical_analysis_t::state_reset_whitespace() -> void
+{
+	empty_line_ = true;
+	previous_tabs_ = tabs_;
+	tabs_ = 0;
+}
+
+auto lexical_analysis_t::state_nonwhitespace_token() -> void
+{
+	if (empty_line_)
+	{
+		if (tabs_ > previous_tabs_)
+		while (previous_tabs_++ != tabs_)
+			lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
+		else if (tabs_ < previous_tabs_)
+		while (previous_tabs_-- != tabs_)
+			lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
+	}
+
+	empty_line_ = false;
+}
+
 #if 0
 namespace
 {
@@ -83,26 +127,25 @@ auto lexical_analysis_t::run() -> void
 		switch (cv())
 		{
 			case '\n': case '\r':
-				empty_line_ = true;
-				tabs_ = 0;
+				state_reset_whitespace();
 				break;
 
 			default:
-				non_whitespace_token();
+				state_nonwhitespace_token();
 		}
 
 		switch (cv())
 		{
 			case '\n': case '\r': case '\t':
-				block(state, stream);
+				block();
 				break;
 
 			CASE_IDENTIFIER_CHAR:
-				identifier(state, stream);
+				identifier();
 				break;
 
 			CASE_NUMBER_CHAR:
-				number_literal(state, stream);
+				number_literal();
 				break;
 
 			CASE_PUNCTUATION_CHAR:
@@ -110,15 +153,15 @@ auto lexical_analysis_t::run() -> void
 				break;
 
 			case '"':
-				string_literal(state, stream);
+				string_literal();
 				break;
 
 			case '\'':
-				character_literal(state, stream);
+				character_literal();
 				break;
 
 			case ' ':
-				whitespace_tokeniser(state, stream);
+				whitespace_tokeniser();
 				break;
 
 			default:
@@ -127,4 +170,35 @@ auto lexical_analysis_t::run() -> void
 	}
 }
 
+auto lexical_analysis_t::identifier() -> void
+{
+	char const* m = current_;
 
+	ID id = ID::identifier;
+	int types = 0;
+
+	while (stream.cv() == '@') {
+		stream.increment();
+		++types;
+	}
+
+	char c;
+	while (stream_valid() && (c = stream_cv()) && ('a' <= c && c <='z' || '0' <= c && c <= '9' || c == '-'))
+		stream_increment();
+
+	if (types == 1)
+		id = ID::type;
+
+	for (auto x = keywords_begin; x != keywords_end; ++x)
+	{
+		if (keyword_lengths[x] == (current_ - m) && !strncmp(m, keywords[x], keyword_lengths[x])) {
+			state.push_back(static_cast<aeon::lexing::ID>(x), m, current_, stream.marked_position(), channels[x]);
+			return;
+		}
+		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
+			break;
+		}
+	}
+
+	state.push_back(id, b, stream.current(), stream.marked_position(), channels[static_cast<int>(id)]);
+}
