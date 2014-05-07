@@ -1,10 +1,49 @@
 #include <aeon/lexing/lexical_analysis.hpp>
 
+#include <aeon/lexing/id.hpp>
+
+
 using namespace aeon::lexing;
 using aeon::lexing::lexical_analysis_t;
 
+
+//
+// these things aren't used outside of the lexical analysis
+//
+#if 1
+namespace
+{
+	namespace
+	{
+		using namespace aeon::lexing;
+#define X(n,s,l,c) c,
+		aeon::lexing::channel_t const channels[] ={
+			AEON_LEXING_IDS()
+		};
+#undef X
+	}
+
+#define X(n,s,l,c) s,
+	char const* keywords[] ={
+		AEON_LEXING_IDS()
+	};
+#undef X
+
+#define X(n,s,l,c) l,
+	uint keyword_lengths[] ={
+		AEON_LEXING_IDS()
+	};
+#undef X
+
+	uint const keywords_begin = static_cast<uint>(aeon::lexing::ID::keyword_lower_bound) + 1;
+	uint const keywords_end = static_cast<uint>(aeon::lexing::ID::keyword_upper_bound);
+}
+#endif
+
+
+
 lexical_analysis_t::lexical_analysis_t(char const* begin, char const* end)
-	: begin_(begin), end_(end), current_(begin),
+	: begin_(begin), end_(end), current_(begin), consumed_newline_(),
 	  tabs_(), previous_tabs_(), empty_line_(true)
 {
 	run();
@@ -20,7 +59,7 @@ auto lexical_analysis_t::stream_valid() const -> bool
 	return current_ != end_;
 }
 
-auto lexical_analysis_t::stream_increment() const -> bool
+auto lexical_analysis_t::stream_increment() -> void
 {
 	ATMA_ASSERT(current_ != end_);
 
@@ -64,35 +103,6 @@ auto lexical_analysis_t::state_nonwhitespace_token() -> void
 	empty_line_ = false;
 }
 
-#if 0
-namespace
-{
-	namespace
-	{
-		using namespace aeon::lexing;
-#define X(n,s,l,c) c,
-		aeon::lexing::channel_t const channels[] ={
-			AEON_LEXING_IDS()
-		};
-#undef X
-	}
-
-#define X(n,s,l,c) s,
-	char const* keywords[] ={
-		AEON_LEXING_IDS()
-	};
-#undef X
-
-#define X(n,s,l,c) l,
-	uint32_t keyword_lengths[] ={
-		AEON_LEXING_IDS()
-	};
-#undef X
-
-	uint32_t const keywords_begin = static_cast<uint32_t>(aeon::lexing::ID::keyword_lower_bound) + 1;
-	uint32_t const keywords_end = static_cast<uint32_t>(aeon::lexing::ID::keyword_upper_bound);
-}
-#endif
 
 
 
@@ -124,7 +134,7 @@ auto lexical_analysis_t::run() -> void
 {
 	while (stream_valid())
 	{
-		switch (cv())
+		switch (stream_cv())
 		{
 			case '\n': case '\r':
 				state_reset_whitespace();
@@ -134,7 +144,7 @@ auto lexical_analysis_t::run() -> void
 				state_nonwhitespace_token();
 		}
 
-		switch (cv())
+		switch (stream_cv())
 		{
 			case '\n': case '\r': case '\t':
 				block();
@@ -165,20 +175,21 @@ auto lexical_analysis_t::run() -> void
 				break;
 
 			default:
-				stream.increment();
+				stream_increment();
 		}
 	}
 }
 
 auto lexical_analysis_t::identifier() -> void
 {
-	char const* m = current_;
+	auto m = current_;
+	auto mpos = position_;
 
 	ID id = ID::identifier;
 	int types = 0;
 
-	while (stream.cv() == '@') {
-		stream.increment();
+	while (stream_cv() == '@') {
+		stream_increment();
 		++types;
 	}
 
@@ -192,13 +203,50 @@ auto lexical_analysis_t::identifier() -> void
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (current_ - m) && !strncmp(m, keywords[x], keyword_lengths[x])) {
-			state.push_back(static_cast<aeon::lexing::ID>(x), m, current_, stream.marked_position(), channels[x]);
+			lexemes_.push_back(lexeme_t((ID)x, m, current_, mpos, channels[x]));
 			return;
 		}
-		else if (keyword_lengths[x] > uint32_t(stream.current() - b)) {
+		else if (keyword_lengths[x] > uint(current_ - m)) {
 			break;
 		}
 	}
 
-	state.push_back(id, b, stream.current(), stream.marked_position(), channels[static_cast<int>(id)]);
+	lexemes_.push_back(lexeme_t(id, m, current_, mpos, channels[(int)id]));
+}
+
+auto lexical_analysis_t::number_literal() -> void
+{
+	auto m = current_;
+	auto mpos = position_;
+
+	// do the integer literal
+	while (stream_valid() && ('0' <= stream_cv() && stream_cv() <='9'))
+		stream_increment();
+
+	// maybe turn it into a real literal?
+	if (stream_cv() == '.')
+	{
+		// do more numbers for decimal places
+		auto period = current_;
+		stream_increment();
+		uint i = 0;
+		while (stream_valid() && ('0' <= stream_cv() && stream_cv() <= '9')) {
+			stream_increment();
+			++i;
+		}
+
+		// integer or real
+		if (i > 0) {
+			lexemes_.push_back(lexeme_t(ID::real_literal, m, current_, mpos, channels[(int)ID::real_literal]));
+		}
+		else {
+			lexemes_.push_back(lexeme_t(ID::integer_literal, m, period, mpos, channels[(int)ID::integer_literal]));
+
+			// probably want to throw an syntax error here
+			current_ = period;
+		}
+	}
+	else {
+		lexemes_.push_back(lexeme_t(ID::integer_literal, m, current_, mpos, channels[(int)ID::integer_literal]));
+	}
 }

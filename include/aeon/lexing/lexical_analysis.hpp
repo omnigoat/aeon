@@ -23,9 +23,9 @@ namespace aeon { namespace lexing {
 		auto identifier() -> void;
 		auto block() -> void;
 
-		auto stream_valid() -> bool;
-		auto stream_increment() -> void;
+		auto stream_valid() const -> bool;
 		auto stream_cv() const -> char;
+		auto stream_increment() -> void;
 
 		auto state_reset_whitespace() -> void;
 		auto state_nonwhitespace_token() -> void;
@@ -36,6 +36,7 @@ namespace aeon { namespace lexing {
 		char const* end_;
 		char const* current_;
 		position_t position_;
+		bool consumed_newline_;
 
 		// state
 		lexemes_t lexemes_;
