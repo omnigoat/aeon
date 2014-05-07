@@ -76,6 +76,8 @@ auto main(uint32_t arg_count, char const** args) -> int
 	//	//ATMA_ASSERT(lexemes.begin() == LA.lexemes());
 	//	std::cout << LA.lexemes() << std::endl << lexemes << std::endl;
 	//}
+	std::cout << lexical_analysis.lexemes() << std::endl;
+
 	
 	// syntactic analysis
 	parsing::children_t parsemes;

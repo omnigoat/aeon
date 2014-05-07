@@ -10,7 +10,6 @@ using aeon::lexing::lexical_analysis_t;
 //
 // these things aren't used outside of the lexical analysis
 //
-#if 1
 namespace
 {
 	namespace
@@ -38,12 +37,12 @@ namespace
 	uint const keywords_begin = static_cast<uint>(aeon::lexing::ID::keyword_lower_bound) + 1;
 	uint const keywords_end = static_cast<uint>(aeon::lexing::ID::keyword_upper_bound);
 }
-#endif
+
 
 
 
 lexical_analysis_t::lexical_analysis_t(char const* begin, char const* end)
-	: begin_(begin), end_(end), current_(begin), consumed_newline_(),
+	: begin_(begin), end_(end), current_(begin), consumed_newline_(), position_(1, 1, 0),
 	  tabs_(), previous_tabs_(), empty_line_(true)
 {
 	run();
@@ -73,10 +72,10 @@ auto lexical_analysis_t::stream_increment() -> void
 	++current_;
 
 	bool is_newline = *current_ == '\n' || *current_ == '\r';
-
+	
 	// skip past nestled newline characters so we don't erroneously continue
 	// changing our logical file position
-	if (!consumed_newline_ && is_newline) {
+	if (is_newline) {
 		consumed_newline_ = true;
 		++position_.row;
 		position_.column = 1;
@@ -88,6 +87,12 @@ auto lexical_analysis_t::stream_increment() -> void
 
 auto lexical_analysis_t::state_reset_whitespace() -> void
 {
+	if (lines_.empty())
+		lines_.push_back({begin_, current_});
+	else
+		lines_.push_back({lines_.back().second + 1, current_});
+
+
 	empty_line_ = true;
 	tabs_ = 0;
 }
@@ -136,13 +141,17 @@ auto lexical_analysis_t::state_nonwhitespace_token() -> void
 	case '0': case '1': case '2': case '3': case '4': \
 	case '5': case '6': case '7': case '8': case '9'
 
+
 auto lexical_analysis_t::run() -> void
 {
 	while (stream_valid())
 	{
+		if (stream_cv() == '\r')
+			++current_;
+
 		switch (stream_cv())
 		{
-			case '\n': case '\r':
+			case '\n':
 				state_reset_whitespace();
 				break;
 
@@ -152,7 +161,7 @@ auto lexical_analysis_t::run() -> void
 
 		switch (stream_cv())
 		{
-			case '\n': case '\r': case '\t':
+			case '\n': case '\t':
 				block();
 				break;
 
@@ -184,6 +193,11 @@ auto lexical_analysis_t::run() -> void
 				stream_increment();
 		}
 	}
+
+#if 0
+	for (auto const& x : lines_)
+		printf("%.*s\n", x.second - x.first, x.first);
+#endif
 }
 
 auto lexical_analysis_t::identifier() -> void
@@ -338,7 +352,6 @@ auto lexical_analysis_t::block() -> void
 		switch (stream_cv())
 		{
 			case '\n': case '\r':
-				state_reset_whitespace();
 				stream_increment();
 				break;
 

@@ -1,6 +1,8 @@
 #pragma once
 //=====================================================================
 #include <aeon/lexing/lexemes.hpp>
+
+#include <atma/string.hpp>
 //=====================================================================
 namespace aeon { namespace lexing {
 
@@ -11,7 +13,8 @@ namespace aeon { namespace lexing {
 		auto lexemes() const -> lexemes_t const&;
 		//auto errors() const 
 
-		//auto make_synthetic_lexeme()
+		auto make_synthetic_lexeme(ID, position_t const&, char const* text, char const* text_end) -> lexeme_t const*;
+		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, char const* text, char const* text_end) -> lexeme_t const*;
 
 	private:
 		auto run() -> void;
@@ -42,6 +45,13 @@ namespace aeon { namespace lexing {
 		lexemes_t lexemes_;
 		uint tabs_, previous_tabs_;
 		bool empty_line_;
+
+		// book-keeping
+		std::vector<std::pair<char const*, char const*>> lines_;
+
+		// auxiliary data
+		atma::string aux_text_;
+		lexemes_t aux_lexemes_;
 	};
 
 } }
