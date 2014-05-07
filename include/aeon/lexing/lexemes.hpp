@@ -176,7 +176,7 @@ namespace lexing {
 	
 	inline std::ostream& operator << (std::ostream& stream, lexemes_t const& rhs) 
 	{
-		stream << "lexemes\n---------" << std::endl;
+		stream << "lexemes (" << std::distance(rhs.begin(), rhs.end()) << ")\n-------------" << std::endl;
 		if (rhs.empty())
 			stream << "  empty!" << std::endl;
 		

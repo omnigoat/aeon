@@ -3,6 +3,7 @@
 
 #include <aeon/lexing/lex.hpp>
 #include <aeon/lexing/id.hpp>
+#include <aeon/lexing/lexical_analysis.hpp>
 #include <aeon/parsing/parse.hpp>
 #include <aeon/semantics/analyse.hpp>
 #include <aeon/optimization/inlining.hpp>
@@ -62,14 +63,19 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 
 	// lexical analysis
-	//auto lexemes = lexing::lexemes_t lexemes;
+	//auto lexemes = lexing::lexemes_t();
 	auto lexical_analysis = aeon::lexing::lexical_analysis_t(file.begin(), file.end());
-	{
-		//using namespace aeon::lexing;
+	//{
+	//	using namespace aeon::lexing;
 
-		//state_t state(lexemes);
-		//lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
-	}
+	//	auto LA = aeon::lexing::lexical_analysis_t(file.begin(), file.end());
+
+	//	state_t state(lexemes);
+	//	lex(state, aeon::lexing::stream_t(file.begin(), file.end()));
+
+	//	//ATMA_ASSERT(lexemes.begin() == LA.lexemes());
+	//	std::cout << LA.lexemes() << std::endl << lexemes << std::endl;
+	//}
 	
 	// syntactic analysis
 	parsing::children_t parsemes;
@@ -77,7 +83,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 		using namespace aeon::parsing;
 
 		auto errors = parsing::errors_t(args[1], file.begin());
-		parse(errors, parsemes, lexemes);
+		parse(errors, parsemes, lexical_analysis.lexemes());
 
 		if (errors.size() > 0) {
 			std::cout << errors << std::endl;
@@ -138,4 +144,6 @@ auto main(uint32_t arg_count, char const** args) -> int
 	printf("\n");
 	system("pause");
 }
+
+
 

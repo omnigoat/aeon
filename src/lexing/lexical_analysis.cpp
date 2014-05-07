@@ -59,6 +59,11 @@ auto lexical_analysis_t::stream_valid() const -> bool
 	return current_ != end_;
 }
 
+auto lexical_analysis_t::stream_cv() const -> char
+{
+	return *current_;
+}
+
 auto lexical_analysis_t::stream_increment() -> void
 {
 	ATMA_ASSERT(current_ != end_);
@@ -84,7 +89,6 @@ auto lexical_analysis_t::stream_increment() -> void
 auto lexical_analysis_t::state_reset_whitespace() -> void
 {
 	empty_line_ = true;
-	previous_tabs_ = tabs_;
 	tabs_ = 0;
 }
 
@@ -98,6 +102,8 @@ auto lexical_analysis_t::state_nonwhitespace_token() -> void
 		else if (tabs_ < previous_tabs_)
 		while (previous_tabs_-- != tabs_)
 			lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
+
+		previous_tabs_ = tabs_;
 	}
 
 	empty_line_ = false;
@@ -171,7 +177,7 @@ auto lexical_analysis_t::run() -> void
 				break;
 
 			case ' ':
-				whitespace_tokeniser();
+				whitespace();
 				break;
 
 			default:
@@ -226,7 +232,6 @@ auto lexical_analysis_t::number_literal() -> void
 	// maybe turn it into a real literal?
 	if (stream_cv() == '.')
 	{
-		// do more numbers for decimal places
 		auto period = current_;
 		stream_increment();
 		uint i = 0;
@@ -235,7 +240,6 @@ auto lexical_analysis_t::number_literal() -> void
 			++i;
 		}
 
-		// integer or real
 		if (i > 0) {
 			lexemes_.push_back(lexeme_t(ID::real_literal, m, current_, mpos, channels[(int)ID::real_literal]));
 		}
@@ -248,5 +252,103 @@ auto lexical_analysis_t::number_literal() -> void
 	}
 	else {
 		lexemes_.push_back(lexeme_t(ID::integer_literal, m, current_, mpos, channels[(int)ID::integer_literal]));
+	}
+}
+
+
+auto lexical_analysis_t::punctuation() -> void
+{
+	auto m = current_;
+	auto mpos = position_;
+
+	while (stream_valid())
+	{
+		switch (stream_cv())
+		{
+			CASE_PUNCTUATION_CHAR:
+				stream_increment();
+				break;
+
+			default:
+				ATMA_ASSERT(current_ != m);
+				lexemes_.push_back(lexeme_t(ID::punctuation, m, current_, mpos, channels[(int)ID::punctuation]));
+				return;
+		}
+	}
+}
+
+
+auto lexical_analysis_t::string_literal() -> void
+{
+	auto m = current_;
+	auto mpos = position_;
+
+	if (stream_cv() == '"')
+	{
+		stream_increment();
+		while (stream_valid() && stream_cv() != '"')
+			stream_increment();
+		stream_increment();
+	}
+
+	lexemes_.push_back(lexeme_t(ID::string_literal, m, current_, mpos, channels[(int)ID::string_literal]));
+}
+
+
+auto lexical_analysis_t::character_literal() -> void
+{
+	auto m = current_;
+	auto mpos = position_;
+
+	if (stream_cv() == '\'')
+	{
+		stream_increment();
+		while (stream_valid() && stream_cv() != '\'')
+			stream_increment();
+		stream_increment();
+	}
+
+	lexemes_.push_back(lexeme_t(ID::character_literal, m, current_, mpos, channels[(int)ID::character_literal]));
+}
+
+auto lexical_analysis_t::whitespace() -> void
+{
+	auto m = current_;
+	auto mpos = position_;
+
+	while (stream_valid())
+	{
+		switch (stream_cv())
+		{
+			case ' ':
+				stream_increment();
+				break;
+
+			default:
+				lexemes_.push_back(lexeme_t(ID::whitespace, m, current_, mpos, channels[(int)ID::whitespace]));
+				return;
+		}
+	}
+}
+
+auto lexical_analysis_t::block() -> void
+{
+	while (stream_valid())
+	{
+		switch (stream_cv())
+		{
+			case '\n': case '\r':
+				state_reset_whitespace();
+				stream_increment();
+				break;
+
+			case '\t':
+				++tabs_;
+				stream_increment();
+				break;
+
+			default:
+				return;
+		}
 	}
 }

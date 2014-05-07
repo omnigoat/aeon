@@ -19,7 +19,7 @@ namespace aeon { namespace lexing {
 		auto string_literal() -> void;
 		auto number_literal() -> void;
 		auto punctuation() -> void;
-		auto whitespace_tokeniser() -> void;
+		auto whitespace() -> void;
 		auto identifier() -> void;
 		auto block() -> void;
 

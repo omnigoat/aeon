@@ -57,7 +57,7 @@ std::ostream& aeon::lexing::operator << (std::ostream& stream, lexeme_t const& L
 	return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text();
 }
 
-auto aeon::lexing::make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel = multichannel_t()) -> lexeme_t const*
+auto aeon::lexing::make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel) -> lexeme_t const*
 {
 	auto L = new lexeme_t(id, begin, end, position, channel);
 	return (lexeme_t const*)(((intptr_t)L) | 1);
