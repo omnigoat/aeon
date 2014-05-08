@@ -20,7 +20,8 @@ namespace aeon { namespace parsing {
 
 		//auto module()
 	private:
-		lexing::lexical_analysis_t& lexical_analysis_;
+		lexing::lexical_analysis_t& lxa_;
+		lexing::lexemes_t::const_iterator lxa_iter_;
 
 		children_t parsemes_;
 	};
