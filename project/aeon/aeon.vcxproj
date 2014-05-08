@@ -100,6 +100,7 @@
     <ClInclude Include="..\..\include\aeon\marshall.hpp" />
     <ClInclude Include="..\..\include\aeon\optimization\inlining.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\syntactic_analysis.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\xpi.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\parse.hpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="..\..\src\parsing\parse.cpp" />
     <ClCompile Include="..\..\src\parsing\parseme.cpp" />
     <ClCompile Include="..\..\src\parsing\children.cpp" />
+    <ClCompile Include="..\..\src\parsing\syntactic_analysis.cpp" />
     <ClCompile Include="..\..\src\resolve\identifier.cpp" />
     <ClCompile Include="..\..\src\resolve\type.cpp" />
     <ClCompile Include="..\..\src\semantics\analyse.cpp" />

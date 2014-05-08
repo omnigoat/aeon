@@ -4,6 +4,7 @@
 #include <aeon/lexing/lex.hpp>
 #include <aeon/lexing/id.hpp>
 #include <aeon/lexing/lexical_analysis.hpp>
+#include <aeon/parsing/syntactic_analysis.hpp>
 #include <aeon/parsing/parse.hpp>
 #include <aeon/semantics/analyse.hpp>
 #include <aeon/optimization/inlining.hpp>
@@ -80,6 +81,7 @@ auto main(uint32_t arg_count, char const** args) -> int
 
 	
 	// syntactic analysis
+	auto syntactic_analysis = aeon::parsing::syntactic_analysis_t(lexical_analysis);
 	parsing::children_t parsemes;
 	{
 		using namespace aeon::parsing;

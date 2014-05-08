@@ -116,6 +116,9 @@
     <ClInclude Include="..\..\include\aeon\lexing\lexical_analysis.hpp">
       <Filter>include\lexing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\syntactic_analysis.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\lexing\lexical_analysis.cpp">
       <Filter>source\lexing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parsing\syntactic_analysis.cpp">
+      <Filter>source\parsing</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
