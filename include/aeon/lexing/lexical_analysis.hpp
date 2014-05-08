@@ -13,8 +13,10 @@ namespace aeon { namespace lexing {
 		auto lexemes() const -> lexemes_t const&;
 		//auto errors() const 
 
-		auto make_synthetic_lexeme(ID, position_t const&, char const* text, char const* text_end) -> lexeme_t const*;
-		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, char const* text, char const* text_end) -> lexeme_t const*;
+		auto make_synthetic_lexeme(ID, position_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
+		auto make_synthetic_lexeme(ID, position_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
+		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
+		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
 
 	private:
 		auto run() -> void;
@@ -51,7 +53,7 @@ namespace aeon { namespace lexing {
 
 		// auxiliary data
 		atma::string aux_text_;
-		lexemes_t aux_lexemes_;
+		std::vector<lexeme_t> aux_lexemes_;
 	};
 
 } }

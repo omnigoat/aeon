@@ -53,6 +53,26 @@ auto lexical_analysis_t::lexemes() const -> lexemes_t const&
 	return lexemes_;
 }
 
+auto lexical_analysis_t::make_synthetic_lexeme(ID id, position_t const& position, atma::utf8_string_range_t const& text) -> lexeme_t const*
+{
+	aux_lexemes_.push_back(lexeme_t(id, text.begin(), text.end(), position));
+	return &aux_lexemes_.back();
+}
+
+auto lexical_analysis_t::make_synthetic_lexeme(ID id, position_t const& position, atma::utf8_string_t const& text) -> lexeme_t const*
+{
+	aux_text_ += text;
+	aux_lexemes_.push_back(lexeme_t(id, aux_text_.bytes_end() - text.bytes(), aux_text_.bytes_end(), position));
+	return &aux_lexemes_.back();
+}
+
+#if 0
+auto lexical_analysis_t::make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
+auto lexical_analysis_t::make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
+#endif
+
+
+
 auto lexical_analysis_t::stream_valid() const -> bool
 {
 	return current_ != end_;
