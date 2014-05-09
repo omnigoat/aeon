@@ -8,6 +8,9 @@ using namespace aeon::parsing;
 using aeon::lexing::lexical_analysis_t;
 using aeon::parsing::syntactic_analysis_t;
 
+typedef parsing::ID psid;
+typedef lexing::ID lxid;
+
 
 syntactic_analysis_t::syntactic_analysis_t(lexical_analysis_t& lexical_analysis)
 	: lxa_(lexical_analysis), lxa_iter_(lexical_analysis.lexemes().begin(lexing::basic))
@@ -25,31 +28,31 @@ auto syntactic_analysis_t::lxa_peek() -> lexing::lexeme_t const*
 	return &*lxa_iter_;
 }
 
-auto syntactic_analysis_t::lxa_mk_if(parsing::ID psid, lexing::ID lxid) -> parseme_ptr
+auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid) -> parseme_ptr
 {
 	auto L = lxa_peek();
-	if (L->id() == lxid) {
+	if (L->id() == Lid) {
 		++lxa_iter_;
-		return parsing::parseme_t::make(psid, L);
+		return parsing::parseme_t::make(Pid, L);
 	}
 
 	return parsing::null_parseme_ptr;
 }
 
-auto syntactic_analysis_t::lxa_mk_if(parsing::ID psid, lexing::ID lxid, char const* text, uint textlen) -> parseme_ptr
+auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid, char const* text, uint textlen) -> parseme_ptr
 {
 	auto L = lxa_peek();
-	if (L->id() == lxid && lxa_peek()->streq(text, text + textlen)) {
+	if (L->id() == Lid && lxa_peek()->streq(text, text + textlen)) {
 		++lxa_iter_;
-		return parsing::parseme_t::make(psid, L);
+		return parsing::parseme_t::make(Pid, L);
 	}
 
 	return parsing::null_parseme_ptr;
 }
 
-auto syntactic_analysis_t::lxa_skip(lexing::ID lxid) -> bool
+auto syntactic_analysis_t::lxa_skip(lxid Lid) -> bool
 {
-	if (lxa_peek()->id() == lxid) {
+	if (lxa_peek()->id() == Lid) {
 		++lxa_iter_;
 		return true;
 	}
@@ -57,9 +60,9 @@ auto syntactic_analysis_t::lxa_skip(lexing::ID lxid) -> bool
 	return false;
 }
 
-auto syntactic_analysis_t::lxa_skip(lexing::ID lxid, char const* text, uint textlen) -> bool
+auto syntactic_analysis_t::lxa_skip(lxid Lid, char const* text, uint textlen) -> bool
 {
-	if (lxa_peek()->id() == lxid && lxa_peek()->streq(text, text + textlen)) {
+	if (lxa_peek()->id() == Lid && lxa_peek()->streq(text, text + textlen)) {
 		++lxa_iter_;
 		return true;
 	}
@@ -77,8 +80,7 @@ auto syntactic_analysis_t::parse_function(children_t& dest) -> bool
 {
 	parseme_ptr id_node, parameter_list_node, function_body_node;
 
-	typedef parsing::ID psid;
-	typedef lexing::ID lxid;
+	
 
 	// function keyword
 	auto fn_node = lxa_mk_if(psid::function, lxid::function_keyword);
@@ -147,14 +149,66 @@ auto syntactic_analysis_t::parse_function(children_t& dest) -> bool
 	return true;
 }
 
-auto syntactic_analysis_t::parse_parameters(children_t&) -> bool
+auto syntactic_analysis_t::parse_parameters(children_t& dest) -> bool
 {
+	for (;;)
+	{
+		auto parameter_node = parseme_t::make(psid::parameter);
+		auto L = lxa_iter_;
+
+		// (<identifier> as)? <typename>
+		{
+			if (auto id_node = lxa_mk_if(psid::identifier, lxid::identifier))
+			{
+				if (!lxa_skip(lxid::as_keyword))
+					goto fail;
+
+				parameter_node->children().push_back(id_node);
+			}
+
+			if (!parse_typename(parameter_node->children())) {
+				goto fail;
+			}
+		}
+
+		// if we don't have another arrow, then we just consumed the return-type,
+		// so let's backtrack a little and finish up
+		if (!lxa_skip(lxid::punctuation, "->", 2)) {
+			lxa_iter_ = L;
+			break;
+		}
+
+		dest.push_back(parameter_node);
+	}
+
 	return true;
+
+
+fail:
+#if 0
+	// we may have failed because there were no parameters. try
+	// skipping the '->' and doing one more
+	if (lxa_skip(lxid::punctuation, "->"))
+	{
+		auto p = parseme_t::make(parsid::parameter);
+		if (type_name(errors, p->children(), lexemes, context)) {
+			parsemes.push_back(p);
+			return true;
+		}
+	}
+#endif
+
+	return false;
 }
 
-auto syntactic_analysis_t::parse_typename(children_t&) -> bool
+auto syntactic_analysis_t::parse_typename(children_t& dest) -> bool
 {
-	return true;
+	if (auto type_name = lxa_mk_if(psid::type_name, lxid::type)) {
+		dest.push_back(type_name);
+		return true;
+	}
+
+	return false;
 }
 
 auto syntactic_analysis_t::parse_function_body(children_t&) -> bool
