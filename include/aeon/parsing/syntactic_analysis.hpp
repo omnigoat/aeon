@@ -14,11 +14,18 @@ namespace aeon { namespace parsing {
 	private:
 		// incoming lexical analysis
 		auto lxa_peek() -> lexing::lexeme_t const*;
-		auto lxa_match_mk(parsing::ID, lexing::ID) -> parseme_ptr;
+		auto lxa_mk_if(parsing::ID, lexing::ID) -> parseme_ptr;
+		auto lxa_mk_if(parsing::ID, lexing::ID, char const*, uint) -> parseme_ptr;
 		auto lxa_skip(lexing::ID) -> bool;
 		auto lxa_skip(lexing::ID, char const*, uint) -> bool;
 
-		//auto module()
+		// parsing
+		auto parse_module(children_t&) -> bool;
+		auto parse_function(children_t&) -> bool;
+		auto parse_parameters(children_t&) -> bool;
+		auto parse_typename(children_t&) -> bool;
+		auto parse_function_body(children_t&) -> bool;
+
 	private:
 		lexing::lexical_analysis_t& lxa_;
 		lexing::lexemes_t::const_iterator lxa_iter_;
