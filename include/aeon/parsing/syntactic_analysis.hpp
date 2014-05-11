@@ -25,6 +25,12 @@ namespace aeon { namespace parsing {
 		auto parse_parameters(children_t&) -> bool;
 		auto parse_typename(children_t&) -> bool;
 		auto parse_function_body(children_t&) -> bool;
+		auto parse_statement(children_t&) -> bool;
+		auto parse_expr(children_t&) -> bool;
+		auto parse_expr_logical(children_t&) -> bool;
+		auto parse_expr_additive(children_t&) -> bool;
+		auto parse_expr_multiplicative(children_t&) -> bool;
+		
 
 	private:
 		lexing::lexical_analysis_t& lxa_;

@@ -1,12 +1,13 @@
 #include <aeon/parsing/syntactic_analysis.hpp>
 
 #include <aeon/lexing/id.hpp>
-
+#include <aeon/parsing/xpi.hpp>
 
 using namespace aeon;
 using namespace aeon::parsing;
 using aeon::lexing::lexical_analysis_t;
 using aeon::parsing::syntactic_analysis_t;
+namespace xpi = aeon::parsing::xpi;
 
 typedef parsing::ID psid;
 typedef lexing::ID lxid;
@@ -70,13 +71,13 @@ auto syntactic_analysis_t::lxa_skip(lxid Lid, char const* text, uint textlen) ->
 	return false;
 }
 
-auto syntactic_analysis_t::parse_module(children_t& dest) -> bool
+auto syntactic_analysis_t::parse_module(children_t& xs) -> bool
 {
-	parse_function(dest);
+	parse_function(xs);
 	return true;
 }
 
-auto syntactic_analysis_t::parse_function(children_t& dest) -> bool
+auto syntactic_analysis_t::parse_function(children_t& xs) -> bool
 {
 	parseme_ptr id_node, parameter_list_node, function_body_node;
 
@@ -145,11 +146,11 @@ auto syntactic_analysis_t::parse_function(children_t& dest) -> bool
 
 	// end keyword
 	lxa_skip(lxid::end_keyword);
-	dest.push_back(fn_node);
+	xs.push_back(fn_node);
 	return true;
 }
 
-auto syntactic_analysis_t::parse_parameters(children_t& dest) -> bool
+auto syntactic_analysis_t::parse_parameters(children_t& xs) -> bool
 {
 	for (;;)
 	{
@@ -178,7 +179,7 @@ auto syntactic_analysis_t::parse_parameters(children_t& dest) -> bool
 			break;
 		}
 
-		dest.push_back(parameter_node);
+		xs.push_back(parameter_node);
 	}
 
 	return true;
@@ -190,9 +191,9 @@ fail:
 	// skipping the '->' and doing one more
 	if (lxa_skip(lxid::punctuation, "->"))
 	{
-		auto p = parseme_t::make(parsid::parameter);
+		auto p = parseme_t::make(psid::parameter);
 		if (type_name(errors, p->children(), lexemes, context)) {
-			parsemes.push_back(p);
+			xs.push_back(p);
 			return true;
 		}
 	}
@@ -201,18 +202,124 @@ fail:
 	return false;
 }
 
-auto syntactic_analysis_t::parse_typename(children_t& dest) -> bool
+auto syntactic_analysis_t::parse_typename(children_t& xs) -> bool
 {
 	if (auto type_name = lxa_mk_if(psid::type_name, lxid::type)) {
-		dest.push_back(type_name);
+		xs.push_back(type_name);
 		return true;
 	}
 
 	return false;
 }
 
-auto syntactic_analysis_t::parse_function_body(children_t&) -> bool
+auto syntactic_analysis_t::parse_function_body(children_t& xs) -> bool
 {
+	while (parse_statement(xs))
+		;
+
 	return true;
 }
 
+
+auto syntactic_analysis_t::parse_statement(children_t& xs) -> bool
+{
+	if (auto return_statement_node = lxa_mk_if(psid::return_statement, lxid::return_keyword)) {
+		parse_expr(return_statement_node->children());
+		xs.push_back(return_statement_node);
+		return true;
+	}
+
+	return false;
+}
+
+auto syntactic_analysis_t::parse_expr(children_t& xs) -> bool
+{
+	return parse_expr_logical(xs);
+}
+
+auto syntactic_analysis_t::parse_expr_logical(children_t& xs) -> bool
+{
+	if (!parse_expr_additive(xs))
+		return false;
+
+	for (;;)
+	{
+		auto op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "==", 2);
+		if (!op_fn)
+			op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "!=", 2);
+
+		if (!op_fn)
+			return true;
+
+		if (!parse_expr_additive(xs)) {
+			//errors.unexpected(ctx.current_lexeme());
+			xs.push_back(parseme_t::make(ID::error_term));
+		}
+
+		auto rhs = xs.back();
+		xs.pop_back();
+		auto lhs = xs.back();
+		xs.pop_back();
+
+		// just a function-call
+		xpi::insert_into(xs,
+			xpi::insert(op_fn)[
+				xpi::make(psid::function_pattern)[
+					xpi::make(psid::placeholder, lhs->lexeme()),
+					xpi::make(psid::identifier, op_fn->lexeme()),
+					xpi::make(psid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(psid::argument_list)[
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
+			]);
+	}
+
+	return true;
+}
+
+auto syntactic_analysis_t::parse_expr_additive(children_t& xs) -> bool
+{
+	if (!parse_expr_multiplicative(xs))
+		return false;
+
+	// this is fine
+	for (;;)
+	{
+		auto op = lxa_mk_if(psid::addition_expr, lxid::punctuation, "+", 1);
+		if (!op)
+			op = lxa_mk_if(psid::function_call, lxid::punctuation, "-", 1);
+
+		if (!op)
+			return true;
+
+		if (!parse_expr_multiplicative(xs)) {
+			//errors.unexpected(ctx.current_lexeme());
+			xs.push_back(parseme_t::make(ID::error_term));
+		}
+
+		auto rhs = xs.back();
+		xs.pop_back();
+		auto lhs = xs.back();
+		xs.pop_back();
+
+		// just a function-call
+		xpi::insert_into(xs,
+			xpi::make(psid::function_call, op->lexeme()) [
+				xpi::make(psid::function_pattern) [
+					xpi::make(psid::placeholder, lhs->lexeme()),
+					xpi::make(psid::identifier, op->lexeme()),
+					xpi::make(psid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(psid::argument_list) [
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
+			]);
+	}
+
+	return true;
+}
