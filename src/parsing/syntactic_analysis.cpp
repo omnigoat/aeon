@@ -16,6 +16,7 @@ typedef lexing::ID lxid;
 syntactic_analysis_t::syntactic_analysis_t(lexical_analysis_t& lexical_analysis)
 	: lxa_(lexical_analysis), lxa_iter_(lexical_analysis.lexemes().begin(lexing::basic))
 {
+	parse_module(parsemes_);
 }
 
 auto syntactic_analysis_t::parsemes() -> parsing::children_t&
@@ -25,14 +26,16 @@ auto syntactic_analysis_t::parsemes() -> parsing::children_t&
 
 auto syntactic_analysis_t::lxa_peek() -> lexing::lexeme_t const*
 {
-	ATMA_ASSERT(lxa_iter_ != lxa_.lexemes().end());
+	if (lxa_iter_ != lxa_.lexemes().end())
+		return nullptr;
+
 	return &*lxa_iter_;
 }
 
 auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid) -> parseme_ptr
 {
 	auto L = lxa_peek();
-	if (L->id() == Lid) {
+	if (L != nullptr && L->id() == Lid) {
 		++lxa_iter_;
 		return parsing::parseme_t::make(Pid, L);
 	}
@@ -73,7 +76,8 @@ auto syntactic_analysis_t::lxa_skip(lxid Lid, char const* text, uint textlen) ->
 
 auto syntactic_analysis_t::parse_module(children_t& xs) -> bool
 {
-	parse_function(xs);
+	while (parse_function(xs))
+		;
 	return true;
 }
 
@@ -118,8 +122,8 @@ auto syntactic_analysis_t::parse_function(children_t& xs) -> bool
 	// return type
 #if 1
 	{
-		if (!lxa_skip(lxid::punctuation, "->", 2))
-			return false;
+		//if (!lxa_skip(lxid::punctuation, "->", 2))
+			//return false;
 
 		if (!parse_typename(fn_node->children()))
 			return false;
@@ -186,16 +190,12 @@ auto syntactic_analysis_t::parse_parameters(children_t& xs) -> bool
 
 
 fail:
-#if 0
+#if 1
 	// we may have failed because there were no parameters. try
 	// skipping the '->' and doing one more
-	if (lxa_skip(lxid::punctuation, "->"))
+	if (lxa_skip(lxid::punctuation, "->", 2))
 	{
-		auto p = parseme_t::make(psid::parameter);
-		if (type_name(errors, p->children(), lexemes, context)) {
-			xs.push_back(p);
-			return true;
-		}
+		return true;
 	}
 #endif
 
@@ -319,6 +319,94 @@ auto syntactic_analysis_t::parse_expr_additive(children_t& xs) -> bool
 					xpi::insert(rhs)
 				]
 			]);
+	}
+
+	return true;
+}
+
+auto syntactic_analysis_t::parse_expr_multiplicative(children_t& xs) -> bool
+{
+	if (!parse_expr_function_call(xs))
+		return false;
+
+	for (;;)
+	{
+		auto op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "*", 1);
+		if (!op_fn)
+			op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "/", 1);
+
+		if (!op_fn)
+			return true;
+
+		if (!parse_expr_function_call(xs)) {
+			//errors.unexpected(ctx.current_lexeme());
+			xs.push_back(parseme_t::make(ID::error_term));
+		}
+
+		auto rhs = xs.back();
+		xs.pop_back();
+		auto lhs = xs.back();
+		xs.pop_back();
+
+		// just a function-call
+		xpi::insert_into(xs,
+			xpi::insert(op_fn) [
+				xpi::make(psid::function_pattern) [
+					xpi::make(psid::placeholder, lhs->lexeme()),
+					xpi::make(psid::identifier, op_fn->lexeme()),
+					xpi::make(psid::placeholder, rhs->lexeme())
+				],
+
+				xpi::make(psid::argument_list)[
+					xpi::insert(lhs),
+					xpi::insert(rhs)
+				]
+			]);
+	}
+
+	return true;
+}
+
+auto syntactic_analysis_t::parse_expr_function_call(children_t& xs) -> bool
+{
+	auto iden = lxa_mk_if(psid::identifier, lxid::identifier);
+	if (!iden) {
+		if (auto intlit = lxa_mk_if(psid::integer_literal, lxid::integer_literal)) {
+			xs.push_back(intlit);
+			return true;
+		}
+
+		return false;
+	}
+
+	// bam, function call
+	if (lxa_skip(lxid::punctuation, "(", 1))
+	{
+		parsing::children_t args;
+
+		for (;;)
+		{
+			if (!parse_expr(args))
+				break;
+			lxa_skip(lxid::punctuation, ",", 1);
+		}
+
+		lxa_skip(lxid::punctuation, ")", 1);
+
+		xpi::insert_into(xs,
+			xpi::make(psid::function_call, iden->lexeme()) [
+				xpi::make(psid::function_pattern) [
+					xpi::insert(iden)
+				],
+
+				xpi::make(psid::argument_list) [
+					xpi::insert(args.begin(), args.end())
+				]
+			]);
+	}
+	else
+	{
+		xs.push_back(iden);
 	}
 
 	return true;

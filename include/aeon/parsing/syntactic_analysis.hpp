@@ -30,7 +30,7 @@ namespace aeon { namespace parsing {
 		auto parse_expr_logical(children_t&) -> bool;
 		auto parse_expr_additive(children_t&) -> bool;
 		auto parse_expr_multiplicative(children_t&) -> bool;
-		
+		auto parse_expr_function_call(children_t&) -> bool;
 
 	private:
 		lexing::lexical_analysis_t& lxa_;
