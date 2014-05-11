@@ -100,6 +100,7 @@
     <ClInclude Include="..\..\include\aeon\marshall.hpp" />
     <ClInclude Include="..\..\include\aeon\optimization\inlining.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\algorithm.hpp" />
+    <ClInclude Include="..\..\include\aeon\parsing\id.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\syntactic_analysis.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\xpi.hpp" />
     <ClInclude Include="..\..\include\aeon\parsing\context.hpp" />

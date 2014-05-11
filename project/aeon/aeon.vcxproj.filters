@@ -119,6 +119,9 @@
     <ClInclude Include="..\..\include\aeon\parsing\syntactic_analysis.hpp">
       <Filter>include\parsing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\aeon\parsing\id.hpp">
+      <Filter>include\parsing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\lexing\lex.cpp">

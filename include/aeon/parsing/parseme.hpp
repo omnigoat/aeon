@@ -1,22 +1,15 @@
+#pragma once
 //=====================================================================
-//
-//
-//
-//=====================================================================
-#ifndef AEON_PARSING_PARSEME_HPP
-#define AEON_PARSING_PARSEME_HPP
-//=====================================================================
+#include <aeon/lexing/lexeme.hpp>
+#include <aeon/parsing/children.hpp>
+#include <aeon/parsing/id.hpp>
+
 #include <cstdint>
 #include <ostream>
 #include <vector>
 #include <memory>
 //=====================================================================
-#include <aeon/lexing/lexeme.hpp>
-#include <aeon/parsing/children.hpp>
-//=====================================================================
-namespace aeon {
-namespace parsing {
-//=====================================================================
+namespace aeon { namespace parsing {
 	
 	struct parseme_t;
 	typedef std::shared_ptr<parseme_t> parseme_ptr;
@@ -29,7 +22,7 @@ namespace parsing {
 	{
 		typedef children_t children_t;
 		typedef lexing::lexeme_t::text_t text_t;
-		enum class id_t;
+		typedef ID id_t;
 
 		parseme_t(id_t);
 		parseme_t(id_t, lexing::lexeme_t const*);
@@ -60,60 +53,10 @@ namespace parsing {
 	auto clone(parseme_ptr const&) -> parseme_ptr;
 	auto clone(parsemes_t&, parsemes_t const&) -> void;
 
-	enum class parseme_t::id_t
-	{
-		root,
-		module,
-
-		integer_literal,
-		identifier,
-		placeholder,
-
-		function,
-		function_pattern,
-		parameter_list,
-		parameter,
-		
-		function_call,
-		type_name,
-		type,
-		block,
-		return_statement,
-		expr,
-		addition_expr,
-		type_definition,
-		argument_list,
-
-		variable_declaration,
-
-		// intrinsics
-		intrinsic_type_int,
-		intrinsic_bitsize,
-		intrinsic_int_add,
-		intrinsic_int_sub,
-		intrinsic_int_mul,
-		intrinsic_int_div,
-
-		// for error recovery
-		error_term,
-		error_type,
-
-		attributes,
-		attribute_forceinline,
-	};
-
-	typedef parseme_t::id_t ID;
-
 	inline auto is_intrinsic_int_typename(parsing::parseme_ptr const& x) -> bool
 	{
 		auto i = x->text().begin();
 		return *i == '@' && *++i == 'i' && *++i == 'n' && *++i == 't' && isdigit(*++i);
 	}
 
-//=====================================================================
-} // namespace parsing
-} // namespace aeon
-//=====================================================================
-#endif
-//=====================================================================
-
+} }
