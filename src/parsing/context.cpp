@@ -42,7 +42,7 @@ auto context_t::match_make(parsid pid, lexid lid) -> parseme_ptr
 		return parsing::null_parseme_ptr;
 
 	if (begin_->id() == lid) {
-		result.reset(new parseme_t(pid, &*begin_));
+		//result.reset(parseme_t::make(pid, &*begin_));
 		++begin_;
 	}
 
@@ -57,7 +57,7 @@ auto context_t::match_make(parsid pid, lexid lid, char const* str) -> parseme_pt
 		return parsing::null_parseme_ptr;
 
 	if (begin_->id() == lid && begin_->streq(str)) {
-		result.reset(new parseme_t(pid, &*begin_));
+		//result.reset(parseme_t::make(pid, &*begin_));
 		++begin_;
 	}
 
@@ -103,6 +103,7 @@ auto context_t::current_lexeme() const -> aeon::lexing::lexeme_t const*
 
 auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_name) -> void
 {
+#if 0
 	ATMA_ASSERT(type_name->id() == ID::type_name);
 
 	uint32_t size = std::atoi(type_name->text().begin() + 4);
@@ -259,5 +260,6 @@ auto context_t::generate_intrinsic_integer_definition(parseme_ptr const& type_na
 			]
 		]
 	));
+#endif
 }
 

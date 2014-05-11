@@ -24,10 +24,10 @@ namespace aeon { namespace parsing {
 		typedef lexing::lexeme_t::text_t text_t;
 		typedef ID id_t;
 
-		parseme_t(id_t);
-		parseme_t(id_t, lexing::lexeme_t const*);
-		~parseme_t();
-
+		static auto make(id_t) -> parseme_ptr;
+		static auto make(id_t, lexing::lexeme_t const*) -> parseme_ptr;
+		static auto make(id_t, lexing::lexeme_t const*, lexing::lexeme_t const*) -> parseme_ptr;
+		
 		auto id() const -> id_t;
 		auto text() const -> lexing::lexeme_t::text_t const&;
 		auto position() const -> lexing::position_t const&;
@@ -35,16 +35,26 @@ namespace aeon { namespace parsing {
 		auto children() const -> children_t const&;
 		auto children() -> children_t&;
 		auto lexeme() const -> lexing::lexeme_t const*;
+		auto lexeme2() const -> lexing::lexeme_t const*;
 
 		auto set_parent(parseme_ptr const&) -> void;
 
-		static auto make(id_t, lexing::lexeme_t const* = nullptr) -> parseme_ptr;
+	private:
+		parseme_t(id_t);
+		parseme_t(id_t, lexing::lexeme_t const*);
+		parseme_t(id_t, lexing::lexeme_t const*, lexing::lexeme_t const*);
 
 	private:
 		id_t id_;
 		parseme_wptr parent_;
 		children_t children_;
+
+		// not every parseme has a lexeme2, but if it does:
+		//  - lexeme2_ signifies the terminal (i.e: end)
+		//  - neither lexeme_ and lexeme2_ may be auxililary
+		//  - lexeme2_ must occur after lexeme_
 		lexing::lexeme_t const* lexeme_;
+		lexing::lexeme_t const* lexeme2_;
 	};
 	
 	std::ostream& operator << (std::ostream& stream, parseme_t const& x);

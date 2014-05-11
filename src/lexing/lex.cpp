@@ -116,7 +116,7 @@ state_t::state_t(lexemes_t& lexemes)
 auto state_t::push_back(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel) -> void
 {
 	ATMA_ASSERT(begin != end);
-	lexemes_.push_back( lexeme_t(id, begin, end, position, channel) );
+	lexemes_.push_back( lexeme_t::make(id, begin, end, position, channel) );
 }
 
 auto state_t::non_whitespace_token() -> void
@@ -125,10 +125,10 @@ auto state_t::non_whitespace_token() -> void
 	{
 		if (tabs_ > previous_tabs_)
 			while (previous_tabs_++ != tabs_)
-				lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_t(), channels[static_cast<uint32_t>(ID::block_begin)]));
+				lexemes_.push_back(lexeme_t::make(ID::block_begin, nullptr, nullptr, position_t::zero, channels[static_cast<uint32_t>(ID::block_begin)]));
 		else if (tabs_ < previous_tabs_)
 			while (previous_tabs_-- != tabs_)
-				lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_t(), channels[static_cast<uint32_t>(ID::block_begin)]));
+				lexemes_.push_back(lexeme_t::make(ID::block_end, nullptr, nullptr, position_t::zero, channels[static_cast<uint32_t>(ID::block_begin)]));
 
 		previous_tabs_ = tabs_;
 	}

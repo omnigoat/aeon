@@ -22,10 +22,9 @@ parseme_t::parseme_t(id_t id, lexing::lexeme_t const* lexeme)
 {
 }
 
-parseme_t::~parseme_t()
+parseme_t::parseme_t(id_t id, lexing::lexeme_t const* L0, lexing::lexeme_t const* L1)
+	: id_(id), children_(this), lexeme_(L0), lexeme2_(L1)
 {
-	if ((intptr_t)lexeme_ & 1)
-		delete lexeme();
 }
 
 auto parseme_t::id() const -> id_t
@@ -75,12 +74,22 @@ auto parseme_t::set_parent(parseme_ptr const& p) -> void
 
 auto parseme_t::lexeme() const -> lexing::lexeme_t const*
 {
-	return (lexing::lexeme_t const*)((intptr_t)lexeme_ & intptr_t(-2));
+	return lexeme_;
 }
 
 auto parseme_t::make(id_t id, lexing::lexeme_t const* L) -> parseme_ptr
 {
 	return parseme_ptr(new parseme_t(id, L));
+}
+
+auto parseme_t::make(id_t id) -> parseme_ptr
+{
+	return parseme_ptr(new parseme_t(id));
+}
+
+auto parseme_t::make(id_t id, lexing::lexeme_t const* begin, lexing::lexeme_t const* end) -> parseme_ptr
+{
+	return parseme_ptr(new parseme_t(id, begin, end));
 }
 
 namespace

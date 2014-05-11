@@ -52,7 +52,7 @@ namespace xpi {
 			}
 
 			auto operator ()(parsemes_t& dest) -> bool {
-				dest.push_back( parseme_ptr(new parseme_t(id_, lexeme_)) );
+				dest.push_back(parseme_t::make(id_, lexeme_));
 				return true;
 			}
 
@@ -146,10 +146,6 @@ namespace xpi {
 		}
 	}
 
-	inline auto make(parseme_t::id_t id, lexing::lexeme_t const& L) -> detail::expr_t {
-		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, &L)));
-	}
-
 	inline auto make(parseme_t::id_t id, lexing::lexeme_t const* L) -> detail::expr_t {
 		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, L)));
 	}
@@ -158,14 +154,6 @@ namespace xpi {
 		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, nullptr)));
 	}
 	
-	inline auto make(parseme_t::id_t id, lexing::ID lid, lexing::lexeme_t::text_t const& text) -> detail::expr_t {
-		return make(id, lexing::make_synthetic_lexeme(lid, text.begin(), text.end(), lexing::position_t::zero));
-	}
-
-	inline auto make(parseme_t::id_t id, lexing::lexeme_t::text_t const& text) -> detail::expr_t {
-		return make(id, lexing::make_synthetic_lexeme(lexing::ID::dummy, text.begin(), text.end(), lexing::position_t::zero));
-	}
-
 	template <typename IT>
 	inline auto insert(IT begin, IT end) -> detail::expr_t {
 		return detail::expr_t(detail::abstract_expr_ptr(new detail::insert_expr_t<IT>(begin, end)));

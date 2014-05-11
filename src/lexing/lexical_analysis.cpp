@@ -55,14 +55,14 @@ auto lexical_analysis_t::lexemes() const -> lexemes_t const&
 
 auto lexical_analysis_t::make_synthetic_lexeme(ID id, position_t const& position, atma::utf8_string_range_t const& text) -> lexeme_t const*
 {
-	aux_lexemes_.push_back(lexeme_t(id, text.begin(), text.end(), position));
+	aux_lexemes_.push_back(lexeme_t::make(id, text.begin(), text.end(), position));
 	return &aux_lexemes_.back();
 }
 
 auto lexical_analysis_t::make_synthetic_lexeme(ID id, position_t const& position, atma::utf8_string_t const& text) -> lexeme_t const*
 {
 	aux_text_ += text;
-	aux_lexemes_.push_back(lexeme_t(id, aux_text_.bytes_end() - text.bytes(), aux_text_.bytes_end(), position));
+	aux_lexemes_.push_back(lexeme_t::make(id, aux_text_.bytes_end() - text.bytes(), aux_text_.bytes_end(), position));
 	return &aux_lexemes_.back();
 }
 
@@ -123,10 +123,10 @@ auto lexical_analysis_t::state_nonwhitespace_token() -> void
 	{
 		if (tabs_ > previous_tabs_)
 		while (previous_tabs_++ != tabs_)
-			lexemes_.push_back(lexeme_t(ID::block_begin, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
+			lexemes_.push_back(lexeme_t::make(ID::block_begin, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
 		else if (tabs_ < previous_tabs_)
 		while (previous_tabs_-- != tabs_)
-			lexemes_.push_back(lexeme_t(ID::block_end, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
+			lexemes_.push_back(lexeme_t::make(ID::block_end, nullptr, nullptr, position_, channels[(uint)ID::block_begin]));
 
 		previous_tabs_ = tabs_;
 	}
@@ -243,7 +243,7 @@ auto lexical_analysis_t::identifier() -> void
 	for (auto x = keywords_begin; x != keywords_end; ++x)
 	{
 		if (keyword_lengths[x] == (current_ - m) && !strncmp(m, keywords[x], keyword_lengths[x])) {
-			lexemes_.push_back(lexeme_t((ID)x, m, current_, mpos, channels[x]));
+			lexemes_.push_back(lexeme_t::make((ID)x, m, current_, mpos, channels[x]));
 			return;
 		}
 		else if (keyword_lengths[x] > uint(current_ - m)) {
@@ -251,7 +251,7 @@ auto lexical_analysis_t::identifier() -> void
 		}
 	}
 
-	lexemes_.push_back(lexeme_t(id, m, current_, mpos, channels[(int)id]));
+	lexemes_.push_back(lexeme_t::make(id, m, current_, mpos, channels[(int)id]));
 }
 
 auto lexical_analysis_t::number_literal() -> void
@@ -275,17 +275,17 @@ auto lexical_analysis_t::number_literal() -> void
 		}
 
 		if (i > 0) {
-			lexemes_.push_back(lexeme_t(ID::real_literal, m, current_, mpos, channels[(int)ID::real_literal]));
+			lexemes_.push_back(lexeme_t::make(ID::real_literal, m, current_, mpos, channels[(int)ID::real_literal]));
 		}
 		else {
-			lexemes_.push_back(lexeme_t(ID::integer_literal, m, period, mpos, channels[(int)ID::integer_literal]));
+			lexemes_.push_back(lexeme_t::make(ID::integer_literal, m, period, mpos, channels[(int)ID::integer_literal]));
 
 			// probably want to throw an syntax error here
 			current_ = period;
 		}
 	}
 	else {
-		lexemes_.push_back(lexeme_t(ID::integer_literal, m, current_, mpos, channels[(int)ID::integer_literal]));
+		lexemes_.push_back(lexeme_t::make(ID::integer_literal, m, current_, mpos, channels[(int)ID::integer_literal]));
 	}
 }
 
@@ -305,7 +305,7 @@ auto lexical_analysis_t::punctuation() -> void
 
 			default:
 				ATMA_ASSERT(current_ != m);
-				lexemes_.push_back(lexeme_t(ID::punctuation, m, current_, mpos, channels[(int)ID::punctuation]));
+				lexemes_.push_back(lexeme_t::make(ID::punctuation, m, current_, mpos, channels[(int)ID::punctuation]));
 				return;
 		}
 	}
@@ -325,7 +325,7 @@ auto lexical_analysis_t::string_literal() -> void
 		stream_increment();
 	}
 
-	lexemes_.push_back(lexeme_t(ID::string_literal, m, current_, mpos, channels[(int)ID::string_literal]));
+	lexemes_.push_back(lexeme_t::make(ID::string_literal, m, current_, mpos, channels[(int)ID::string_literal]));
 }
 
 
@@ -342,7 +342,7 @@ auto lexical_analysis_t::character_literal() -> void
 		stream_increment();
 	}
 
-	lexemes_.push_back(lexeme_t(ID::character_literal, m, current_, mpos, channels[(int)ID::character_literal]));
+	lexemes_.push_back(lexeme_t::make(ID::character_literal, m, current_, mpos, channels[(int)ID::character_literal]));
 }
 
 auto lexical_analysis_t::whitespace() -> void
@@ -359,7 +359,7 @@ auto lexical_analysis_t::whitespace() -> void
 				break;
 
 			default:
-				lexemes_.push_back(lexeme_t(ID::whitespace, m, current_, mpos, channels[(int)ID::whitespace]));
+				lexemes_.push_back(lexeme_t::make(ID::whitespace, m, current_, mpos, channels[(int)ID::whitespace]));
 				return;
 		}
 	}

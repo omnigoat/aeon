@@ -38,7 +38,7 @@ auto aeon::parsing::operator << (std::ostream& stream, errors_t const& rhs) -> s
 
 auto aeon::parsing::parse(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes) -> void
 {
-	parseme_ptr root_node(new parseme_t(parsid::root));
+	auto root_node = parseme_t::make(parsid::root);
 
 	detail::context_t context(root_node, lexemes.begin(lexing::basic), lexemes.end(lexing::basic));
 
@@ -51,7 +51,7 @@ auto aeon::parsing::parse(errors_t& errors, children_t& parsemes, lexing::lexeme
 
 auto aeon::parsing::detail::module(errors_t& errors, children_t& parsemes, lexing::lexemes_t const& lexemes, detail::context_t& context) -> bool
 {
-	parseme_ptr module_node(new parseme_t(parsid::module));
+	parseme_ptr module_node(parseme_t::make(parsid::module));
 
 	parsemes.push_back(module_node);
 
@@ -148,7 +148,7 @@ auto aeon::parsing::detail::parameters(errors_t& errors, children_t& parsemes, l
 
 	for (;;)
 	{
-		parseme_ptr parameter_node(new parseme_t(parsid::parameter));
+		parseme_ptr parameter_node(parseme_t::make(parsid::parameter));
 		
 		// (<identifier> as)? <typename>
 		detail::context_t old_context = context;

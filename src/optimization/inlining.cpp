@@ -102,6 +102,7 @@ namespace
 				if (resolve::is_atomic_expr(arg))
 					continue;
 
+#if SERIOUSLY_ENABLE_AGAIN
 				auto vd = xpi::reify(
 					xpi::make(parsing::ID::variable_declaration)[
 						xpi::make(parsing::ID::identifier, lexing::make_synthetic_lexeme(lexing::ID::identifier, iden)),
@@ -111,6 +112,7 @@ namespace
 				arg_to_iden[arg] = parsing::parseme_t::make(parsing::ID::identifier, lexing::make_synthetic_lexeme(lexing::ID::identifier, iden));
 
 				precaller_statements.push_back(vd);
+#endif
 			}
 		}
 

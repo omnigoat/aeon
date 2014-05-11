@@ -18,7 +18,9 @@ namespace aeon { namespace lexing {
 		typedef atma::utf8_string_range_t text_t;
 		static text_t const empty_text;
 
-		lexeme_t(id_t, char const* begin, char const* end, position_t const&, multichannel_t const& = multichannel_t());
+		static auto make(id_t, char const* begin, char const* end, position_t const&) -> lexeme_t;
+		static auto make(id_t, char const* begin, char const* end, position_t const&, multichannel_t const&) -> lexeme_t;
+		static auto make_aux(id_t, char const*, char const*, position_t const&) -> lexeme_t;
 
 		auto id() const -> id_t const&;
 		auto position() const -> position_t const&;
@@ -29,17 +31,17 @@ namespace aeon { namespace lexing {
 		auto streq(char const*, char const*) const -> bool;
 
 	private:
+		lexeme_t(id_t, char const* begin, char const* end, position_t const&, multichannel_t const&, uint flags);
+
+	private:
 		id_t id_;
 		text_t text_;
 		position_t position_;
 		multichannel_t channel_;
+		uint synthetic_:1;
 	};
 	
 
 	auto operator << (std::ostream& stream, lexeme_t const& L) -> std::ostream&;
-
-	auto make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel = multichannel_t()) -> lexeme_t const*;
-	auto make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end) -> lexeme_t const*;
-	auto make_synthetic_lexeme(lexeme_t::id_t id, char const* str) -> lexeme_t const*;
 
 } }

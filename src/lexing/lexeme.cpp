@@ -9,8 +9,8 @@ using aeon::lexing::multichannel_t;
 lexeme_t::text_t const lexeme_t::empty_text;
 position_t const aeon::lexing::position_t::zero;
 
-lexeme_t::lexeme_t(id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel)
-: id_(id), text_(begin, end), position_(position), channel_(channel)
+lexeme_t::lexeme_t(id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel, uint flags)
+: id_(id), text_(begin, end), position_(position), channel_(channel), synthetic_(flags & 1)
 {
 }
 
@@ -53,24 +53,27 @@ auto lexeme_t::streq(char const* begin, char const* end) const -> bool
 }
 
 
+
+auto lexeme_t::make(id_t id, char const* begin, char const* end, position_t const& position) -> lexeme_t
+{
+	return lexeme_t(id, begin, end, position, multichannel_t::all, 0);
+}
+
+auto lexeme_t::make(id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& chan) -> lexeme_t
+{
+	return lexeme_t(id, begin, end, position, chan, 0);
+}
+
+auto lexeme_t::make_aux(id_t id, char const* begin, char const* end, position_t const& position) -> lexeme_t
+{
+	return lexeme_t(id, begin, end, position, multichannel_t::all, 1);
+}
+
+
+
+
+
 std::ostream& aeon::lexing::operator << (std::ostream& stream, lexeme_t const& L) {
 	return stream << static_cast<int>(L.id()) << "[" << L.position().row << ":" << L.position().column << "]: " << L.text();
 }
 
-auto aeon::lexing::make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end, position_t const& position, multichannel_t const& channel) -> lexeme_t const*
-{
-	auto L = new lexeme_t(id, begin, end, position, channel);
-	return (lexeme_t const*)(((intptr_t)L) | 1);
-}
-
-auto aeon::lexing::make_synthetic_lexeme(lexeme_t::id_t id, char const* begin, char const* end) -> lexeme_t const*
-{
-	auto L = new lexeme_t(id, begin, end, position_t(), multichannel_t());
-	return (lexeme_t const*)(((intptr_t)L) | 1);
-}
-
-auto aeon::lexing::make_synthetic_lexeme(lexeme_t::id_t id, char const* str) -> lexeme_t const*
-{
-	auto L = new lexeme_t(id, str, str + strlen(str), position_t(), multichannel_t());
-	return (lexeme_t const*)(((intptr_t)L) | 1);
-}
