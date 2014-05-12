@@ -17,6 +17,7 @@ syntactic_analysis_t::syntactic_analysis_t(lexical_analysis_t& lexical_analysis)
 	: lxa_(lexical_analysis), lxa_iter_(lexical_analysis.lexemes().begin(lexing::basic))
 {
 	parse_module(parsemes_);
+	generate_prelude();
 }
 
 auto syntactic_analysis_t::parsemes() -> parsing::children_t&
@@ -26,7 +27,8 @@ auto syntactic_analysis_t::parsemes() -> parsing::children_t&
 
 auto syntactic_analysis_t::lxa_peek() -> lexing::lexeme_t const*
 {
-	if (lxa_iter_ != lxa_.lexemes().end())
+	auto E = lxa_.lexemes().end(lxa_iter_.channel());
+	if (lxa_iter_ == E)
 		return nullptr;
 
 	return &*lxa_iter_;
@@ -411,3 +413,175 @@ auto syntactic_analysis_t::parse_expr_function_call(children_t& xs) -> bool
 
 	return true;
 }
+
+auto syntactic_analysis_t::generate_prelude() -> bool
+{
+	return generate_int_type(32);
+}
+
+auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
+{
+	// lexemes used
+	auto lx_typename = lxa_.make_aux(lxid::identifier, lexing::position_t::zero, "@int" + atma::to_string(bitsize));
+	auto lx_bitsize = lxa_.make_aux(lxid::integer_literal, lexing::position_t::zero, atma::to_string(bitsize));
+	auto lx_lhs = lxa_.make_aux(lxid::identifier, lexing::position_t::zero, "lhs");
+	auto lx_rhs = lxa_.make_aux(lxid::identifier, lexing::position_t::zero, "rhs");
+	auto lx_add = lxa_.make_aux(lxid::punctuation, lexing::position_t::zero, "+");
+	auto lx_sub = lxa_.make_aux(lxid::punctuation, lexing::position_t::zero, "-");
+	auto lx_mul = lxa_.make_aux(lxid::punctuation, lexing::position_t::zero, "*");
+	auto lx_div = lxa_.make_aux(lxid::punctuation, lexing::position_t::zero, "/");
+
+	xpi::insert_into(parsemes_, parsemes_.begin(), (
+		xpi::make(ID::type_definition) [
+			xpi::make(ID::identifier, lx_typename),
+			xpi::make(ID::intrinsic_type_int),
+			xpi::make(ID::intrinsic_bitsize, lx_bitsize)
+		],
+
+		// addition
+		xpi::make(ID::function) [
+			xpi::make(ID::function_pattern) [
+				xpi::make(ID::placeholder),
+				xpi::make(ID::identifier, lx_add),
+				xpi::make(ID::placeholder)
+			],
+
+			xpi::make(ID::parameter_list) [
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_lhs),
+					xpi::make(ID::type_name, lx_typename)
+				],
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_rhs),
+					xpi::make(ID::type_name, lx_typename)
+				]
+			],
+
+			xpi::make(ID::type_name, lx_typename),
+
+			xpi::make(ID::block) [
+				xpi::make(ID::return_statement)[
+					xpi::make(ID::intrinsic_int_add, lx_typename)[
+						xpi::make(ID::identifier, lx_lhs),
+						xpi::make(ID::identifier, lx_rhs)
+					]
+				]
+			],
+
+			xpi::make(ID::attributes) [
+				xpi::make(ID::attribute_forceinline)
+			]
+		],
+
+		// subtraction
+		xpi::make(ID::function) [
+			xpi::make(ID::function_pattern) [
+				xpi::make(ID::placeholder),
+				xpi::make(ID::identifier, lx_sub),
+				xpi::make(ID::placeholder)
+			],
+
+			xpi::make(ID::parameter_list) [
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_lhs),
+					xpi::make(ID::type_name, lx_typename)
+				],
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_rhs),
+					xpi::make(ID::type_name, lx_typename)
+				]
+			],
+
+			xpi::make(ID::type_name, lx_typename),
+
+			xpi::make(ID::block) [
+				xpi::make(ID::return_statement) [
+					xpi::make(ID::intrinsic_int_sub, lx_typename) [
+						xpi::make(ID::identifier, lx_lhs),
+						xpi::make(ID::identifier, lx_rhs)
+					]
+				]
+			],
+
+			xpi::make(ID::attributes) [
+				xpi::make(ID::attribute_forceinline)
+			]
+		],
+
+		// multiplication
+		xpi::make(ID::function)[
+			xpi::make(ID::function_pattern) [
+				xpi::make(ID::placeholder),
+				xpi::make(ID::identifier, lx_mul),
+				xpi::make(ID::placeholder)
+			],
+
+			xpi::make(ID::parameter_list) [
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_lhs),
+					xpi::make(ID::type_name, lx_typename)
+				],
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_rhs),
+					xpi::make(ID::type_name, lx_typename)
+				]
+			],
+
+			xpi::make(ID::type_name, lx_typename),
+
+			xpi::make(ID::block) [
+				xpi::make(ID::return_statement) [
+					xpi::make(ID::intrinsic_int_mul, lx_typename) [
+						xpi::make(ID::identifier, lx_lhs),
+						xpi::make(ID::identifier, lx_rhs)
+					]
+				]
+			],
+
+			xpi::make(ID::attributes)[
+				xpi::make(ID::attribute_forceinline)
+			]
+		],
+
+		// division
+		xpi::make(ID::function)[
+			xpi::make(ID::function_pattern) [
+				xpi::make(ID::placeholder),
+				xpi::make(ID::identifier, lx_div),
+				xpi::make(ID::placeholder)
+			],
+
+			xpi::make(ID::parameter_list) [
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_lhs),
+					xpi::make(ID::type_name, lx_typename)
+				],
+				xpi::make(ID::parameter) [
+					xpi::make(ID::identifier, lx_rhs),
+					xpi::make(ID::type_name, lx_typename)
+				]
+			],
+
+			xpi::make(ID::type_name, lx_typename),
+
+			xpi::make(ID::block) [
+				xpi::make(ID::return_statement) [
+					xpi::make(ID::intrinsic_int_div, lx_typename) [
+						xpi::make(ID::identifier, lx_lhs),
+						xpi::make(ID::identifier, lx_rhs)
+					]
+				]
+			],
+
+			xpi::make(ID::attributes)[
+				xpi::make(ID::attribute_forceinline)
+			]
+		]
+	));
+
+	return true;
+}
+
+
+//auto generate_void_type() -> bool;
+//auto generate_bool_type() -> bool;

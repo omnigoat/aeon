@@ -51,6 +51,8 @@ namespace lexing {
 			template <typename Y, typename enable = typename std::enable_if<std::is_convertible<Y, T>::value, void>::type>
 			iterator(iterator<Y> const& rhs);
 
+			auto channel() const -> multichannel_t const& { return channel_; }
+
 			// operators
 			auto operator * () -> T&;
 			auto operator * () const -> T const&;

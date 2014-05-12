@@ -3,6 +3,8 @@
 #include <aeon/lexing/lexemes.hpp>
 
 #include <atma/string.hpp>
+
+#include <list>
 //=====================================================================
 namespace aeon { namespace lexing {
 
@@ -11,12 +13,11 @@ namespace aeon { namespace lexing {
 		lexical_analysis_t(char const* begin, char const* end);
 
 		auto lexemes() const -> lexemes_t const&;
-		//auto errors() const 
-
-		auto make_synthetic_lexeme(ID, position_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
-		auto make_synthetic_lexeme(ID, position_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
-		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
-		auto make_synthetic_lexeme(ID, position_t const&, multichannel_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
+		
+		auto make_aux(ID, position_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
+		auto make_aux(ID, position_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
+		auto make_aux(ID, position_t const&, multichannel_t const&, atma::utf8_string_range_t const&) -> lexeme_t const*;
+		auto make_aux(ID, position_t const&, multichannel_t const&, atma::utf8_string_t const&) -> lexeme_t const*;
 
 	private:
 		auto run() -> void;
@@ -36,24 +37,19 @@ namespace aeon { namespace lexing {
 		auto state_nonwhitespace_token() -> void;
 
 	private:
-		// incoming stream
 		char const* begin_;
 		char const* end_;
 		char const* current_;
 		position_t position_;
-		bool consumed_newline_;
 
-		// state
-		lexemes_t lexemes_;
+		std::vector<std::pair<char const*, char const*>> lines_;
 		uint tabs_, previous_tabs_;
 		bool empty_line_;
+		bool consumed_newline_;
 
-		// book-keeping
-		std::vector<std::pair<char const*, char const*>> lines_;
-
-		// auxiliary data
-		atma::string aux_text_;
-		std::vector<lexeme_t> aux_lexemes_;
+		lexemes_t lexemes_;
+		std::list<atma::string> aux_texts_;
+		std::list<lexeme_t> aux_lexemes_;
 	};
 
 } }

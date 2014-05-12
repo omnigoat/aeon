@@ -116,8 +116,9 @@ auto children_t::detach(parseme_ptr const& x) -> bool
 auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator
 {
 	auto ni = elements_.insert(where_, begin, end);
-	for (auto i = begin; i != end; ++i, ++ni)
-		(*i)->set_parent(owner_->shared_from_this());
+	if (owner_)
+		for (auto i = begin; i != end; ++i, ++ni)
+			(*i)->set_parent(owner_->shared_from_this());
 	return ni;
 }
 

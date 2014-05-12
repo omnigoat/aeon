@@ -32,6 +32,12 @@ namespace aeon { namespace parsing {
 		auto parse_expr_multiplicative(children_t&) -> bool;
 		auto parse_expr_function_call(children_t&) -> bool;
 
+		// prelude generation
+		auto generate_prelude() -> bool;
+		auto generate_int_type(uint bitsize) -> bool;
+		auto generate_void_type() -> bool;
+		auto generate_bool_type() -> bool;
+
 	private:
 		lexing::lexical_analysis_t& lxa_;
 		lexing::lexemes_t::const_iterator lxa_iter_;

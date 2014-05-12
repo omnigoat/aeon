@@ -13,12 +13,12 @@ using aeon::parsing::children_t;
 parseme_ptr const aeon::parsing::null_parseme_ptr;
 
 parseme_t::parseme_t(id_t id)
-	: id_(id), children_(this), lexeme_()
+	: id_(id), children_(this), lexeme_(), lexeme2_()
 {
 }
 
 parseme_t::parseme_t(id_t id, lexing::lexeme_t const* lexeme)
-	: id_(id), children_(this), lexeme_(lexeme)
+	: id_(id), children_(this), lexeme_(lexeme), lexeme2_()
 {
 }
 
