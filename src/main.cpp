@@ -4,8 +4,11 @@
 #include <aeon/lexing/lex.hpp>
 #include <aeon/lexing/id.hpp>
 #include <aeon/lexing/lexical_analysis.hpp>
+
 #include <aeon/parsing/syntactic_analysis.hpp>
 #include <aeon/parsing/parse.hpp>
+#include <aeon/parsing/algorithm.hpp>
+
 #include <aeon/semantics/analyse.hpp>
 #include <aeon/optimization/inlining.hpp>
 #include <aeon/generation/generation.hpp>
@@ -82,45 +85,33 @@ auto main(uint32_t arg_count, char const** args) -> int
 	
 	// syntactic analysis
 	auto syntactic_analysis = aeon::parsing::syntactic_analysis_t(lexical_analysis);
-	parsing::children_t parsemes;
+	parsing::children_t& parsemes = syntactic_analysis.parsemes();
 	{
 		using namespace aeon::parsing;
 
-		auto errors = parsing::errors_t(args[1], file.begin());
-		parse(errors, parsemes, lexical_analysis.lexemes());
+		//auto errors = parsing::errors_t(args[1], file.begin());
+		//parse(errors, parsemes, lexical_analysis.lexemes());
 
-		if (errors.size() > 0) {
-			std::cout << errors << std::endl;
-			return EXIT_FAILURE;
-		}
+		//if (errors.size() > 0) {
+			//std::cout << errors << std::endl;
+			//return EXIT_FAILURE;
+		//}
 
-		std::cout << parsemes << std::endl;
+		//std::cout << parsemes << std::endl;
 		std::cout << syntactic_analysis.parsemes() << std::endl;
 	}
-
-	ATMA_ASSERT(!parsemes.empty());
-	ATMA_ASSERT(parsemes[0]->id() == aeon::parsing::parseme_t::id_t::root);
 
 	FILE* out = fopen(args[2], "w");
 
 	auto stream = new generation::file_output_stream_t(out);
-
-	// collect the root
-	parsing::parsemes_t root_list;
-	std::copy_if(parsemes.begin(), parsemes.end(), std::back_inserter(root_list), [](parsing::parseme_ptr const& x){
-		return x->id() == parsing::parseme_t::id_t::root;
-	});
-	auto root = root_list.back();
-	ATMA_ASSERT(root);
 
 	optimization::inline_all_the_things(parsemes);
 
 	// intrinsic functions
 	{
 		parsing::parsemes_t functions;
-		std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(functions), [](parsing::parseme_ptr const& x) {
-			return x->id() == parsing::parseme_t::id_t::function;
-		});
+		std::copy_if(parsemes.begin(), parsemes.end(), std::back_inserter(functions), parsing::id_equals_t(parsing::ID::function));
+
 		for (auto const& x : functions) {
 			generation::genesis_t g;
 			generation::analyse::function(g, x);
@@ -128,18 +119,18 @@ auto main(uint32_t arg_count, char const** args) -> int
 		}
 	}
 
-	// collect the modules
-	parsing::parsemes_t modules;
-	std::copy_if(root->children().begin(), root->children().end(), std::back_inserter(modules), [](parsing::parseme_ptr const& x) {
-		return x->id() == parsing::parseme_t::id_t::module;
-	});
-
-	for (auto const& x : modules)
+	// modules
 	{
-		generation::module(*stream, x);
+		parsing::parsemes_t modules;
+		std::copy_if(parsemes.begin(), parsemes.end(), std::back_inserter(modules), parsing::id_equals_t(parsing::ID::module));
+
+		for (auto const& x : modules)
+		{
+			generation::module(*stream, x);
+		}
 	}
 
-	std::cout << parsemes << std::endl;
+	//std::cout << parsemes << std::endl;
 
 	fflush(out);
 	fclose(out);

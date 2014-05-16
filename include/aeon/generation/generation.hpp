@@ -131,7 +131,7 @@ namespace generation {
 
 	namespace llvm
 	{
-		auto storage_typename(genesis_t&, parsing::parseme_ptr const&) -> parsing::parseme_t::text_t;
+		auto storage_typename(genesis_t&, parsing::parseme_ptr const&) -> atma::string;
 		auto lvalue_name(genesis_t&, parsing::parseme_ptr const&) -> atma::string;
 	}
 	

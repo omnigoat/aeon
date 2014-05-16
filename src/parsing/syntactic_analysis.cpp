@@ -48,7 +48,7 @@ auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid) -> parseme_ptr
 auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid, char const* text, uint textlen) -> parseme_ptr
 {
 	auto L = lxa_peek();
-	if (L->id() == Lid && lxa_peek()->streq(text, text + textlen)) {
+	if (L && L->id() == Lid && lxa_peek()->streq(text, text + textlen)) {
 		++lxa_iter_;
 		return parsing::parseme_t::make(Pid, L);
 	}
@@ -58,7 +58,8 @@ auto syntactic_analysis_t::lxa_mk_if(psid Pid, lxid Lid, char const* text, uint 
 
 auto syntactic_analysis_t::lxa_skip(lxid Lid) -> bool
 {
-	if (lxa_peek()->id() == Lid) {
+	auto L = lxa_peek();
+	if (L && L->id() == Lid) {
 		++lxa_iter_;
 		return true;
 	}
@@ -68,7 +69,8 @@ auto syntactic_analysis_t::lxa_skip(lxid Lid) -> bool
 
 auto syntactic_analysis_t::lxa_skip(lxid Lid, char const* text, uint textlen) -> bool
 {
-	if (lxa_peek()->id() == Lid && lxa_peek()->streq(text, text + textlen)) {
+	auto L = lxa_peek();
+	if (L && L->id() == Lid && L->streq(text, text + textlen)) {
 		++lxa_iter_;
 		return true;
 	}
@@ -78,8 +80,16 @@ auto syntactic_analysis_t::lxa_skip(lxid Lid, char const* text, uint textlen) ->
 
 auto syntactic_analysis_t::parse_module(children_t& xs) -> bool
 {
-	while (parse_function(xs))
+	//xs.push_back(parseme_t::make(psid::module));
+	xpi::insert_into(xs,
+		//xpi::make(psid::root) [
+			xpi::make(psid::module)
+		//]
+		);
+
+	while (parse_function(xs.back()->children()))
 		;
+
 	return true;
 }
 
@@ -87,21 +97,14 @@ auto syntactic_analysis_t::parse_function(children_t& xs) -> bool
 {
 	parseme_ptr id_node, parameter_list_node, function_body_node;
 
-	
-
 	// function keyword
-	auto fn_node = lxa_mk_if(psid::function, lxid::function_keyword);
-	if (!fn_node)
+	if (!lxa_skip(lxid::function_keyword))
 		return false;
 
 	// name expression
-	{
-		auto name = lxa_mk_if(psid::identifier, lxid::identifier);
-		if (!name)
-			name = lxa_mk_if(psid::placeholder, lxid::punctuation, "_", 1);
-
-		fn_node->children().push_back(name);
-	}
+		auto fn_node = lxa_mk_if(psid::function, lxid::identifier);
+		if (!fn_node)
+			fn_node = lxa_mk_if(psid::function, lxid::punctuation);
 
 	// parameter list
 	{
@@ -113,12 +116,6 @@ auto syntactic_analysis_t::parse_function(children_t& xs) -> bool
 			return false;
 
 		fn_node->children().push_back(parameter_list_node);
-
-#if 0
-		auto r = parameter_list_node->children().back();
-		parameter_list_node->children().pop_back();
-		fn_node->children().push_back(parseme_t::make(psid::type_name, r->children()[0]->lexeme()));
-#endif
 	}
 
 	// return type
@@ -265,17 +262,9 @@ auto syntactic_analysis_t::parse_expr_logical(children_t& xs) -> bool
 
 		// just a function-call
 		xpi::insert_into(xs,
-			xpi::insert(op_fn)[
-				xpi::make(psid::function_pattern)[
-					xpi::make(psid::placeholder, lhs->lexeme()),
-					xpi::make(psid::identifier, op_fn->lexeme()),
-					xpi::make(psid::placeholder, rhs->lexeme())
-				],
-
-				xpi::make(psid::argument_list)[
-					xpi::insert(lhs),
-					xpi::insert(rhs)
-				]
+			xpi::insert(op_fn) [
+				xpi::insert(lhs),
+				xpi::insert(rhs)
 			]);
 	}
 
@@ -290,7 +279,7 @@ auto syntactic_analysis_t::parse_expr_additive(children_t& xs) -> bool
 	// this is fine
 	for (;;)
 	{
-		auto op = lxa_mk_if(psid::addition_expr, lxid::punctuation, "+", 1);
+		auto op = lxa_mk_if(psid::function_call, lxid::punctuation, "+", 1);
 		if (!op)
 			op = lxa_mk_if(psid::function_call, lxid::punctuation, "-", 1);
 
@@ -309,17 +298,9 @@ auto syntactic_analysis_t::parse_expr_additive(children_t& xs) -> bool
 
 		// just a function-call
 		xpi::insert_into(xs,
-			xpi::make(psid::function_call, op->lexeme()) [
-				xpi::make(psid::function_pattern) [
-					xpi::make(psid::placeholder, lhs->lexeme()),
-					xpi::make(psid::identifier, op->lexeme()),
-					xpi::make(psid::placeholder, rhs->lexeme())
-				],
-
-				xpi::make(psid::argument_list) [
-					xpi::insert(lhs),
-					xpi::insert(rhs)
-				]
+			xpi::insert(op) [
+				xpi::insert(lhs),
+				xpi::insert(rhs)
 			]);
 	}
 
@@ -353,16 +334,8 @@ auto syntactic_analysis_t::parse_expr_multiplicative(children_t& xs) -> bool
 		// just a function-call
 		xpi::insert_into(xs,
 			xpi::insert(op_fn) [
-				xpi::make(psid::function_pattern) [
-					xpi::make(psid::placeholder, lhs->lexeme()),
-					xpi::make(psid::identifier, op_fn->lexeme()),
-					xpi::make(psid::placeholder, rhs->lexeme())
-				],
-
-				xpi::make(psid::argument_list)[
-					xpi::insert(lhs),
-					xpi::insert(rhs)
-				]
+				xpi::insert(lhs),
+				xpi::insert(rhs)
 			]);
 	}
 
@@ -384,27 +357,17 @@ auto syntactic_analysis_t::parse_expr_function_call(children_t& xs) -> bool
 	// bam, function call
 	if (lxa_skip(lxid::punctuation, "(", 1))
 	{
-		parsing::children_t args;
+		auto fncall = parseme_t::make(psid::function_call, iden->lexeme());
 
 		for (;;)
 		{
-			if (!parse_expr(args))
+			if (!parse_expr(fncall->children()))
 				break;
 			lxa_skip(lxid::punctuation, ",", 1);
 		}
 
 		lxa_skip(lxid::punctuation, ")", 1);
-
-		xpi::insert_into(xs,
-			xpi::make(psid::function_call, iden->lexeme()) [
-				xpi::make(psid::function_pattern) [
-					xpi::insert(iden)
-				],
-
-				xpi::make(psid::argument_list) [
-					xpi::insert(args.begin(), args.end())
-				]
-			]);
+		xs.push_back(fncall);
 	}
 	else
 	{
@@ -439,13 +402,8 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 		],
 
 		// addition
-		xpi::make(ID::function) [
-			xpi::make(ID::function_pattern) [
-				xpi::make(ID::placeholder),
-				xpi::make(ID::identifier, lx_add),
-				xpi::make(ID::placeholder)
-			],
-
+		xpi::make(ID::function, lx_add) [
+			
 			xpi::make(ID::parameter_list) [
 				xpi::make(ID::parameter) [
 					xpi::make(ID::identifier, lx_lhs),
@@ -474,13 +432,8 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 		],
 
 		// subtraction
-		xpi::make(ID::function) [
-			xpi::make(ID::function_pattern) [
-				xpi::make(ID::placeholder),
-				xpi::make(ID::identifier, lx_sub),
-				xpi::make(ID::placeholder)
-			],
-
+		xpi::make(ID::function, lx_sub) [
+			
 			xpi::make(ID::parameter_list) [
 				xpi::make(ID::parameter) [
 					xpi::make(ID::identifier, lx_lhs),
@@ -509,12 +462,7 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 		],
 
 		// multiplication
-		xpi::make(ID::function)[
-			xpi::make(ID::function_pattern) [
-				xpi::make(ID::placeholder),
-				xpi::make(ID::identifier, lx_mul),
-				xpi::make(ID::placeholder)
-			],
+		xpi::make(ID::function, lx_mul) [
 
 			xpi::make(ID::parameter_list) [
 				xpi::make(ID::parameter) [
@@ -544,13 +492,8 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 		],
 
 		// division
-		xpi::make(ID::function)[
-			xpi::make(ID::function_pattern) [
-				xpi::make(ID::placeholder),
-				xpi::make(ID::identifier, lx_div),
-				xpi::make(ID::placeholder)
-			],
-
+		xpi::make(ID::function, lx_div) [
+			
 			xpi::make(ID::parameter_list) [
 				xpi::make(ID::parameter) [
 					xpi::make(ID::identifier, lx_lhs),
@@ -581,7 +524,3 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 
 	return true;
 }
-
-
-//auto generate_void_type() -> bool;
-//auto generate_bool_type() -> bool;

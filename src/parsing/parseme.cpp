@@ -13,17 +13,17 @@ using aeon::parsing::children_t;
 parseme_ptr const aeon::parsing::null_parseme_ptr;
 
 parseme_t::parseme_t(id_t id)
-	: id_(id), children_(this), lexeme_(), lexeme2_()
+	: parseme_t(id, nullptr, nullptr)
 {
 }
 
 parseme_t::parseme_t(id_t id, lexing::lexeme_t const* lexeme)
-	: id_(id), children_(this), lexeme_(lexeme), lexeme2_()
+	: parseme_t(id, lexeme, nullptr)
 {
 }
 
 parseme_t::parseme_t(id_t id, lexing::lexeme_t const* L0, lexing::lexeme_t const* L1)
-	: id_(id), children_(this), lexeme_(L0), lexeme2_(L1)
+	: id_(id), children_(this), siblings_(), lexeme_(L0), lexeme2_(L1)
 {
 }
 
@@ -66,15 +66,26 @@ auto parseme_t::children() -> children_t&
 	return children_;
 }
 
+auto parseme_t::lexeme() const -> lexing::lexeme_t const*
+{
+	return lexeme_;
+}
+
+auto parseme_t::siblings() const -> children_t const*
+{
+	return siblings_;
+}
+
 auto parseme_t::set_parent(parseme_ptr const& p) -> void
 {
 	ATMA_ASSERT(!p || parent_.expired());
 	parent_ = p;
 }
 
-auto parseme_t::lexeme() const -> lexing::lexeme_t const*
+auto parseme_t::set_siblings(children_t const* siblings) -> void
 {
-	return lexeme_;
+	ATMA_ASSERT(!siblings || siblings_ == nullptr || siblings_ == siblings);
+	siblings_ = siblings;
 }
 
 auto parseme_t::make(id_t id, lexing::lexeme_t const* L) -> parseme_ptr

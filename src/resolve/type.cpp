@@ -22,7 +22,7 @@ auto aeon::resolve::is_atomic_expr(parsing::parseme_ptr const& x) -> bool
 }
 
 // return type-definition
-parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x)
+auto aeon::resolve::type_of(parsing::parseme_ptr const& x) -> parsing::parseme_ptr const&
 {
 	ATMA_ASSERT(x);
 
@@ -30,14 +30,16 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 	{
 		case id::integer_literal:
 		{
-			// get to the root
-			auto root = parsing::find_root(x);
-
-			// find type-definition
-			for (auto const& i : root->children())
-				if (i->id() == parsing::ID::type_definition)
-					if (marshall::type_definition::definition(i)->id() == parsing::ID::intrinsic_type_int)
-						return i;
+			using namespace parsing;
+			//auto tds = parseme_ptr_refs_t();
+			//upwards_enclosing_copy_rawptr(tds, x->siblings(), [&x](parseme_ptr const& y) {
+				//return y->id() == ID::type_definition &&
+					//marshall::type_definition::name(y) == "@int32";
+			//});
+			return parsing::upwards_enclosing_find(x->siblings(), [](parseme_ptr const& y) {
+				return y->id() == ID::type_definition &&
+					marshall::type_definition::name(y)->text() == "@int32";
+			});
 		}
 
 		case id::return_statement:
@@ -69,7 +71,7 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 			auto root = parsing::find_root(x);
 			
 			// find type-definition
-			for (auto const& i : root->children())
+			for (auto const& i : *root->siblings())
 				if (i->id() == parsing::ID::type_definition)
 					if (marshall::type_definition::definition(i)->id() == parsing::ID::intrinsic_type_int)
 						if (marshall::type_definition::name(i)->text() == x->text())
@@ -82,32 +84,19 @@ parsing::parseme_ptr const& aeon::resolve::type_of(parsing::parseme_ptr const& x
 	return x;
 }
 
-parsing::parseme_ptr const& aeon::resolve::typename_to_definition(parsing::parseme_ptr const& x)
+auto aeon::resolve::typename_to_definition(parsing::parseme_ptr const& x) -> parsing::parseme_ptr const&
 {
+	using namespace parsing;
+
 	ATMA_ASSERT(x->id() == id::type_name);
 
-	
 	// get all locations which may house our type-definition
-	parsing::parsemes_t locations;
-	parsing::copy_direct_upwards_if(
-		std::back_inserter(locations), x->parent(),
-		[](parsing::parseme_ptr const& y) { return y->id() == id::root; });
-	
+	auto type_definitions = parseme_ptr_refs_t();
+	upwards_enclosing_copy_rawptr(type_definitions, x->siblings(), id_equals(ID::type_definition));
 
-	// loop through until we find one
-	parsing::parseme_ptr root;
-	for (auto const& y : locations) {
-		// try root
-		if (y->id() == id::root) {
-			root = y;
-			for (auto const& z : y->children()) {
-				if (z->id() == id::type_definition) {
-					if ( marshall::type_definition::name(z)->text() == x->text() )
-						return z;
-				}
-			}
-		}
-	}
+	for (auto const* y : type_definitions)
+		if (marshall::type_definition::name(*y)->text() == x->text())
+			return *y;
 
 	return parsing::null_parseme_ptr;
 }

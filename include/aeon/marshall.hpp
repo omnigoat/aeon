@@ -15,11 +15,11 @@ namespace aeon { namespace marshall {
 	namespace function {
 		using parsing::parseme_ptr;
 
-		inline auto pattern(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[0]; }
-		inline auto parameter_list(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[1]; }
-		inline auto return_type(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[2]; }
-		inline auto body(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[3]; }
-		inline auto attributes(parseme_ptr const& x) -> parseme_ptr const& { return x->children().size() > 4 ? x->children()[4] : parsing::null_parseme_ptr; }
+		inline auto name(parseme_ptr const& x) -> parseme_ptr const& { return x; }
+		inline auto parameter_list(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[0]; }
+		inline auto return_type(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[1]; }
+		inline auto body(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[2]; }
+		inline auto attributes(parseme_ptr const& x) -> parseme_ptr const& { return x->children().size() > 3 ? x->children()[3] : parsing::null_parseme_ptr; }
 	}
 
 	namespace parameter {
@@ -51,8 +51,8 @@ namespace aeon { namespace marshall {
 	namespace function_call {
 		using parsing::parseme_ptr;
 
-		inline auto pattern(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[0]; }
-		inline auto argument_list(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[1]; }
+		inline auto name(parseme_ptr const& x) -> parseme_ptr const& { return x; }
+		inline auto argument_list(parseme_ptr const& x) -> parseme_ptr const& { return x; }
 	}
 
 	namespace variable_declaration {

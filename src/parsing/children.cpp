@@ -72,15 +72,21 @@ auto children_t::push_back(parseme_ptr const& x) -> void
 {
 	ATMA_ASSERT(!x->parent());
 	elements_.push_back(x);
-	if (owner_)
+	if (owner_) {
 		x->set_parent(owner_->shared_from_this());
+	}
+	x->set_siblings(this);
 }
 
 auto children_t::replace(const_iterator const& i, parseme_ptr const& n) -> void
 {
-	parseme_ptr p = *i;
+	parseme_ptr const& p = *i;
 	p->set_parent(nullptr);
+	p->set_siblings(nullptr);
+
 	n->set_parent(owner_ ? owner_->shared_from_this() : parseme_ptr());
+	n->set_siblings(this);
+	
 	*unconst(i) = n;
 }
 
@@ -89,16 +95,15 @@ auto children_t::replace(parseme_ptr const& p, parseme_ptr const& n) -> void
 	auto i = std::find(elements_.begin(), elements_.end(), p);
 	ATMA_ASSERT(i != elements_.end());
 
-	p->set_parent(nullptr);
-	n->set_parent(owner_ ? owner_->shared_from_this() : parseme_ptr());
-	*unconst(i) = n;
+	replace(i, n);
 }
 
 auto children_t::detach(const_iterator const& i) -> parseme_ptr
 {
 	parseme_ptr p = *i;
-	elements_.erase( unconst(i) );
 	p->set_parent(nullptr);
+	p->set_siblings(nullptr);
+	elements_.erase(unconst(i));
 	return p;
 }
 
@@ -108,17 +113,22 @@ auto children_t::detach(parseme_ptr const& x) -> bool
 	if (i == elements_.end())
 		return false;
 
-	(*i)->set_parent(nullptr);
-	elements_.erase(i);
+	detach(i);
 	return true;
 }
 
 auto children_t::insert(iterator const& where_, iterator const& begin, iterator const& end) -> iterator
 {
 	auto ni = elements_.insert(where_, begin, end);
+	
+	for (auto i = begin; i != end; ++i, ++ni)
+		(*i)->set_siblings(this);
+
 	if (owner_)
-		for (auto i = begin; i != end; ++i, ++ni)
+		for (auto i = begin; i != end; ++i) {
 			(*i)->set_parent(owner_->shared_from_this());
+		}
+
 	return ni;
 }
 
@@ -130,6 +140,7 @@ auto children_t::unconst(const_iterator const& i) -> iterator
 auto children_t::pop_back() -> void
 {
 	elements_.back()->set_parent(nullptr);
+	elements_.back()->set_siblings(nullptr);
 	elements_.pop_back();
 }
 

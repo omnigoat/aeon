@@ -16,28 +16,21 @@ auto aeon::generation::function_name_mangle(parsing::parseme_ptr const& fn) -> a
 	atma::string result = "f";
 
 	// function name
-	auto pattern = marshall::function::pattern(fn);
-
-	if (pattern->children().size() == 1 && pattern->children().back()->text() == "main")
+	auto name = marshall::function::name(fn);
+	if (name->text() == "main")
 		return "main";
+	else if (name->text() == "+")
+		result += "$add";
+	else if (name->text() == "-")
+		result += "$sub";
+	else if (name->text() == "*")
+		result += "$mul";
+	else if (name->text() == "/")
+		result += "$div";
+	else
+		result += atma::to_string(name->text().bytes()) + name->text();
 
-	for (auto const& x : pattern->children())
-	{
-		if (x->id() == parsing::ID::placeholder)
-			result += "$";
-		else if (x->text() == "+")
-			result += "$add";
-		else if (x->text() == "-")
-			result += "$sub";
-		else if (x->text() == "*")
-			result += "$mul";
-		else if (x->text() == "/")
-			result += "$div";
-		else
-			result += atma::to_string(x->text().bytes()) + x->text();
-
-		result += "_";
-	}
+	result += "_";
 
 	// return-type
 	auto return_type = marshall::function::return_type(fn);
@@ -242,7 +235,7 @@ auto aeon::generation::expression(abstract_output_stream_t& stream, genesis_t& g
 	}
 }
 
-auto aeon::generation::llvm::storage_typename(genesis_t& genesis, parsing::parseme_ptr const& x) -> parsing::parseme_t::text_t
+auto aeon::generation::llvm::storage_typename(genesis_t& genesis, parsing::parseme_ptr const& x) -> atma::string
 {
 	auto type_definition = resolve::type_of(x);
 	ATMA_ASSERT(type_definition->id() == ID::type_definition);

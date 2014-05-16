@@ -7,7 +7,43 @@
 namespace aeon {
 namespace parsing {
 //=====================================================================
+
 	
+	template <typename OT, typename PR>
+	inline void copy_breadth_first_upwards_if(OT& out, children_t const& xs, PR& pred)
+	{
+		for (auto const* cxs = &xs; !!cxs; cxs = cxs->owner() ? cxs->owner()->siblings() : nullptr)
+			for (auto const& pc : *cxs)
+				if (pred(pc))
+					*out++ = pc;
+	}
+
+	template <typename PR>
+	inline void upwards_enclosing_copy_rawptr(parseme_ptr_refs_t& dest, children_t const* xs, PR& pred)
+	{
+		for (auto const* cxs = xs; !!cxs; cxs = cxs->owner() ? cxs->owner()->siblings() : nullptr)
+			for (auto const& pc : *cxs)
+				if (pred(pc))
+					dest.push_back(&pc);
+	}
+
+	template <typename F>
+	inline auto upwards_enclosing_find(children_t const* xs, F const& pred) -> parseme_ptr const&
+	{
+		for (auto const* cxs = xs; !!cxs; cxs = cxs->owner() ? cxs->owner()->siblings() : nullptr)
+			for (auto const& pc : *cxs)
+				if (pred(pc))
+					return pc;
+
+		return null_parseme_ptr;
+	}
+
+
+	//=====================================================================
+	//   -- END OF BEST ALGORITHMS --
+	//=====================================================================
+
+
 	template <typename OT, typename PR>
 	inline void copy_depth_first_if(OT& out, children_t const& xs, PR& pred)
 	{
@@ -34,6 +70,7 @@ namespace parsing {
 				if (pred(pc))
 					*out++ = pc;
 	}
+
 
 	template <typename FN>
 	inline void for_each_direct_upwards(parseme_ptr const& x, FN fn) {
@@ -184,5 +221,7 @@ namespace parsing {
 	private:
 		ID id_;
 	};
+
+	inline auto id_equals(ID id) -> id_equals_t { return id_equals_t(id); }
 
 } }

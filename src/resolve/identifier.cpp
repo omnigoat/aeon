@@ -10,11 +10,8 @@ namespace
 {
 	auto is_matching_function_pattern(parsing::parseme_ptr const& lhs, parsing::parseme_ptr const& rhs) -> bool
 	{
-		return lhs->children().size() == rhs->children().size() &&
-			std::equal(lhs->children().begin(), lhs->children().end(), rhs->children().begin(),
-				[](parsing::parseme_ptr const& lhs, parsing::parseme_ptr const& rhs) {
-					return lhs->id() == rhs->id() && (lhs->id() != parsing::ID::identifier || lhs->text() == rhs->text());
-				});
+		// this doesn't take into account types of parameters
+		return lhs->text() == rhs->text();
 	}
 }
 
@@ -25,6 +22,9 @@ auto aeon::resolve::identifier_to_definition(parsing::parseme_ptr const& x) -> p
 	parsing::copy_direct_upwards_if(
 		std::back_inserter(locations), x->parent(),
 		[](parsing::parseme_ptr const& y) { return y->id() == id::function; });
+
+	parsing::copy_breadth_first_upwards_if(
+		std::back_inserter(locations), *x->siblings(), parsing::id_equals_t(id::function));
 
 	// loop through until we find one
 	for (auto const& y : locations) {
@@ -43,9 +43,9 @@ auto aeon::resolve::function_from_function_call(parsing::parseme_ptr const& x) -
 {
 	ATMA_ASSERT(x->id() == parsing::ID::function_call);
 
-	return parsing::upwards_enclosing_find(x, [&x](parsing::parseme_ptr const& f) {
+	return parsing::upwards_enclosing_find(x->siblings(), [&x](parsing::parseme_ptr const& f) {
 		return f->id() == id::function
-			&& is_matching_function_pattern(marshall::function::pattern(f), marshall::function_call::pattern(x));
+			&& is_matching_function_pattern(marshall::function::name(f), marshall::function_call::name(x));
 	});
 }
 

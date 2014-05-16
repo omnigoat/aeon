@@ -170,7 +170,7 @@ namespace
 		return_statements.front()->children().pop_back();
 		call_parent->children().replace(call, p);
 
-		std::cout << marshall::function::pattern(fn)->text() << ": inlined " << scope->children() << std::endl;
+		std::cout << marshall::function::name(fn)->text() << ": inlined " << scope->children() << std::endl;
 	}
 }
 
