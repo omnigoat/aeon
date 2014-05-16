@@ -46,19 +46,20 @@ namespace xpi {
 
 		struct make_expr_t : abstract_expr_t
 		{
-			make_expr_t(parseme_t::id_t id, lexing::lexeme_t const* lexeme)
-				: id_(id), lexeme_(lexeme)
+			make_expr_t(parseme_t::id_t id, lexing::lexeme_t const* lexeme, lexing::lexeme_t const* L2)
+				: id_(id), lexeme_(lexeme), lexeme2_(L2)
 			{
 			}
 
 			auto operator ()(parsemes_t& dest) -> bool {
-				dest.push_back(parseme_t::make(id_, lexeme_));
+				dest.push_back(parseme_t::make(id_, lexeme_, lexeme2_));
 				return true;
 			}
 
 		private:
 			parseme_t::id_t id_;
 			lexing::lexeme_t const* lexeme_;
+			lexing::lexeme_t const* lexeme2_;
 		};
 
 		struct dive_expr_t : abstract_expr_t
@@ -147,11 +148,15 @@ namespace xpi {
 	}
 
 	inline auto make(parseme_t::id_t id, lexing::lexeme_t const* L) -> detail::expr_t {
-		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, L)));
+		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, L, nullptr)));
+	}
+
+	inline auto make(parseme_t::id_t id, lexing::lexeme_t const* L, lexing::lexeme_t const* L2) -> detail::expr_t {
+		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, L, L2)));
 	}
 
 	inline auto make(parseme_t::id_t id) -> detail::expr_t {
-		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, nullptr)));
+		return detail::expr_t(detail::abstract_expr_ptr(new detail::make_expr_t(id, nullptr, nullptr)));
 	}
 	
 	template <typename IT>

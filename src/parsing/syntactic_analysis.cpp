@@ -243,11 +243,11 @@ auto syntactic_analysis_t::parse_expr_logical(children_t& xs) -> bool
 
 	for (;;)
 	{
-		auto op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "==", 2);
-		if (!op_fn)
-			op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "!=", 2);
+		auto op = lxa_mk_if(psid::function_call, lxid::punctuation, "==", 2);
+		if (!op)
+			op = lxa_mk_if(psid::function_call, lxid::punctuation, "!=", 2);
 
-		if (!op_fn)
+		if (!op)
 			return true;
 
 		if (!parse_expr_additive(xs)) {
@@ -262,9 +262,13 @@ auto syntactic_analysis_t::parse_expr_logical(children_t& xs) -> bool
 
 		// just a function-call
 		xpi::insert_into(xs,
-			xpi::insert(op_fn) [
-				xpi::insert(lhs),
-				xpi::insert(rhs)
+			xpi::make(psid::function_call, lhs->lexeme(), rhs->lexeme()) [
+				xpi::make(psid::identifier, op->lexeme()),
+
+				xpi::make(psid::argument_list) [
+					xpi::insert(lhs),
+					xpi::insert(rhs)	
+				]
 			]);
 	}
 
@@ -298,9 +302,13 @@ auto syntactic_analysis_t::parse_expr_additive(children_t& xs) -> bool
 
 		// just a function-call
 		xpi::insert_into(xs,
-			xpi::insert(op) [
-				xpi::insert(lhs),
-				xpi::insert(rhs)
+			xpi::make(psid::function_call, lhs->lexeme(), rhs->lexeme()) [
+				xpi::make(psid::identifier, op->lexeme()),
+
+				xpi::make(psid::argument_list) [
+					xpi::insert(lhs),
+					xpi::insert(rhs)	
+				]
 			]);
 	}
 
@@ -314,11 +322,11 @@ auto syntactic_analysis_t::parse_expr_multiplicative(children_t& xs) -> bool
 
 	for (;;)
 	{
-		auto op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "*", 1);
-		if (!op_fn)
-			op_fn = lxa_mk_if(psid::function_call, lxid::punctuation, "/", 1);
+		auto op = lxa_mk_if(psid::function_call, lxid::punctuation, "*", 1);
+		if (!op)
+			op = lxa_mk_if(psid::function_call, lxid::punctuation, "/", 1);
 
-		if (!op_fn)
+		if (!op)
 			return true;
 
 		if (!parse_expr_function_call(xs)) {
@@ -333,9 +341,13 @@ auto syntactic_analysis_t::parse_expr_multiplicative(children_t& xs) -> bool
 
 		// just a function-call
 		xpi::insert_into(xs,
-			xpi::insert(op_fn) [
-				xpi::insert(lhs),
-				xpi::insert(rhs)
+			xpi::make(psid::function_call, lhs->lexeme(), rhs->lexeme()) [
+				xpi::make(psid::identifier, op->lexeme()),
+
+				xpi::make(psid::argument_list) [
+					xpi::insert(lhs),
+					xpi::insert(rhs)	
+				]
 			]);
 	}
 
@@ -357,16 +369,24 @@ auto syntactic_analysis_t::parse_expr_function_call(children_t& xs) -> bool
 	// bam, function call
 	if (lxa_skip(lxid::punctuation, "(", 1))
 	{
-		auto fncall = parseme_t::make(psid::function_call, iden->lexeme());
+		//
+		auto alist = parseme_t::make(psid::argument_list);
+		//fncall->children().push_back(alist);
 
 		for (;;)
 		{
-			if (!parse_expr(fncall->children()))
+			if (!parse_expr(alist->children()))
 				break;
 			lxa_skip(lxid::punctuation, ",", 1);
 		}
 
-		lxa_skip(lxid::punctuation, ")", 1);
+		//lxa_skip(lxid::punctuation, ")", 1);
+		auto terminal = lxa_mk_if(psid::identifier, lxid::punctuation, ")", 1);
+
+		auto fncall = parseme_t::make(psid::function_call, iden->lexeme(), terminal->lexeme());
+		fncall->children().push_back(iden);
+		fncall->children().push_back(alist);
+
 		xs.push_back(fncall);
 	}
 	else

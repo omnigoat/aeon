@@ -51,8 +51,8 @@ namespace aeon { namespace marshall {
 	namespace function_call {
 		using parsing::parseme_ptr;
 
-		inline auto name(parseme_ptr const& x) -> parseme_ptr const& { return x; }
-		inline auto argument_list(parseme_ptr const& x) -> parseme_ptr const& { return x; }
+		inline auto name(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[0]; }
+		inline auto argument_list(parseme_ptr const& x) -> parseme_ptr const& { return x->children()[1]; }
 	}
 
 	namespace variable_declaration {

@@ -71,6 +71,11 @@ auto parseme_t::lexeme() const -> lexing::lexeme_t const*
 	return lexeme_;
 }
 
+auto parseme_t::lexeme2() const -> lexing::lexeme_t const*
+{
+	return lexeme2_;
+}
+
 auto parseme_t::siblings() const -> children_t const*
 {
 	return siblings_;
@@ -143,10 +148,23 @@ namespace
 	}
 }
 
-std::ostream& aeon::parsing::operator << (std::ostream& stream, parseme_t const& x) {
+std::ostream& aeon::parsing::operator << (std::ostream& stream, parseme_t const& x)
+{
 	stream << atma::console::fg_dark_green << strid(x.id()) << atma::console::reset << ": ";
-	if (!x.text().empty())
-		stream << atma::console::fg_yellow << "\"" << x.text() << "\"" << atma::console::reset << " [" << x.position().row << ":" << x.position().column << "]";
+
+	if (!x.lexeme2() && !x.text().empty())
+		stream << atma::console::fg_yellow << "\"" << x.text() << "\"" << atma::console::reset << " ";
+
+	auto valid_lexeme = x.lexeme() && x.lexeme()->position() != lexing::position_t::zero;
+	if (valid_lexeme)
+		stream << "[" << x.position().row << ":" << x.position().column;
+
+	if (x.lexeme2())
+		stream << " ~> " << x.lexeme2()->position().row << ":" << x.lexeme2()->position().column;
+
+	if (valid_lexeme)
+		stream << "]";
+
 	return stream;
 }
 

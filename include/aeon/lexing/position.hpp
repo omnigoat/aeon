@@ -24,4 +24,9 @@ namespace aeon { namespace lexing {
 		uint row, column, total;
 	};
 
+	inline auto operator != (position_t const& lhs, position_t const& rhs) -> bool
+	{
+		return lhs.row != rhs.row || lhs.column != rhs.column || lhs.total != rhs.total;
+	}
+
 } }
