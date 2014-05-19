@@ -5,6 +5,27 @@
 
 namespace aeon { namespace parsing {
 
+	struct error_t
+	{
+		struct message_t
+		{
+			atma::string msg;
+			lexing::lexeme_t const* begin;
+			lexing::lexeme_t const* end;
+		};
+
+		// range of lexemes spanning the problem. this is used
+		// to reconstruct the line of source text
+		lexing::lexeme_t const* begin;
+		lexing::lexeme_t const* end;
+
+		// messages which may highlight various parts of the line
+		std::vector<message_t> messages;
+	};
+
+
+
+
 	struct syntactic_analysis_t
 	{
 		syntactic_analysis_t(lexing::lexical_analysis_t&);
@@ -38,11 +59,16 @@ namespace aeon { namespace parsing {
 		auto generate_void_type() -> bool;
 		auto generate_bool_type() -> bool;
 
+		// error handling
+		auto error_unexpected(lexing::lexeme_t const*) -> void;
+
 	private:
 		lexing::lexical_analysis_t& lxa_;
 		lexing::lexemes_t::const_iterator lxa_iter_;
 
 		children_t parsemes_;
+
+		std::vector<error_t> errors_;
 	};
 
 } }

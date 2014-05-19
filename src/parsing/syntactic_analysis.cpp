@@ -544,3 +544,8 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 
 	return true;
 }
+
+auto syntactic_analysis_t::error_unexpected(lexing::lexeme_t const* L)
+{
+	auto err = error_t{L, nullptr, {"unexpected", L, nullptr}};
+}
