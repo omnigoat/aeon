@@ -4,15 +4,23 @@
 #include <aeon/parsing/parseme.hpp>
 
 namespace aeon { namespace parsing {
+	
+	struct syntactic_analysis_t;
 
 	struct error_t
 	{
+		error_t(syntactic_analysis_t const* sa, lexing::lexeme_t const* begin, lexing::lexeme_t const* end)
+		: analysis_(sa), begin(begin), end(end)
+		{}
+
 		struct message_t
 		{
 			atma::string msg;
 			lexing::lexeme_t const* begin;
 			lexing::lexeme_t const* end;
 		};
+
+		syntactic_analysis_t const* analysis_;
 
 		// range of lexemes spanning the problem. this is used
 		// to reconstruct the line of source text
@@ -23,14 +31,17 @@ namespace aeon { namespace parsing {
 		std::vector<message_t> messages;
 	};
 
-
+	auto operator << (std::ostream&, error_t const&) -> std::ostream&;
 
 
 	struct syntactic_analysis_t
 	{
+		typedef std::vector<error_t> errors_t;
+		
 		syntactic_analysis_t(lexing::lexical_analysis_t&);
 
 		auto parsemes() -> children_t&;
+		auto errors() const -> errors_t const&;
 
 	private:
 		// incoming lexical analysis

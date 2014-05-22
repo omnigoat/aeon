@@ -11,6 +11,7 @@
 //=====================================================================
 namespace aeon { namespace parsing {
 
+#if 0
 	struct error_t
 	{
 		error_t(atma::string const& f, lexing::position_t const& p, atma::string const& m)
@@ -44,6 +45,8 @@ namespace aeon { namespace parsing {
 	};
 
 	auto operator << (std::ostream&, errors_t const&) -> std::ostream&;
+#endif
+	typedef std::vector<int> errors_t;
 
 	namespace detail
 	{

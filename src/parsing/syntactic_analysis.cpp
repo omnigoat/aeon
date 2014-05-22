@@ -13,6 +13,20 @@ typedef parsing::ID psid;
 typedef lexing::ID lxid;
 
 
+auto aeon::parsing::operator << (std::ostream& stream, error_t const& error) -> std::ostream&
+{
+	// get line from analysis
+	stream << "<filename>" << error.begin->position().row << ": " << std::endl;
+	
+	for (auto const& m : error.messages)
+		stream << '\t' << m.msg << std::endl;
+
+	return stream;
+}
+
+
+
+
 syntactic_analysis_t::syntactic_analysis_t(lexical_analysis_t& lexical_analysis)
 	: lxa_(lexical_analysis), lxa_iter_(lexical_analysis.lexemes().begin(lexing::basic))
 {
@@ -23,6 +37,11 @@ syntactic_analysis_t::syntactic_analysis_t(lexical_analysis_t& lexical_analysis)
 auto syntactic_analysis_t::parsemes() -> parsing::children_t&
 {
 	return parsemes_;
+}
+
+auto syntactic_analysis_t::errors() const -> errors_t const&
+{
+	return errors_;
 }
 
 auto syntactic_analysis_t::lxa_peek() -> lexing::lexeme_t const*
@@ -545,7 +564,8 @@ auto syntactic_analysis_t::generate_int_type(uint bitsize) -> bool
 	return true;
 }
 
-auto syntactic_analysis_t::error_unexpected(lexing::lexeme_t const* L)
+auto syntactic_analysis_t::error_unexpected(lexing::lexeme_t const* L) -> void
 {
-	auto err = error_t{L, nullptr, {"unexpected", L, nullptr}};
+	auto err = error_t{this, L, nullptr};
+	err.messages.push_back({"unexpected", L, nullptr});
 }
